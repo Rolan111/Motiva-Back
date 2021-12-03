@@ -1,7 +1,7 @@
 package co.edu.ucc.motivaback.service;
 
-import co.edu.ucc.motivaback.dto.UserDto;
-import co.edu.ucc.motivaback.payload.UserForm;
+import co.edu.ucc.motivaback.dto.LoginDto;
+import co.edu.ucc.motivaback.payload.LoginForm;
 
 import java.util.List;
 
@@ -11,13 +11,13 @@ import java.util.List;
  * @class UserService
  */
 public interface UserService {
-    List<UserDto> findAll();
+    List<LoginDto> findAll();
 
-    UserDto create(UserForm userForm);
+    LoginDto create(LoginForm loginForm);
 
-    UserDto update(UserForm userForm);
+    LoginDto update(LoginForm loginForm);
 
     boolean delete(String id);
 
-    UserDto findById(String id);
+    LoginDto findById(String id);
 }

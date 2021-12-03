@@ -1,7 +1,7 @@
 package co.edu.ucc.motivaback.controller;
 
-import co.edu.ucc.motivaback.dto.UserDto;
-import co.edu.ucc.motivaback.payload.UserForm;
+import co.edu.ucc.motivaback.dto.LoginDto;
+import co.edu.ucc.motivaback.payload.LoginForm;
 import co.edu.ucc.motivaback.service.UserService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
 import org.springframework.http.HttpStatus;
@@ -28,9 +28,9 @@ public class UserController {
     }
 
     @GetMapping(value = "/users")
-    public ResponseEntity<GeneralBodyResponse<List<UserDto>>> getAll() {
+    public ResponseEntity<GeneralBodyResponse<List<LoginDto>>> getAll() {
         try {
-            List<UserDto> postDTOS = this.userService.findAll();
+            List<LoginDto> postDTOS = this.userService.findAll();
 
             if (!postDTOS.isEmpty())
                 return new ResponseEntity<>(new GeneralBodyResponse<>(postDTOS, "list users", null), HttpStatus.OK);
@@ -43,12 +43,12 @@ public class UserController {
     }
 
     @PostMapping(value = "/user")
-    public ResponseEntity<GeneralBodyResponse<UserDto>> create(@RequestBody UserForm userForm) {
+    public ResponseEntity<GeneralBodyResponse<LoginDto>> create(@RequestBody LoginForm loginForm) {
         try {
-            UserDto userDto = this.userService.create(userForm);
+            LoginDto loginDto = this.userService.create(loginForm);
 
-            if (userDto != null)
-                return new ResponseEntity<>(new GeneralBodyResponse<>(userDto, "created", null), HttpStatus.OK);
+            if (loginDto != null)
+                return new ResponseEntity<>(new GeneralBodyResponse<>(loginDto, "created", null), HttpStatus.OK);
             else
                 return new ResponseEntity<>(new GeneralBodyResponse<>(null, "not created", null), HttpStatus.BAD_REQUEST);
 
@@ -58,11 +58,11 @@ public class UserController {
     }
 
     @PutMapping("/user")
-    public ResponseEntity<GeneralBodyResponse<UserDto>> update(@Valid @RequestBody UserForm userForm) {
+    public ResponseEntity<GeneralBodyResponse<LoginDto>> update(@Valid @RequestBody LoginForm loginForm) {
         try {
-            UserDto userDto = this.userService.update(userForm);
+            LoginDto loginDto = this.userService.update(loginForm);
 
-            return new ResponseEntity<>(new GeneralBodyResponse<>(userDto, "update", null), HttpStatus.OK);
+            return new ResponseEntity<>(new GeneralBodyResponse<>(loginDto, "update", null), HttpStatus.OK);
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
@@ -82,11 +82,11 @@ public class UserController {
     }
 
     @GetMapping("user/{id}")
-    public ResponseEntity<GeneralBodyResponse<UserDto>> findById(@PathVariable String id) {
+    public ResponseEntity<GeneralBodyResponse<LoginDto>> findById(@PathVariable String id) {
         try {
-            UserDto userDto = this.userService.findById(id);
+            LoginDto loginDto = this.userService.findById(id);
 
-            return new ResponseEntity<>(new GeneralBodyResponse<>(userDto, "find user", null), HttpStatus.OK);
+            return new ResponseEntity<>(new GeneralBodyResponse<>(loginDto, "find user", null), HttpStatus.OK);
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }

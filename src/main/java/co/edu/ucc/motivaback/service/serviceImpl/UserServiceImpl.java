@@ -1,7 +1,7 @@
 package co.edu.ucc.motivaback.service.serviceImpl;
 
-import co.edu.ucc.motivaback.dto.UserDto;
-import co.edu.ucc.motivaback.payload.UserForm;
+import co.edu.ucc.motivaback.dto.LoginDto;
+import co.edu.ucc.motivaback.payload.LoginForm;
 import co.edu.ucc.motivaback.service.FirebaseInitializer;
 import co.edu.ucc.motivaback.service.UserService;
 import com.google.api.core.ApiFuture;
@@ -34,16 +34,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAll() {
-        List<UserDto> response = new ArrayList<>();
-        UserDto userDto;
+    public List<LoginDto> findAll() {
+        List<LoginDto> response = new ArrayList<>();
+        LoginDto loginDto;
 
         ApiFuture<QuerySnapshot> querySnapshotApiFuture = getCollection().get();
         try {
             for (DocumentSnapshot doc : querySnapshotApiFuture.get().getDocuments()) {
-                userDto = doc.toObject(UserDto.class);
-                userDto.setUserId(doc.getId());
-                response.add(userDto);
+                loginDto = doc.toObject(LoginDto.class);
+                loginDto.setUserId(doc.getId());
+                response.add(loginDto);
             }
             return response;
         } catch (Exception e) {
@@ -52,14 +52,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto create(UserForm userForm) {
-        Map<String, Object> docData = getDocData(userForm);
+    public LoginDto create(LoginForm loginForm) {
+        Map<String, Object> docData = getDocData(loginForm);
 
         ApiFuture<WriteResult> writeResultApiFuture = getCollection().document().create(docData);
 
         try {
             if (writeResultApiFuture.get() != null) {
-                return modelMapper.map(userForm, UserDto.class);
+                return modelMapper.map(loginForm, LoginDto.class);
             }
             return null;
         } catch (Exception e) {
@@ -68,12 +68,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(UserForm userForm) {
-        Map<String, Object> docData = getDocData(userForm);
-        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(userForm.getUserId()).set(docData);
+    public LoginDto update(LoginForm loginForm) {
+        Map<String, Object> docData = getDocData(loginForm);
+        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(loginForm.getUserId()).set(docData);
         try {
             if (writeResultApiFuture.get() != null) {
-                return modelMapper.map(userForm, UserDto.class);
+                return modelMapper.map(loginForm, LoginDto.class);
             }
             return null;
         } catch (Exception e) {
@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto findById(String id) {
+    public LoginDto findById(String id) {
         return null;
     }
 
@@ -103,10 +103,10 @@ public class UserServiceImpl implements UserService {
         return firebase.getFirestore().collection("user");
     }
 
-    private Map<String, Object> getDocData(UserForm userForm) {
+    private Map<String, Object> getDocData(LoginForm loginForm) {
         Map<String, Object> docData = new HashMap<>();
-        docData.put("username", userForm.getUsername());
-        docData.put("password", userForm.getPassword());
+        docData.put("username", loginForm.getUsername());
+        docData.put("password", loginForm.getPassword());
         return docData;
     }
 }

@@ -1,11 +1,12 @@
-package co.edu.ucc.motivaback.payload;
+package co.edu.ucc.motivaback.dto;
 
 /**
  * @author nagredo
  * @project motiva-back
- * @class UserForm
+ * @class LoginDto
  */
-public class UserForm {
+
+public class LoginDto {
     private String userId;
     private String username;
     private String password;
