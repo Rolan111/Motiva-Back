@@ -1,5 +1,7 @@
 package co.edu.ucc.motivaback.config.security;
 
+import co.edu.ucc.motivaback.config.security.filter.AuthenticationFilter;
+import co.edu.ucc.motivaback.config.security.filter.AuthorizationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -42,8 +44,8 @@ public class ApiSecurityConf extends WebSecurityConfigurerAdapter implements Web
                 .authorizeRequests()
                 .anyRequest().authenticated()
                 .and()
-//                .addFilter(new AuthenticationFilter(authenticationManager(), this.keyPairComponent.getKeysPair(), "/auth"))
-//                .addFilter(new AuthorizationFilter(authenticationManager(), this.keyPairComponent.getKeysPair()))
+                .addFilter(new AuthenticationFilter(authenticationManager(), this.keyPairComponent.getKeysPair(), "/auth"))
+                .addFilter(new AuthorizationFilter(authenticationManager(), this.keyPairComponent.getKeysPair()))
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 }

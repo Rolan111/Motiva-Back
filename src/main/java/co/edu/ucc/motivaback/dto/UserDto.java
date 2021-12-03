@@ -8,9 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
-public class UserDto implements UserDetails {
-
-    private String id;
+public class UserDto extends AbstractDto implements UserDetails {
 
     private UserRolEnum userRolEnum;
 
@@ -56,14 +54,6 @@ public class UserDto implements UserDetails {
     @Override
     public String getUsername() {
         return getEmail();
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public UserRolEnum getUserRolEnum() {
