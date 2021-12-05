@@ -39,6 +39,7 @@ public class SeederControl {
 
     protected void userSeed() {
         UserDto userDto = new UserDto();
+        userDto.setId("IBDqhq83fp3f9CIyGWRx");
         userDto.setEmail("a@b.com");
         userDto.setFullName("Test test");
         userDto.setIdentification("5");

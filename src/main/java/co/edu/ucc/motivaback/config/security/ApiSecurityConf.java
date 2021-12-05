@@ -9,11 +9,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-//@EnableTransactionManagement
-public class ApiSecurityConf extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
+public class ApiSecurityConf extends WebSecurityConfigurerAdapter {
     private final KeyPairComponent keyPairComponent;
 
     @Bean
@@ -25,7 +23,6 @@ public class ApiSecurityConf extends WebSecurityConfigurerAdapter implements Web
         this.keyPairComponent = keyPairComponent;
     }
 
-    @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOriginPatterns("*")
