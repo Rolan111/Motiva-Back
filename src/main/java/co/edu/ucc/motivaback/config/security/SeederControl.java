@@ -55,8 +55,8 @@ public class SeederControl {
 
         Map<String, Object> docData = getDocData(userDto);
 
-        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document().create(docData);
-        System.out.println(writeResultApiFuture);
+        //ApiFuture<WriteResult> writeResultApiFuture = getCollection().document().create(docData);
+        //System.out.println(writeResultApiFuture);
     }
 
     private CollectionReference getCollection() {
