@@ -26,7 +26,7 @@ public class FirebaseInitializer {
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://ctei-ucc-default-rtdb.firebaseio.com")
+                .setDatabaseUrl("https://motiva-db-default-rtdb.firebaseio.com")
                 .build();
 
         if (FirebaseApp.getApps().isEmpty()) {
