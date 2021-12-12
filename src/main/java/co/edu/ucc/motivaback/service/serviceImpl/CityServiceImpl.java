@@ -1,9 +1,8 @@
 package co.edu.ucc.motivaback.service.serviceImpl;
 
-import co.edu.ucc.motivaback.dto.LoginDto;
-import co.edu.ucc.motivaback.payload.LoginForm;
-import co.edu.ucc.motivaback.service.FirebaseInitializer;
-import co.edu.ucc.motivaback.service.UserService;
+import co.edu.ucc.motivaback.dto.CityDto;
+import co.edu.ucc.motivaback.payload.CityForm;
+import co.edu.ucc.motivaback.service.CityService;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -20,30 +19,30 @@ import java.util.Map;
 /**
  * @author nagredo
  * @project motiva-back
- * @class UserServiceImpl
+ * @class CityServiceImpl
  */
 @Service
-public class UserServiceImpl implements UserService {
+public class CityServiceImpl implements CityService {
 
     private final FirebaseInitializer firebase;
     private final ModelMapper modelMapper;
 
-    public UserServiceImpl(FirebaseInitializer firebase, ModelMapper modelMapper) {
+    public CityServiceImpl(FirebaseInitializer firebase, ModelMapper modelMapper) {
         this.firebase = firebase;
         this.modelMapper = modelMapper;
     }
 
     @Override
-    public List<LoginDto> findAll() {
-        List<LoginDto> response = new ArrayList<>();
-        LoginDto loginDto;
+    public List<CityDto> findAll() {
+        List<CityDto> response = new ArrayList<>();
+        CityDto cityDto;
 
         ApiFuture<QuerySnapshot> querySnapshotApiFuture = getCollection().get();
         try {
             for (DocumentSnapshot doc : querySnapshotApiFuture.get().getDocuments()) {
-                loginDto = doc.toObject(LoginDto.class);
-                loginDto.setUserId(doc.getId());
-                response.add(loginDto);
+                cityDto = doc.toObject(CityDto.class);
+                cityDto.setDocumentCityId(doc.getId());
+                response.add(cityDto);
             }
             return response;
         } catch (Exception e) {
@@ -52,14 +51,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LoginDto create(LoginForm loginForm) {
-        Map<String, Object> docData = getDocData(loginForm);
+    public CityDto create(CityForm cityForm) {
+        Map<String, Object> docData = getDocData(cityForm);
 
         ApiFuture<WriteResult> writeResultApiFuture = getCollection().document().create(docData);
 
         try {
             if (writeResultApiFuture.get() != null) {
-                return modelMapper.map(loginForm, LoginDto.class);
+                return modelMapper.map(cityForm, CityDto.class);
             }
             return null;
         } catch (Exception e) {
@@ -68,12 +67,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LoginDto update(LoginForm loginForm) {
-        Map<String, Object> docData = getDocData(loginForm);
-        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(loginForm.getUserId()).set(docData);
+    public CityDto update(CityForm cityForm) {
+        Map<String, Object> docData = getDocData(cityForm);
+        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(cityForm.getDocumentCityId()).set(docData);
         try {
             if (writeResultApiFuture.get() != null) {
-                return modelMapper.map(loginForm, LoginDto.class);
+                return modelMapper.map(cityForm, CityDto.class);
             }
             return null;
         } catch (Exception e) {
@@ -95,18 +94,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LoginDto findById(String id) {
+    public CityDto findById(String id) {
         return null;
     }
 
     private CollectionReference getCollection() {
-        return firebase.getFirestore().collection("user");
+        return firebase.getFirestore().collection("city");
     }
 
-    private Map<String, Object> getDocData(LoginForm loginForm) {
+    private Map<String, Object> getDocData(CityForm cityForm) {
         Map<String, Object> docData = new HashMap<>();
-        docData.put("username", loginForm.getUsername());
-        docData.put("password", loginForm.getPassword());
+        docData.put("name", cityForm.getName());
+        docData.put("count", cityForm.getCount());
         return docData;
     }
 }

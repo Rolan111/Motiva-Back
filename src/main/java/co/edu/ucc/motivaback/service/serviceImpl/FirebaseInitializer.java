@@ -1,4 +1,4 @@
-package co.edu.ucc.motivaback.service;
+package co.edu.ucc.motivaback.service.serviceImpl;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;

@@ -1,4 +1,4 @@
-package co.edu.ucc.motivaback.service;
+package co.edu.ucc.motivaback.service.serviceImpl;
 
 import co.edu.ucc.motivaback.dto.UserDto;
 import com.google.cloud.firestore.DocumentReference;

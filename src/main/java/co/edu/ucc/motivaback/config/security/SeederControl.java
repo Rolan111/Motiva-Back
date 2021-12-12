@@ -3,10 +3,8 @@ package co.edu.ucc.motivaback.config.security;
 import co.edu.ucc.motivaback.dto.UserDto;
 import co.edu.ucc.motivaback.enums.RegisterStatusEnum;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
-import co.edu.ucc.motivaback.service.FirebaseInitializer;
-import com.google.api.core.ApiFuture;
+import co.edu.ucc.motivaback.service.serviceImpl.FirebaseInitializer;
 import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.WriteResult;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,10 +37,9 @@ public class SeederControl {
 
     protected void userSeed() {
         UserDto userDto = new UserDto();
-        userDto.setId("IBDqhq83fp3f9CIyGWRx");
         userDto.setEmail("a@b.com");
         userDto.setFullName("Test test");
-        userDto.setIdentification("5");
+        userDto.setIdentification("123456789");
         userDto.setUserRolEnum(UserRolEnum.ADMIN);
         System.out.println("***************************************************");
         String encode = bCryptPasswordEncoder.encode("pruebas");
