@@ -19,7 +19,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:4200")
 public class CityController {
     private final CityService cityService;
 
@@ -45,7 +44,7 @@ public class CityController {
     @PostMapping(value = "/city")
     public ResponseEntity<GeneralBodyResponse<CityDto>> create(@RequestBody CityForm cityForm) {
         try {
-            CityDto cityDto = this.cityService.create(cityForm);
+            var cityDto = this.cityService.create(cityForm);
 
             if (cityDto != null)
                 return new ResponseEntity<>(new GeneralBodyResponse<>(cityDto, "created", null), HttpStatus.OK);
@@ -60,7 +59,7 @@ public class CityController {
     @PutMapping("/city")
     public ResponseEntity<GeneralBodyResponse<CityDto>> update(@Valid @RequestBody CityForm cityForm) {
         try {
-            CityDto cityDto = this.cityService.update(cityForm);
+            var cityDto = this.cityService.update(cityForm);
 
             return new ResponseEntity<>(new GeneralBodyResponse<>(cityDto, "update", null), HttpStatus.OK);
         } catch (Exception ex) {
@@ -84,7 +83,7 @@ public class CityController {
     @GetMapping("city/{id}")
     public ResponseEntity<GeneralBodyResponse<CityDto>> findById(@PathVariable String id) {
         try {
-            CityDto cityDto = this.cityService.findById(id);
+            var cityDto = this.cityService.findById(id);
 
             return new ResponseEntity<>(new GeneralBodyResponse<>(cityDto, "find city", null), HttpStatus.OK);
         } catch (Exception ex) {

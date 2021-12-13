@@ -58,10 +58,11 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         Collection<GrantedAuthority> authorities = new LinkedList<>();
         Long userId = decodedJWT.getBody().get("uid", Long.class);
         String username = decodedJWT.getBody().get("username", String.class);
+        String rol = decodedJWT.getBody().get("rol", String.class);
 
         if (userId != null) {
             return new UsernamePasswordAuthenticationToken(
-                    new AuthenticatedUser(userId, username),
+                    new AuthenticatedUser(userId, username, rol),
                     null,
                     authorities);
         } else {

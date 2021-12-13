@@ -10,11 +10,11 @@ import java.util.Collections;
 
 public class UserDto extends AbstractDto implements UserDetails {
 
-    private UserRolEnum userRolEnum;
+    private UserRolEnum userRol;
 
     private String password;
 
-    private String fullName;
+    private String fullname;
 
     private String email;
 
@@ -22,9 +22,11 @@ public class UserDto extends AbstractDto implements UserDetails {
 
     private String phone;
 
+    private Long idUser;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(userRolEnum.name()));
+        return Collections.singleton(new SimpleGrantedAuthority(userRol.name()));
     }
 
     public String getEmail() {
@@ -56,12 +58,12 @@ public class UserDto extends AbstractDto implements UserDetails {
         return getEmail();
     }
 
-    public UserRolEnum getUserRolEnum() {
-        return userRolEnum;
+    public UserRolEnum getUserRol() {
+        return userRol;
     }
 
-    public void setUserRolEnum(UserRolEnum userRolEnum) {
-        this.userRolEnum = userRolEnum;
+    public void setUserRol(UserRolEnum userRol) {
+        this.userRol = userRol;
     }
 
     public String getPassword() {
@@ -72,12 +74,12 @@ public class UserDto extends AbstractDto implements UserDetails {
         this.password = password;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getFullname() {
+        return fullname;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
 
     public void setEmail(String email) {
@@ -98,5 +100,13 @@ public class UserDto extends AbstractDto implements UserDetails {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public Long getIdUser() {
+        return idUser;
+    }
+
+    public void setIdUser(Long idUser) {
+        this.idUser = idUser;
     }
 }

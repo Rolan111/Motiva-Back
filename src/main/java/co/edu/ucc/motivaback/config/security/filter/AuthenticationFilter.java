@@ -25,10 +25,8 @@ import java.util.Date;
 import java.util.UUID;
 
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private AuthenticationManager authenticationManager;
-    private KeyPair keyPair;
-    private LoginForm loginForm;
-    private Authentication authentication;
+    private final AuthenticationManager authenticationManager;
+    private final KeyPair keyPair;
 
     public AuthenticationFilter(
             AuthenticationManager authenticationManager,
@@ -43,15 +41,15 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) {
         try {
-            loginForm = new ObjectMapper()
+            var loginForm = new ObjectMapper()
                     .readValue(req.getInputStream(), LoginForm.class);
-            UsernamePasswordAuthenticationToken passwordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+            var passwordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                     loginForm.getUsername(),
                     loginForm.getPassword(),
                     new ArrayList<>());
             return authenticationManager.authenticate(passwordAuthenticationToken);
         } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new BadCredentialsException(e.getMessage(), e);
         } catch (AuthenticationException aue) {
             logger.error(aue.getMessage());
             throw new BadCredentialsException(aue.getMessage(), aue);
@@ -69,24 +67,24 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) {
         try {
-            authentication = auth;
-            UserDto userDto = (UserDto) authentication.getPrincipal();
-            Date expiration = new Date(System.currentTimeMillis() + 3600000);//todo determine value
-            String token = Jwts.builder()
+            var userDto = (UserDto) auth.getPrincipal();
+            var expiration = new Date(System.currentTimeMillis() + 3600000);
+            var subject = UUID.randomUUID().toString();
+            var token = Jwts.builder()
                     .setIssuer("key_maker")
-                    .setSubject(UUID.randomUUID().toString())
+                    .setSubject(subject)
                     .setIssuedAt(new Date())
                     .setExpiration(expiration)
                     .setAudience(req.getRemoteAddr())
-                    .setId(UUID.randomUUID().toString())
-                    .claim("uid", userDto.getId())
+                    .setId(subject)
+                    .claim("uid", userDto.getIdUser())
                     .claim("username", userDto.getEmail())
-                    .claim("fullname", userDto.getFullName())
-                    .claim("rol", userDto.getUserRolEnum().name())
+                    .claim("fullname", userDto.getFullname())
+                    .claim("rol", userDto.getUserRol().name())
                     .signWith(this.keyPair.getPrivate(), SignatureAlgorithm.RS256)
                     .compact();
-            GeneratedAccessToken generatedAccessToken = new GeneratedAccessToken(token, TokenTypeEnum.BEARER, expiration,
-                    userDto.getUsername(), userDto.getFullName(), userDto.getUserRolEnum().name());
+            var generatedAccessToken = new GeneratedAccessToken(token, TokenTypeEnum.BEARER, expiration,
+                    userDto.getUsername(), userDto.getFullname(), userDto.getUserRol().name());
 
             res.setContentType("application/json");
             res.setCharacterEncoding("UTF-8");

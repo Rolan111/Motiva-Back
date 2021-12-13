@@ -19,17 +19,17 @@ public abstract class AbstractDto {
 
     private RegisterStatusEnum status;
 
-    public AbstractDto() {
+    protected AbstractDto() {
         setCreatedAt(new Date());
         setCreatedBy(1L);
         setStatus(RegisterStatusEnum.ACTIVE);
     }
 
-    public AbstractDto(RegisterStatusEnum status) {
+    protected AbstractDto(RegisterStatusEnum status) {
         this.status = status;
     }
 
-    public AbstractDto(DadLog dadLog) {
+    protected AbstractDto(DadLog dadLog) {
         this.createdAt = dadLog.getCreatedAt();
         this.createdBy = dadLog.getCreatedBy();
         this.updatedAt = dadLog.getUpdatedAt();

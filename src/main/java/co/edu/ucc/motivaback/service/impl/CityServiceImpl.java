@@ -1,4 +1,4 @@
-package co.edu.ucc.motivaback.service.serviceImpl;
+package co.edu.ucc.motivaback.service.impl;
 
 import co.edu.ucc.motivaback.dto.CityDto;
 import co.edu.ucc.motivaback.payload.CityForm;
@@ -11,10 +11,8 @@ import com.google.cloud.firestore.WriteResult;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author nagredo
@@ -35,61 +33,64 @@ public class CityServiceImpl implements CityService {
     @Override
     public List<CityDto> findAll() {
         List<CityDto> response = new ArrayList<>();
-        CityDto cityDto;
-
         ApiFuture<QuerySnapshot> querySnapshotApiFuture = getCollection().get();
+
         try {
             for (DocumentSnapshot doc : querySnapshotApiFuture.get().getDocuments()) {
-                cityDto = doc.toObject(CityDto.class);
+                var cityDto = doc.toObject(CityDto.class);
                 cityDto.setDocumentCityId(doc.getId());
                 response.add(cityDto);
             }
             return response;
-        } catch (Exception e) {
-            return null;
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return Collections.emptyList();
         }
     }
 
     @Override
     public CityDto create(CityForm cityForm) {
         Map<String, Object> docData = getDocData(cityForm);
-
         ApiFuture<WriteResult> writeResultApiFuture = getCollection().document().create(docData);
+        var cityDto = new CityDto();
 
         try {
-            if (writeResultApiFuture.get() != null) {
-                return modelMapper.map(cityForm, CityDto.class);
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            if (writeResultApiFuture.get() != null)
+                cityDto = modelMapper.map(cityForm, CityDto.class);
+
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
+
+        return cityDto;
     }
 
     @Override
     public CityDto update(CityForm cityForm) {
         Map<String, Object> docData = getDocData(cityForm);
         ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(cityForm.getDocumentCityId()).set(docData);
+        var cityDto = new CityDto();
+
         try {
-            if (writeResultApiFuture.get() != null) {
-                return modelMapper.map(cityForm, CityDto.class);
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            if (writeResultApiFuture.get() != null)
+                cityDto = modelMapper.map(cityForm, CityDto.class);
+
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
+
+        return cityDto;
     }
 
     @Override
     public boolean delete(String id) {
-        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(id).delete();
         try {
-            if (writeResultApiFuture.get() != null) {
-                return Boolean.TRUE;
-            }
-            return Boolean.FALSE;
-        } catch (Exception e) {
-            return Boolean.FALSE;
+            ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(id).delete();
+
+            return writeResultApiFuture.get() != null;
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
         }
     }
 

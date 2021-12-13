@@ -8,8 +8,8 @@ package co.edu.ucc.motivaback.exceptions;
 public class ArgumentRequiredException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
-    public ArgumentRequiredException(String mensaje) {
-        super(mensaje);
+    public ArgumentRequiredException(String message) {
+        super(message);
     }
 
 }
