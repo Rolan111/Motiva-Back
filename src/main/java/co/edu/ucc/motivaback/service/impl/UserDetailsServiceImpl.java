@@ -20,12 +20,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String identification) throws UsernameNotFoundException {
         ApiFuture<QuerySnapshot> querySnapshotApiFuture = getCollection().get();
 
         try {
             var doc = querySnapshotApiFuture.get().getDocuments()
-                    .stream().filter(row -> row.toObject(UserDto.class).getEmail().equals(email))
+                    .stream().filter(row -> row.toObject(UserDto.class).getIdentification().equals(identification))
                     .findFirst().orElseThrow(() -> new UsernameNotFoundException("El usuario no existe"));
             var userDto = doc.toObject(UserDto.class);
 
