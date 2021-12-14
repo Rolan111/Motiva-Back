@@ -41,8 +41,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) {
         try {
-            var loginForm = new ObjectMapper()
-                    .readValue(req.getInputStream(), LoginForm.class);
+            var loginForm = new ObjectMapper().readValue(req.getInputStream(), LoginForm.class);
             var passwordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                     loginForm.getUsername(),
                     loginForm.getPassword(),
