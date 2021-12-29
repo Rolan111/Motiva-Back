@@ -77,13 +77,14 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                     .setAudience(req.getRemoteAddr())
                     .setId(subject)
                     .claim("uid", userDto.getIdUser())
-                    .claim("username", userDto.getEmail())
-                    .claim("fullname", userDto.getFullname())
-                    .claim("rol", userDto.getUserRol().name())
+                    .claim("username", userDto.getIdentification())
+                    .claim("name", userDto.getName())
+                    .claim("last_name", userDto.getLast_name())
+                    .claim("job_profile", userDto.getJob_profile().name())
                     .signWith(this.keyPair.getPrivate(), SignatureAlgorithm.RS256)
                     .compact();
             var generatedAccessToken = new GeneratedAccessToken(token, TokenTypeEnum.BEARER, expiration,
-                    userDto.getUsername(), userDto.getFullname(), userDto.getUserRol().name());
+                    userDto.getIdentification(), userDto.getName(), userDto.getLast_name(), userDto.getJob_profile().name());
 
             res.setContentType("application/json");
             res.setCharacterEncoding("UTF-8");

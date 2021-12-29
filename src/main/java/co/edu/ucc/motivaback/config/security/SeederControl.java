@@ -37,15 +37,15 @@ public class SeederControl {
 
     protected void userSeed() {
         UserDto userDto = new UserDto();
-        userDto.setEmail("a@b.com");
-        userDto.setFullname("Test test");
+        userDto.setLast_name("BOLAÑOS");
+        userDto.setName("FERNANDO");
         userDto.setIdentification("123456789");
-        userDto.setUserRol(UserRolEnum.COORD_GENERAL);
+        userDto.setJob_profile(UserRolEnum.PSYCHOLOGIST);
         System.out.println("***************************************************");
         String encode = bCryptPasswordEncoder.encode("motivapw");
         System.out.println(encode);
         userDto.setPassword(encode);
-        userDto.setPhone("456456");
+        userDto.setIdentification_type("CC");
         userDto.setCreatedAt(new Date());
         userDto.setCreatedBy(1L);
         userDto.setStatus(RegisterStatusEnum.ACTIVE);
@@ -62,12 +62,12 @@ public class SeederControl {
 
     private Map<String, Object> getDocData(UserDto userDto) {
         Map<String, Object> docData = new HashMap<>();
-        docData.put("email", userDto.getEmail());
-        docData.put("fullname", userDto.getFullname());
+        docData.put("last_name", userDto.getLast_name());
+        docData.put("name", userDto.getName());
         docData.put("identification", userDto.getIdentification());
-        docData.put("userRol", userDto.getUserRol());
+        docData.put("job_profile", userDto.getJob_profile());
         docData.put("password", userDto.getPassword());
-        docData.put("phone", userDto.getPhone());
+        docData.put("identification_type", userDto.getIdentification_type());
         docData.put("createAt", userDto.getCreatedAt());
         docData.put("createBy", userDto.getCreatedBy());
         docData.put("status", userDto.getStatus());

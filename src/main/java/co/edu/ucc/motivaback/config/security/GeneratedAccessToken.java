@@ -11,24 +11,26 @@ public class GeneratedAccessToken {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSz")
     private Date expirationDate;
     private String username;
-    private String fullName;
-    private String rol;
+    private String name;
+    private String last_name;
+    private String job_profile;
 
-    public GeneratedAccessToken(String token, TokenTypeEnum type, Date expirationDate, String username, String fullName, String rol) {
+    public GeneratedAccessToken(String token, TokenTypeEnum type, Date expirationDate, String username, String name, String last_name, String job_profile) {
         this.token = token;
         this.type = type;
         this.expirationDate = expirationDate;
         this.username = username;
-        this.fullName = fullName;
-        this.rol = rol;
+        this.name = name;
+        this.last_name = last_name;
+        this.job_profile = job_profile;
     }
 
-    public String getRol() {
-        return rol;
+    public String getJob_profile() {
+        return job_profile;
     }
 
-    public void setRol(String rol) {
-        this.rol = rol;
+    public void setJob_profile(String job_profile) {
+        this.job_profile = job_profile;
     }
 
     public String getToken() {
@@ -63,11 +65,19 @@ public class GeneratedAccessToken {
         this.username = username;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getName() {
+        return name;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getLast_name() {
+        return last_name;
+    }
+
+    public void setLast_name(String last_name) {
+        this.last_name = last_name;
     }
 }

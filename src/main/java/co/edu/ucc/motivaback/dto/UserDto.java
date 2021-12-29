@@ -10,27 +10,27 @@ import java.util.Collections;
 
 public class UserDto extends AbstractDto implements UserDetails {
 
-    private UserRolEnum userRol;
+    private UserRolEnum job_profile;
 
     private String password;
 
-    private String fullname;
+    private String name;
 
-    private String email;
+    private String last_name;
 
     private String identification;
 
-    private String phone;
+    private String identification_type;
 
     private Long idUser;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(userRol.name()));
+        return Collections.singleton(new SimpleGrantedAuthority(job_profile.name()));
     }
 
-    public String getEmail() {
-        return this.email;
+    public String getLast_name() {
+        return this.last_name;
     }
 
     @Override
@@ -55,15 +55,15 @@ public class UserDto extends AbstractDto implements UserDetails {
 
     @Override
     public String getUsername() {
-        return getEmail();
+        return getIdentification();
     }
 
-    public UserRolEnum getUserRol() {
-        return userRol;
+    public UserRolEnum getJob_profile() {
+        return job_profile;
     }
 
-    public void setUserRol(UserRolEnum userRol) {
-        this.userRol = userRol;
+    public void setJob_profile(UserRolEnum job_profile) {
+        this.job_profile = job_profile;
     }
 
     public String getPassword() {
@@ -74,16 +74,16 @@ public class UserDto extends AbstractDto implements UserDetails {
         this.password = password;
     }
 
-    public String getFullname() {
-        return fullname;
+    public String getName() {
+        return name;
     }
 
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setLast_name(String last_name) {
+        this.last_name = last_name;
     }
 
     public String getIdentification() {
@@ -94,12 +94,12 @@ public class UserDto extends AbstractDto implements UserDetails {
         this.identification = identification;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getIdentification_type() {
+        return identification_type;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setIdentification_type(String identification_type) {
+        this.identification_type = identification_type;
     }
 
     public Long getIdUser() {
