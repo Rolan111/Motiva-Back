@@ -16,7 +16,6 @@ import java.util.List;
  * @project motiva-back
  * @class CityController
  */
-
 @RestController
 @RequestMapping("/api")
 public class CityController {
