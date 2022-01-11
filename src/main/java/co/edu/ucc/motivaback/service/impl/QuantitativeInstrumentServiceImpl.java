@@ -1,6 +1,7 @@
 package co.edu.ucc.motivaback.service.impl;
 
 import co.edu.ucc.motivaback.dto.QuantitativeInstrumentDto;
+import co.edu.ucc.motivaback.payload.AnswerQuantitativeInstrumentForm;
 import co.edu.ucc.motivaback.payload.QuantitativeInstrumentForm;
 import co.edu.ucc.motivaback.service.QuantitativeInstrumentService;
 import com.google.api.core.ApiFuture;
@@ -50,9 +51,17 @@ public class QuantitativeInstrumentServiceImpl implements QuantitativeInstrument
 
     @Override
     public QuantitativeInstrumentDto create(QuantitativeInstrumentForm quantitativeInstrumentForm) {
-        Map<String, Object> docData = getDocData(quantitativeInstrumentForm);
-        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document().create(docData);
         var quantitativeInstrumentDto = new QuantitativeInstrumentDto();
+        AnswerQuantitativeInstrumentForm answer = new AnswerQuantitativeInstrumentForm();
+
+        answer.setIdAnswer(1);
+        answer.setIdQuestion(1);
+        answer.setIdOptionAnswer(null);
+        answer.setOpenAnswer("NESTOR");
+        answer.setIdPoll(1);
+
+        Map<String, Object> docData = getDocData(answer);
+        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document().create(docData);
 
         try {
             if (writeResultApiFuture.get() != null)
@@ -67,9 +76,11 @@ public class QuantitativeInstrumentServiceImpl implements QuantitativeInstrument
 
     @Override
     public QuantitativeInstrumentDto update(QuantitativeInstrumentForm quantitativeInstrumentForm) {
-        Map<String, Object> docData = getDocData(quantitativeInstrumentForm);
-        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(quantitativeInstrumentForm.getDocumentId()).set(docData);
         var quantitativeInstrumentDto = new QuantitativeInstrumentDto();
+        AnswerQuantitativeInstrumentForm answer = new AnswerQuantitativeInstrumentForm();
+
+        Map<String, Object> docData = getDocData(answer);
+        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(quantitativeInstrumentForm.getDocumentId()).set(docData);
 
         try {
             if (writeResultApiFuture.get() != null)
@@ -100,13 +111,16 @@ public class QuantitativeInstrumentServiceImpl implements QuantitativeInstrument
     }
 
     private CollectionReference getCollection() {
-        return firebase.getFirestore().collection("city");
+        return firebase.getFirestore().collection("answer");
     }
 
-    private Map<String, Object> getDocData(QuantitativeInstrumentForm quantitativeInstrumentForm) {
+    private Map<String, Object> getDocData(AnswerQuantitativeInstrumentForm answer) {
         Map<String, Object> docData = new HashMap<>();
-        docData.put("age", quantitativeInstrumentForm.getAge());
-        docData.put("sex", quantitativeInstrumentForm.getSex());
+        docData.put("id_answer", answer.getIdAnswer());
+        docData.put("id_question", answer.getIdQuestion());
+        docData.put("id_option_answer", answer.getIdOptionAnswer());
+        docData.put("open_answer", answer.getOpenAnswer());
+        docData.put("id_poll", answer.getIdPoll());
         return docData;
     }
 }
