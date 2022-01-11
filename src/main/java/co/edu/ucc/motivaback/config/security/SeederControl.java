@@ -25,7 +25,7 @@ public class SeederControl {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.firebase = firebase;
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
-                new AuthenticatedUser(1L, "a@a.com", ""),
+                new AuthenticatedUser("a@a.com", ""),
                 "key"
         ));
     }

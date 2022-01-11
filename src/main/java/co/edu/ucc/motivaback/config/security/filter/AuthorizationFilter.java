@@ -56,13 +56,12 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         Jws<Claims> decodedJWT = Jwts.parserBuilder().setSigningKey(this.keyPair.getPublic()).build()
                 .parseClaimsJws(token);
         Collection<GrantedAuthority> authorities = new LinkedList<>();
-        Long userId = decodedJWT.getBody().get("uid", Long.class);
         String username = decodedJWT.getBody().get("username", String.class);
         String rol = decodedJWT.getBody().get("rol", String.class);
 
-        if (userId != null) {
+        if (username != null) {
             return new UsernamePasswordAuthenticationToken(
-                    new AuthenticatedUser(userId, username, rol),
+                    new AuthenticatedUser(username, rol),
                     null,
                     authorities);
         } else {

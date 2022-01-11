@@ -1,12 +1,10 @@
 package co.edu.ucc.motivaback.config.security;
 
 public class AuthenticatedUser {
-    private Long userId;
     private String username;
     private String rol;
 
-    public AuthenticatedUser(Long userId, String username, String rol) {
-        this.userId = userId;
+    public AuthenticatedUser(String username, String rol) {
         this.username = username;
         this.rol = rol;
     }
@@ -17,14 +15,6 @@ public class AuthenticatedUser {
 
     public void setRol(String rol) {
         this.rol = rol;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public String getUsername() {
