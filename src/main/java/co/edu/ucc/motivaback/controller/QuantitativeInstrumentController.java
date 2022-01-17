@@ -84,7 +84,7 @@ public class QuantitativeInstrumentController {
         try {
             var quantitativeInstrumentDto = this.quantitativeInstrumentService.findById(id);
 
-            return new ResponseEntity<>(new GeneralBodyResponse<>(quantitativeInstrumentDto, "find city", null), HttpStatus.OK);
+            return new ResponseEntity<>(new GeneralBodyResponse<>(quantitativeInstrumentDto, "find quantitative-instrument", null), HttpStatus.OK);
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }

@@ -4,6 +4,7 @@ import co.edu.ucc.motivaback.dto.CityDto;
 import co.edu.ucc.motivaback.payload.CityForm;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author nagredo
@@ -19,5 +20,5 @@ public interface CityService {
 
     boolean delete(String id);
 
-    CityDto findById(String id);
+    CityDto findById(String id) throws ExecutionException, InterruptedException;
 }

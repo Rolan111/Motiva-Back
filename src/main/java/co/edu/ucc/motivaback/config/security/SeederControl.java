@@ -18,7 +18,7 @@ import java.util.Map;
 
 @Component
 public class SeederControl {
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final FirebaseInitializer firebase;
 
     public SeederControl(BCryptPasswordEncoder bCryptPasswordEncoder, FirebaseInitializer firebase) {

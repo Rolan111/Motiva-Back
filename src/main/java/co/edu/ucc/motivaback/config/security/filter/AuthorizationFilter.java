@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 public class AuthorizationFilter extends BasicAuthenticationFilter {
-    private KeyPair keyPair;
+    private final KeyPair keyPair;
 
     public AuthorizationFilter(AuthenticationManager authenticationManager, KeyPair keyPair) {
         super(authenticationManager);

@@ -55,7 +55,7 @@ public class CityController {
         }
     }
 
-    @PutMapping("/city")
+    @PutMapping("/city-update")//cambio aquí por city-update
     public ResponseEntity<GeneralBodyResponse<CityDto>> update(@Valid @RequestBody CityForm cityForm) {
         try {
             var cityDto = this.cityService.update(cityForm);

@@ -4,10 +4,7 @@ import co.edu.ucc.motivaback.dto.CityDto;
 import co.edu.ucc.motivaback.payload.CityForm;
 import co.edu.ucc.motivaback.service.CityService;
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.WriteResult;
+import com.google.cloud.firestore.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +43,16 @@ public class CityServiceImpl implements CityService {
             Thread.currentThread().interrupt();
             return Collections.emptyList();
         }
+    }
+
+    @Override
+    public CityDto findById(String id) throws ExecutionException, InterruptedException {
+        DocumentReference ref = getCollection().document(id);
+        ApiFuture<DocumentSnapshot> futureDoc = ref.get();
+        DocumentSnapshot document = futureDoc.get();
+
+        var cityDto = document.toObject(CityDto.class);
+        return cityDto;
     }
 
     @Override
@@ -94,10 +101,10 @@ public class CityServiceImpl implements CityService {
         }
     }
 
-    @Override
+    /*@Override
     public CityDto findById(String id) {
         return null;
-    }
+    }*/
 
     private CollectionReference getCollection() {
         return firebase.getFirestore().collection("city");
