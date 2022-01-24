@@ -1,6 +1,7 @@
 package co.edu.ucc.motivaback.service.impl;
 
 import co.edu.ucc.motivaback.dto.QuantitativeInstrumentDto;
+import co.edu.ucc.motivaback.dto.QuestionDto;
 import co.edu.ucc.motivaback.payload.AnswerQuantitativeInstrumentForm;
 import co.edu.ucc.motivaback.payload.QuantitativeInstrumentForm;
 import co.edu.ucc.motivaback.service.QuantitativeInstrumentService;
@@ -50,22 +51,15 @@ public class QuantitativeInstrumentServiceImpl implements QuantitativeInstrument
     }
 
     @Override
-    public QuantitativeInstrumentDto create(QuantitativeInstrumentForm quantitativeInstrumentForm) {
+    public QuantitativeInstrumentDto create(AnswerQuantitativeInstrumentForm answerQuantitativeInstrumentForm) {
         var quantitativeInstrumentDto = new QuantitativeInstrumentDto();
-        AnswerQuantitativeInstrumentForm answer = new AnswerQuantitativeInstrumentForm();
 
-        answer.setIdAnswer(1);
-        answer.setIdQuestion(1);
-        answer.setIdOptionAnswer(null);
-        answer.setOpenAnswer("NESTOR");
-        answer.setIdPoll(1);
-
-        Map<String, Object> docData = getDocData(answer);
+        Map<String, Object> docData = getDocData(answerQuantitativeInstrumentForm);
         ApiFuture<WriteResult> writeResultApiFuture = getCollection().document().create(docData);
 
         try {
             if (writeResultApiFuture.get() != null)
-                quantitativeInstrumentDto = modelMapper.map(quantitativeInstrumentForm, QuantitativeInstrumentDto.class);
+                quantitativeInstrumentDto = modelMapper.map(answerQuantitativeInstrumentForm, QuantitativeInstrumentDto.class);
 
         } catch (ExecutionException | InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -110,8 +104,29 @@ public class QuantitativeInstrumentServiceImpl implements QuantitativeInstrument
         return null;
     }
 
+    @Override
+    public List<QuestionDto> findAllQuestion() {
+        List<QuestionDto> response = new ArrayList<>();
+        ApiFuture<QuerySnapshot> querySnapshotApiFuture = getCollectionQuestion().get();
+
+        try {
+            for (DocumentSnapshot doc : querySnapshotApiFuture.get().getDocuments()) {
+                var questionDto = doc.toObject(QuestionDto.class);
+                response.add(questionDto);
+            }
+            return response;
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return Collections.emptyList();
+        }
+    }
+
     private CollectionReference getCollection() {
         return firebase.getFirestore().collection("answer");
+    }
+
+    private CollectionReference getCollectionQuestion() {
+        return firebase.getFirestore().collection("question");
     }
 
     private Map<String, Object> getDocData(AnswerQuantitativeInstrumentForm answer) {

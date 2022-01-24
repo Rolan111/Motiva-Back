@@ -1,6 +1,8 @@
 package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.dto.QuantitativeInstrumentDto;
+import co.edu.ucc.motivaback.dto.QuestionDto;
+import co.edu.ucc.motivaback.payload.AnswerQuantitativeInstrumentForm;
 import co.edu.ucc.motivaback.payload.QuantitativeInstrumentForm;
 import co.edu.ucc.motivaback.service.QuantitativeInstrumentService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
@@ -31,7 +33,7 @@ public class QuantitativeInstrumentController {
             List<QuantitativeInstrumentDto> postDTOS = this.quantitativeInstrumentService.findAll();
 
             if (!postDTOS.isEmpty())
-                return new ResponseEntity<>(new GeneralBodyResponse<>(postDTOS, "list cities", null), HttpStatus.OK);
+                return new ResponseEntity<>(new GeneralBodyResponse<>(postDTOS, "list answers", null), HttpStatus.OK);
             else
                 return new ResponseEntity<>(new GeneralBodyResponse<>(null, "empty", null), HttpStatus.BAD_REQUEST);
 
@@ -41,9 +43,9 @@ public class QuantitativeInstrumentController {
     }
 
     @PostMapping(value = "/quantitative-instrument-create")
-    public ResponseEntity<GeneralBodyResponse<QuantitativeInstrumentDto>> create(@Valid @RequestBody QuantitativeInstrumentForm quantitativeInstrumentForm) {
+    public ResponseEntity<GeneralBodyResponse<QuantitativeInstrumentDto>> create(@Valid @RequestBody AnswerQuantitativeInstrumentForm answer) {
         try {
-            var quantitativeInstrumentDto = this.quantitativeInstrumentService.create(quantitativeInstrumentForm);
+            var quantitativeInstrumentDto = this.quantitativeInstrumentService.create(answer);
 
             if (quantitativeInstrumentDto != null)
                 return new ResponseEntity<>(new GeneralBodyResponse<>(quantitativeInstrumentDto, "created", null), HttpStatus.OK);
@@ -85,6 +87,21 @@ public class QuantitativeInstrumentController {
             var quantitativeInstrumentDto = this.quantitativeInstrumentService.findById(id);
 
             return new ResponseEntity<>(new GeneralBodyResponse<>(quantitativeInstrumentDto, "find quantitative-instrument", null), HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping(value = "/quantitative-instrument-questions")
+    public ResponseEntity<GeneralBodyResponse<List<QuestionDto>>> getAllQuestion() {
+        try {
+            List<QuestionDto> postDTOS = this.quantitativeInstrumentService.findAllQuestion();
+
+            if (!postDTOS.isEmpty())
+                return new ResponseEntity<>(new GeneralBodyResponse<>(postDTOS, "list questions", null), HttpStatus.OK);
+            else
+                return new ResponseEntity<>(new GeneralBodyResponse<>(null, "empty", null), HttpStatus.BAD_REQUEST);
+
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
