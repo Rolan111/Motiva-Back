@@ -1,5 +1,6 @@
 package co.edu.ucc.motivaback.service.impl;
 
+import co.edu.ucc.motivaback.dto.AnswerQuantitativeInstrumentDto;
 import co.edu.ucc.motivaback.dto.QuantitativeInstrumentDto;
 import co.edu.ucc.motivaback.dto.QuestionDto;
 import co.edu.ucc.motivaback.payload.AnswerQuantitativeInstrumentForm;
@@ -51,15 +52,15 @@ public class QuantitativeInstrumentServiceImpl implements QuantitativeInstrument
     }
 
     @Override
-    public QuantitativeInstrumentDto create(AnswerQuantitativeInstrumentForm answerQuantitativeInstrumentForm) {
-        var quantitativeInstrumentDto = new QuantitativeInstrumentDto();
+    public AnswerQuantitativeInstrumentDto create(AnswerQuantitativeInstrumentForm answerQuantitativeInstrumentForm) {
+        var quantitativeInstrumentDto = new AnswerQuantitativeInstrumentDto();
 
         Map<String, Object> docData = getDocData(answerQuantitativeInstrumentForm);
         ApiFuture<WriteResult> writeResultApiFuture = getCollection().document().create(docData);
 
         try {
             if (writeResultApiFuture.get() != null)
-                quantitativeInstrumentDto = modelMapper.map(answerQuantitativeInstrumentForm, QuantitativeInstrumentDto.class);
+                quantitativeInstrumentDto = modelMapper.map(answerQuantitativeInstrumentForm, AnswerQuantitativeInstrumentDto.class);
 
         } catch (ExecutionException | InterruptedException e) {
             Thread.currentThread().interrupt();

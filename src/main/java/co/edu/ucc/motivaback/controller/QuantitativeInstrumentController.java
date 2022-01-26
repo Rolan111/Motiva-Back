@@ -1,5 +1,6 @@
 package co.edu.ucc.motivaback.controller;
 
+import co.edu.ucc.motivaback.dto.AnswerQuantitativeInstrumentDto;
 import co.edu.ucc.motivaback.dto.QuantitativeInstrumentDto;
 import co.edu.ucc.motivaback.dto.QuestionDto;
 import co.edu.ucc.motivaback.payload.AnswerQuantitativeInstrumentForm;
@@ -43,7 +44,7 @@ public class QuantitativeInstrumentController {
     }
 
     @PostMapping(value = "/quantitative-instrument-create")
-    public ResponseEntity<GeneralBodyResponse<QuantitativeInstrumentDto>> create(@Valid @RequestBody AnswerQuantitativeInstrumentForm answer) {
+    public ResponseEntity<GeneralBodyResponse<AnswerQuantitativeInstrumentDto>> create(@Valid @RequestBody AnswerQuantitativeInstrumentForm answer) {
         try {
             var quantitativeInstrumentDto = this.quantitativeInstrumentService.create(answer);
 

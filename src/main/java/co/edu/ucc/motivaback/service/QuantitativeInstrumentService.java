@@ -1,5 +1,6 @@
 package co.edu.ucc.motivaback.service;
 
+import co.edu.ucc.motivaback.dto.AnswerQuantitativeInstrumentDto;
 import co.edu.ucc.motivaback.dto.QuantitativeInstrumentDto;
 import co.edu.ucc.motivaback.dto.QuestionDto;
 import co.edu.ucc.motivaback.payload.AnswerQuantitativeInstrumentForm;
@@ -15,7 +16,7 @@ import java.util.List;
 public interface QuantitativeInstrumentService {
     List<QuantitativeInstrumentDto> findAll();
 
-    QuantitativeInstrumentDto create(AnswerQuantitativeInstrumentForm answerQuantitativeInstrumentForm);
+    AnswerQuantitativeInstrumentDto create(AnswerQuantitativeInstrumentForm answerQuantitativeInstrumentForm);
 
     QuantitativeInstrumentDto update(QuantitativeInstrumentForm quantitativeInstrumentForm);
 
