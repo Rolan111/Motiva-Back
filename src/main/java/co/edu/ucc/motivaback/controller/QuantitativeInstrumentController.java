@@ -29,9 +29,9 @@ public class QuantitativeInstrumentController {
     }
 
     @GetMapping(value = "/quantitative-instruments")
-    public ResponseEntity<GeneralBodyResponse<List<QuantitativeInstrumentDto>>> getAll() {
+    public ResponseEntity<GeneralBodyResponse<List<AnswerQuantitativeInstrumentDto>>> getAll() {
         try {
-            List<QuantitativeInstrumentDto> postDTOS = this.quantitativeInstrumentService.findAll();
+            List<AnswerQuantitativeInstrumentDto> postDTOS = this.quantitativeInstrumentService.findAll();
 
             if (!postDTOS.isEmpty())
                 return new ResponseEntity<>(new GeneralBodyResponse<>(postDTOS, "list answers", null), HttpStatus.OK);
@@ -44,7 +44,7 @@ public class QuantitativeInstrumentController {
     }
 
     @PostMapping(value = "/quantitative-instrument-create")
-    public ResponseEntity<GeneralBodyResponse<AnswerQuantitativeInstrumentDto>> create(@Valid @RequestBody AnswerQuantitativeInstrumentForm answer) {
+    public ResponseEntity<GeneralBodyResponse<AnswerQuantitativeInstrumentDto>> create(@Valid @RequestBody List<AnswerQuantitativeInstrumentForm> answer) {
         try {
             var quantitativeInstrumentDto = this.quantitativeInstrumentService.create(answer);
 

@@ -6,18 +6,18 @@ package co.edu.ucc.motivaback.dto;
  * @class QuestionDto
  */
 public class QuestionDto {
-    private Integer id_question;
+    private Long idQuestion;
     private String description;
-    private Integer id_father;
-    private Integer id_question_type;
-    private Integer order;
+    private Long idFather;
+    private Long idQuestionType;
+    private Long order;
 
-    public Integer getId_question() {
-        return id_question;
+    public Long getIdQuestion() {
+        return idQuestion;
     }
 
-    public void setId_question(Integer id_question) {
-        this.id_question = id_question;
+    public void setIdQuestion(Long idQuestion) {
+        this.idQuestion = idQuestion;
     }
 
     public String getDescription() {
@@ -28,27 +28,27 @@ public class QuestionDto {
         this.description = description;
     }
 
-    public Integer getId_father() {
-        return id_father;
+    public Long getIdFather() {
+        return idFather;
     }
 
-    public void setId_father(Integer id_father) {
-        this.id_father = id_father;
+    public void setIdFather(Long idFather) {
+        this.idFather = idFather;
     }
 
-    public Integer getId_question_type() {
-        return id_question_type;
+    public Long getIdQuestionType() {
+        return idQuestionType;
     }
 
-    public void setId_question_type(Integer id_question_type) {
-        this.id_question_type = id_question_type;
+    public void setIdQuestionType(Long idQuestionType) {
+        this.idQuestionType = idQuestionType;
     }
 
-    public Integer getOrder() {
+    public Long getOrder() {
         return order;
     }
 
-    public void setOrder(Integer order) {
+    public void setOrder(Long order) {
         this.order = order;
     }
 }

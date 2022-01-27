@@ -14,9 +14,9 @@ import java.util.List;
  * @class QuantitativeInstrumentService
  */
 public interface QuantitativeInstrumentService {
-    List<QuantitativeInstrumentDto> findAll();
+    List<AnswerQuantitativeInstrumentDto> findAll();
 
-    AnswerQuantitativeInstrumentDto create(AnswerQuantitativeInstrumentForm answerQuantitativeInstrumentForm);
+    AnswerQuantitativeInstrumentDto create(List<AnswerQuantitativeInstrumentForm> answerQuantitativeInstrumentForm);
 
     QuantitativeInstrumentDto update(QuantitativeInstrumentForm quantitativeInstrumentForm);
 

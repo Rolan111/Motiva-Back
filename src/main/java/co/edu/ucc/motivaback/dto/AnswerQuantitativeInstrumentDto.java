@@ -6,33 +6,33 @@ package co.edu.ucc.motivaback.dto;
  * @class AnswerQuantitativeInstrumentForm
  */
 public class AnswerQuantitativeInstrumentDto {
-    private Integer idAnswer;
-    private Integer idQuestion;
-    private Integer idOptionAnswer;
+    private Long idAnswer;
+    private Long idQuestion;
+    private Long idOptionAnswer;
     private String openAnswer;
-    private Integer idPoll;
+    private Long idPoll;
 
-    public Integer getIdAnswer() {
+    public Long getIdAnswer() {
         return idAnswer;
     }
 
-    public void setIdAnswer(Integer idAnswer) {
+    public void setIdAnswer(Long idAnswer) {
         this.idAnswer = idAnswer;
     }
 
-    public Integer getIdQuestion() {
+    public Long getIdQuestion() {
         return idQuestion;
     }
 
-    public void setIdQuestion(Integer idQuestion) {
+    public void setIdQuestion(Long idQuestion) {
         this.idQuestion = idQuestion;
     }
 
-    public Integer getIdOptionAnswer() {
+    public Long getIdOptionAnswer() {
         return idOptionAnswer;
     }
 
-    public void setIdOptionAnswer(Integer idOptionAnswer) {
+    public void setIdOptionAnswer(Long idOptionAnswer) {
         this.idOptionAnswer = idOptionAnswer;
     }
 
@@ -44,11 +44,11 @@ public class AnswerQuantitativeInstrumentDto {
         this.openAnswer = openAnswer;
     }
 
-    public Integer getIdPoll() {
+    public Long getIdPoll() {
         return idPoll;
     }
 
-    public void setIdPoll(Integer idPoll) {
+    public void setIdPoll(Long idPoll) {
         this.idPoll = idPoll;
     }
 }
