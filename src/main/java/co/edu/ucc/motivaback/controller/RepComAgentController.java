@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class RepComAgentController {
+
     private final RepComAgentService repComAgentService;
 
     public RepComAgentController(RepComAgentService repComAgentService) {
@@ -26,7 +27,7 @@ public class RepComAgentController {
             List<RepComAgentDto> postDTOS = this.repComAgentService.findAll();
 
             if (!postDTOS.isEmpty())
-                return new ResponseEntity<>(new GeneralBodyResponse<>(postDTOS, "list Rep Com Agent", null), HttpStatus.OK); //CITIES?
+                return new ResponseEntity<>(new GeneralBodyResponse<>(postDTOS, "list Rep Com Agent", null), HttpStatus.OK);
             else
                 return new ResponseEntity<>(new GeneralBodyResponse<>(null, "empty", null), HttpStatus.BAD_REQUEST);
 

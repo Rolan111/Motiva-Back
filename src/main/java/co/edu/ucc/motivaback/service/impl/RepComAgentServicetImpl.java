@@ -55,22 +55,6 @@ public class RepComAgentServicetImpl implements RepComAgentService {
 
     @Override
     public RepComAgentDto create(RepComAgentForm repComAgentForm) {
-
-        //RepComAgentForm answer = new RepComAgentForm();
-/* DATOS DE PRUEBA
-        answer.setActivityName("Actividad 1");
-        answer.setActivityNumber("1");
-        answer.setDate("2014-04-21");
-        answer.setDuration("2 horas");
-        answer.setPlace("Popayán");
-        answer.setNumberAttendees("4");
-        answer.setActivityObjectives("Descripción de objetivos");
-        answer.setResourcesUsed("Descripción recursos usados");
-        answer.setMethodologyUsed("Descripción metodología usada");
-        answer.setActivityDescriptionDevelopment("Descripción y desarrollo de la actividad");
-        answer.setResourcesObtained("Recursos obtenidos");
-        answer.setActivityProfessionalincharge("Profesional encargado de esta actividad");
-*/
         Map<String, Object> docData = getDocData(repComAgentForm);
         ApiFuture<WriteResult> writeResultApiFuture = getCollection().document().create(docData);
         var repComAgentDto = new RepComAgentDto();
@@ -137,6 +121,7 @@ public class RepComAgentServicetImpl implements RepComAgentService {
         docData.put("methodologyUsed", answer.getMethodologyUsed());
         docData.put("activityDescriptionDevelopment", answer.getActivityDescriptionDevelopment());
         docData.put("resourcesObtained", answer.getResourcesObtained());
+        docData.put("evidence", answer.getEvidence());
         docData.put("activityProfessionalincharge", answer.getActivityProfessionalincharge());
         return docData;
     }

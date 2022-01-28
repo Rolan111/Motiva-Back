@@ -3,16 +3,17 @@ package co.edu.ucc.motivaback.payload;
 public class RepComAgentForm {
     private String documentRepComAgentId;
     private String activityName;
-    private String activityNumber;
+    private int activityNumber;
     private String date;
     private String duration;
     private String place;
-    private String numberAttendees;
+    private int numberAttendees;
     private String activityObjectives;
     private String resourcesUsed;
     private String methodologyUsed;
     private String activityDescriptionDevelopment;
     private String resourcesObtained;
+    private String evidence;
     private String activityProfessionalincharge;
 
     public String getDocumentRepComAgentId() {
@@ -31,11 +32,11 @@ public class RepComAgentForm {
         this.activityName = activityName;
     }
 
-    public String getActivityNumber() {
+    public int getActivityNumber() {
         return activityNumber;
     }
 
-    public void setActivityNumber(String activityNumber) {
+    public void setActivityNumber(int activityNumber) {
         this.activityNumber = activityNumber;
     }
 
@@ -63,11 +64,11 @@ public class RepComAgentForm {
         this.place = place;
     }
 
-    public String getNumberAttendees() {
+    public int getNumberAttendees() {
         return numberAttendees;
     }
 
-    public void setNumberAttendees(String numberAttendees) {
+    public void setNumberAttendees(int numberAttendees) {
         this.numberAttendees = numberAttendees;
     }
 
@@ -109,6 +110,14 @@ public class RepComAgentForm {
 
     public void setResourcesObtained(String resourcesObtained) {
         this.resourcesObtained = resourcesObtained;
+    }
+
+    public String getEvidence() {
+        return evidence;
+    }
+
+    public void setEvidence(String evidence) {
+        this.evidence = evidence;
     }
 
     public String getActivityProfessionalincharge() {
