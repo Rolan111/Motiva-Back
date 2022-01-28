@@ -4,12 +4,12 @@ public class TrackingSheetDto {
     private String documentTrackingSheetId;
     private String names;
     private String lastnames;
-    private String identificationType;
-    private int nIdentification;
-    private String typeRoute;
-    private String referredEntity;
-    private String attentionStatus;
-    private String recommendationsSuggestions;
+    private String identification_type;
+    private int n_identification;
+    private String type_route;
+    private String referred_entity;
+    private String attention_status;
+    private String recommendations_suggestions;
 
     public String getDocumentTrackingSheetId() {
         return documentTrackingSheetId;
@@ -35,51 +35,51 @@ public class TrackingSheetDto {
         this.lastnames = lastnames;
     }
 
-    public String getIdentificationType() {
-        return identificationType;
+    public String getIdentification_type() {
+        return identification_type;
     }
 
-    public void setIdentificationType(String identificationType) {
-        this.identificationType = identificationType;
+    public void setIdentification_type(String identification_type) {
+        this.identification_type = identification_type;
     }
 
-    public int getnIdentification() {
-        return nIdentification;
+    public int getN_identification() {
+        return n_identification;
     }
 
-    public void setnIdentification(int nIdentification) {
-        this.nIdentification = nIdentification;
+    public void setN_identification(int n_identification) {
+        this.n_identification = n_identification;
     }
 
-    public String getTypeRoute() {
-        return typeRoute;
+    public String getType_route() {
+        return type_route;
     }
 
-    public void setTypeRoute(String typeRoute) {
-        this.typeRoute = typeRoute;
+    public void setType_route(String type_route) {
+        this.type_route = type_route;
     }
 
-    public String getReferredEntity() {
-        return referredEntity;
+    public String getReferred_entity() {
+        return referred_entity;
     }
 
-    public void setReferredEntity(String referredEntity) {
-        this.referredEntity = referredEntity;
+    public void setReferred_entity(String referred_entity) {
+        this.referred_entity = referred_entity;
     }
 
-    public String getAttentionStatus() {
-        return attentionStatus;
+    public String getAttention_status() {
+        return attention_status;
     }
 
-    public void setAttentionStatus(String attentionStatus) {
-        this.attentionStatus = attentionStatus;
+    public void setAttention_status(String attention_status) {
+        this.attention_status = attention_status;
     }
 
-    public String getRecommendationsSuggestions() {
-        return recommendationsSuggestions;
+    public String getRecommendations_suggestions() {
+        return recommendations_suggestions;
     }
 
-    public void setRecommendationsSuggestions(String recommendationsSuggestions) {
-        this.recommendationsSuggestions = recommendationsSuggestions;
+    public void setRecommendations_suggestions(String recommendations_suggestions) {
+        this.recommendations_suggestions = recommendations_suggestions;
     }
 }

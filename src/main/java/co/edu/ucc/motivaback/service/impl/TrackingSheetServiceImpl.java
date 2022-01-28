@@ -106,19 +106,19 @@ public class TrackingSheetServiceImpl implements TrackingSheetService {
     }*/
 
     private CollectionReference getCollection() {
-        return firebase.getFirestore().collection("tracking-sheet");
+        return firebase.getFirestore().collection("tracking_sheet");
     }
 
     private Map<String, Object> getDocData(TrackingSheetForm answer) {
         Map<String, Object> docData = new HashMap<>();
         docData.put("names", answer.getNames());
         docData.put("lastnames", answer.getLastnames());
-        docData.put("identificationType", answer.getIdentificationType());
-        docData.put("nIdentification", answer.getnIdentification());
-        docData.put("typeRoute", answer.getTypeRoute());
-        docData.put("referredEntity", answer.getReferredEntity());
-        docData.put("attentionStatus", answer.getAttentionStatus());
-        docData.put("recommendationsSuggestions", answer.getRecommendationsSuggestions());
+        docData.put("identification_type", answer.getIdentification_type());
+        docData.put("n_identification", answer.getN_identification());
+        docData.put("type_route", answer.getType_route());
+        docData.put("referred_entity", answer.getReferred_entity());
+        docData.put("attention_status", answer.getAttention_status());
+        docData.put("recommendations_suggestions", answer.getRecommendations_suggestions());
         return docData;
     }
 }

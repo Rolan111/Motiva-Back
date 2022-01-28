@@ -105,24 +105,24 @@ public class RepComAgentServicetImpl implements RepComAgentService {
     }*/
 
     private CollectionReference getCollection() {
-        return firebase.getFirestore().collection("rep-com-agent");
+        return firebase.getFirestore().collection("rep_com_agent");
     }
 
     private Map<String, Object> getDocData(RepComAgentForm answer) {
         Map<String, Object> docData = new HashMap<>();
-        docData.put("activityName", answer.getActivityName());
-        docData.put("activityNumber", answer.getActivityNumber());
+        docData.put("activity_name", answer.getActivity_name());
+        docData.put("activity_number", answer.getActivity_number());
         docData.put("date", answer.getDate());
         docData.put("duration", answer.getDuration());
         docData.put("place", answer.getPlace());
-        docData.put("numberAttendees", answer.getNumberAttendees());
-        docData.put("activityObjectives", answer.getActivityObjectives());
-        docData.put("resourcesUsed", answer.getResourcesUsed());
-        docData.put("methodologyUsed", answer.getMethodologyUsed());
-        docData.put("activityDescriptionDevelopment", answer.getActivityDescriptionDevelopment());
-        docData.put("resourcesObtained", answer.getResourcesObtained());
+        docData.put("number_attendees", answer.getNumber_attendees());
+        docData.put("activity_objectives", answer.getActivity_objectives());
+        docData.put("resources_used", answer.getResources_used());
+        docData.put("methodology_used", answer.getMethodology_used());
+        docData.put("activity_description_development", answer.getActivity_description_development());
+        docData.put("resources_obtained", answer.getResources_obtained());
         docData.put("evidence", answer.getEvidence());
-        docData.put("activityProfessionalincharge", answer.getActivityProfessionalincharge());
+        docData.put("activity_professional_incharge", answer.getActivity_professional_incharge());
         return docData;
     }
 }
