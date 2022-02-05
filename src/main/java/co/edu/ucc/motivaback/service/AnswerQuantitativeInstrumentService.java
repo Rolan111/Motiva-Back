@@ -2,7 +2,7 @@ package co.edu.ucc.motivaback.service;
 
 import co.edu.ucc.motivaback.dto.AnswerQuantitativeInstrumentDto;
 import co.edu.ucc.motivaback.dto.QuestionDto;
-import co.edu.ucc.motivaback.payload.AnswerQuantitativeInstrumentForm;
+import co.edu.ucc.motivaback.dto.SequenceDto;
 
 import java.util.List;
 
@@ -11,10 +11,12 @@ import java.util.List;
  * @project motiva-back
  * @class QuantitativeInstrumentService
  */
-public interface QuantitativeInstrumentService {
+public interface AnswerQuantitativeInstrumentService {
     List<AnswerQuantitativeInstrumentDto> findAll();
 
-    AnswerQuantitativeInstrumentDto create(List<AnswerQuantitativeInstrumentForm> answerQuantitativeInstrumentForm);
+    List<AnswerQuantitativeInstrumentDto> create(List<AnswerQuantitativeInstrumentDto> answerQuantitativeInstrumentDto);
 
-    List<QuestionDto> findAllQuestion();
+    List<QuestionDto> findAllQuestions();
+
+    SequenceDto getLastSequences();
 }
