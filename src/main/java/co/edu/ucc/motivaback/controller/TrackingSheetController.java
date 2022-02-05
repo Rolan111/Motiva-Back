@@ -2,7 +2,6 @@ package co.edu.ucc.motivaback.controller;
 
 
 import co.edu.ucc.motivaback.dto.TrackingSheetDto;
-import co.edu.ucc.motivaback.payload.TrackingSheetForm;
 import co.edu.ucc.motivaback.service.TrackingSheetService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
 import org.springframework.http.HttpStatus;
@@ -12,18 +11,16 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-@RestController
+import static co.edu.ucc.motivaback.util.CommonsService.*;
 
+@RestController
 @RequestMapping("/api")
 public class TrackingSheetController {
-
     private final TrackingSheetService trackingSheetService;
-
 
     public TrackingSheetController(TrackingSheetService trackingSheetService) {
         this.trackingSheetService = trackingSheetService;
     }
-
 
     @GetMapping(value = "/tracking-sheets")
     public ResponseEntity<GeneralBodyResponse<List<TrackingSheetDto>>> getAll() {
@@ -31,36 +28,36 @@ public class TrackingSheetController {
             List<TrackingSheetDto> postDTOS = this.trackingSheetService.findAll();
 
             if (!postDTOS.isEmpty())
-                return new ResponseEntity<>(new GeneralBodyResponse<>(postDTOS, "list Tracking sheet", null), HttpStatus.OK);
+                return new ResponseEntity<>(new GeneralBodyResponse<>(postDTOS, LIST_OK, null), HttpStatus.OK);
             else
-                return new ResponseEntity<>(new GeneralBodyResponse<>(null, "empty", null), HttpStatus.BAD_REQUEST);
-
+                return new ResponseEntity<>(new GeneralBodyResponse<>(null, EMPTY_LIST, null), HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping(value = "/tracking-sheet-create")
-    public ResponseEntity<GeneralBodyResponse<TrackingSheetDto>> create(@RequestBody TrackingSheetForm trackingSheetForm) {
+    public ResponseEntity<GeneralBodyResponse<TrackingSheetDto>> create(@RequestBody TrackingSheetDto trackingSheetDto) {
         try {
-            var trackingSheetDto = this.trackingSheetService.create(trackingSheetForm);
+            TrackingSheetDto sheetDto = this.trackingSheetService.create(trackingSheetDto);
 
-            if (trackingSheetDto != null)
-                return new ResponseEntity<>(new GeneralBodyResponse<>(trackingSheetDto, "created", null), HttpStatus.OK);
+            if (sheetDto != null)
+                return new ResponseEntity<>(new GeneralBodyResponse<>(sheetDto, CREATED_OK, null), HttpStatus.OK);
             else
-                return new ResponseEntity<>(new GeneralBodyResponse<>(null, "not created", null), HttpStatus.BAD_REQUEST);
-
+                return new ResponseEntity<>(new GeneralBodyResponse<>(null, CREATED_FAIL, null), HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/tracking-sheet-update")
-    public ResponseEntity<GeneralBodyResponse<TrackingSheetDto>> update(@Valid @RequestBody TrackingSheetForm trackingSheetForm) {
+    public ResponseEntity<GeneralBodyResponse<TrackingSheetDto>> update(@Valid @RequestBody TrackingSheetDto trackingSheetDto) {
         try {
-            var trackingSheetDto = this.trackingSheetService.update(trackingSheetForm);
-
-            return new ResponseEntity<>(new GeneralBodyResponse<>(trackingSheetDto, "update Tracking Sheet", null), HttpStatus.OK);
+            var sheetDto = this.trackingSheetService.update(trackingSheetDto);
+            if (sheetDto != null)
+                return new ResponseEntity<>(new GeneralBodyResponse<>(this.trackingSheetService.update(trackingSheetDto), UPDATED_OK, null), HttpStatus.OK);
+            else
+                return new ResponseEntity<>(new GeneralBodyResponse<>(null, UPDATED_FAIL, null), HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
@@ -70,10 +67,9 @@ public class TrackingSheetController {
     public ResponseEntity<GeneralBodyResponse<Boolean>> delete(@PathVariable String id) {
         try {
             if (this.trackingSheetService.delete(id))
-                return new ResponseEntity<>(new GeneralBodyResponse<>(true, "delete Tracking Sheet ok", null), HttpStatus.OK);
+                return new ResponseEntity<>(new GeneralBodyResponse<>(true, DELETED_OK, null), HttpStatus.OK);
             else
-                return new ResponseEntity<>(new GeneralBodyResponse<>(false, "not delete", null), HttpStatus.BAD_REQUEST);
-
+                return new ResponseEntity<>(new GeneralBodyResponse<>(false, DELETED_FAIL, null), HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
@@ -81,12 +77,10 @@ public class TrackingSheetController {
 
     @GetMapping("tracking-sheet/{id}")
     public ResponseEntity<GeneralBodyResponse<TrackingSheetDto>> findById(@PathVariable String id) {
-        try {
-            var trackingSheetDto = this.trackingSheetService.findById(id);
-
-            return new ResponseEntity<>(new GeneralBodyResponse<>(trackingSheetDto, "find rep-com-agent", null), HttpStatus.OK);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
-        }
+        var byId = this.trackingSheetService.findById(id);
+        if (byId != null)
+            return new ResponseEntity<>(new GeneralBodyResponse<>(byId, FOUND_OBJECT, null), HttpStatus.OK);
+        else
+            return new ResponseEntity<>(new GeneralBodyResponse<>(null, NOT_FOUND_OBJECT, null), HttpStatus.BAD_REQUEST);
     }
 }

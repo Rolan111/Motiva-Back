@@ -1,43 +1,46 @@
 package co.edu.ucc.motivaback.service.impl;
 
 import co.edu.ucc.motivaback.dto.TrackingSheetDto;
-import co.edu.ucc.motivaback.payload.TrackingSheetForm;
 import co.edu.ucc.motivaback.service.TrackingSheetService;
+import co.edu.ucc.motivaback.util.CommonsService;
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.*;
-import org.modelmapper.ModelMapper;
+import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.WriteResult;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import static co.edu.ucc.motivaback.util.CommonsService.*;
 
 @Service
 public class TrackingSheetServiceImpl implements TrackingSheetService {
-
     private final FirebaseInitializer firebase;
-    private final ModelMapper modelMapper;
+    private final CollectionReference collectionReference;
 
-
-    public TrackingSheetServiceImpl(FirebaseInitializer firebase, ModelMapper modelMapper) {
+    public TrackingSheetServiceImpl(FirebaseInitializer firebase) {
         this.firebase = firebase;
-        this.modelMapper = modelMapper;
+        this.collectionReference = getFirebaseCollection(this.firebase, CommonsService.COLLECTION_NAME_TRACKING_SHEET);
+    }
+
+    private TrackingSheetDto getTrackingSheetDto(DocumentSnapshot doc) {
+        var jsonString = getGson().toJson(doc.getData());
+        TrackingSheetDto trackingSheetDto = getGson().fromJson(jsonString, TrackingSheetDto.class);
+
+        trackingSheetDto.setId(doc.getId());
+        return trackingSheetDto;
     }
 
     @Override
     public List<TrackingSheetDto> findAll() {
-        List<TrackingSheetDto> response = new ArrayList<>();
-        String id1 = "hola";
-        //ApiFuture<QuerySnapshot> querySnapshotApiFuture = getCollection().get();
-        ApiFuture<QuerySnapshot> querySnapshotApiFuture = getCollection().get();
-
         try {
-            //for (DocumentSnapshot doc : querySnapshotApiFuture.get().getDocuments()) {
-            for (DocumentSnapshot doc : querySnapshotApiFuture.get().getDocuments()) {
-                var trackingSheetDto = doc.toObject(TrackingSheetDto.class);
-                trackingSheetDto.setDocumentTrackingSheetId(doc.getId()); //SE DEBE AGREGAR UN ID AL BEAN?
-                response.add(trackingSheetDto);
-            }
-            return response;
+            return this.collectionReference.get().get().getDocuments().stream().map(this::getTrackingSheetDto)
+                    .collect(Collectors.toList());
         } catch (ExecutionException | InterruptedException e) {
             Thread.currentThread().interrupt();
             return Collections.emptyList();
@@ -45,52 +48,49 @@ public class TrackingSheetServiceImpl implements TrackingSheetService {
     }
 
     @Override
-    public TrackingSheetDto findById(String id) throws ExecutionException, InterruptedException {
-        DocumentReference ref = getCollection().document(id);
-        ApiFuture<DocumentSnapshot> futureDoc = ref.get();
-        DocumentSnapshot document = futureDoc.get();
-
-        var trackingSheetDto = document.toObject(TrackingSheetDto.class);
-        return trackingSheetDto;
+    public TrackingSheetDto findById(String id) {
+        try {
+            return getTrackingSheetDto(this.collectionReference.document(id).get().get());
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        }
     }
 
     @Override
-    public TrackingSheetDto create(TrackingSheetForm trackingSheetForm) {
-        Map<String, Object> docData = getDocData(trackingSheetForm);
-        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document().create(docData);
-        var trackingSheetDto = new TrackingSheetDto();
+    public TrackingSheetDto create(TrackingSheetDto inTrackingSheetDto) {
         try {
-            if (writeResultApiFuture.get() != null)
-                trackingSheetDto = modelMapper.map(trackingSheetForm, TrackingSheetDto.class);
+            ApiFuture<WriteResult> writeResultApiFuture = this.collectionReference.document().create(getDocData(inTrackingSheetDto));
 
+            if (writeResultApiFuture.get() != null)
+                return inTrackingSheetDto;
+            else
+                return null;
         } catch (ExecutionException | InterruptedException e) {
             Thread.currentThread().interrupt();
+            return null;
         }
-
-        return trackingSheetDto;
     }
 
     @Override
-    public TrackingSheetDto update(TrackingSheetForm trackingSheetForm) {
-        Map<String, Object> docData = getDocData(trackingSheetForm);
-        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(trackingSheetForm.getDocumentTrackingSheetId()).set(docData);
-        var trackingSheetDto = new TrackingSheetDto();
-
+    public TrackingSheetDto update(TrackingSheetDto trackingSheetDto) {
         try {
-            if (writeResultApiFuture.get() != null)
-                trackingSheetDto = modelMapper.map(trackingSheetForm, TrackingSheetDto.class);
+            ApiFuture<WriteResult> writeResultApiFuture = this.collectionReference.document(trackingSheetDto.getId()).set(getDocData(trackingSheetDto));
 
+            if (writeResultApiFuture.get() != null)
+                return trackingSheetDto;
+            else
+                return null;
         } catch (ExecutionException | InterruptedException e) {
             Thread.currentThread().interrupt();
+            return null;
         }
-
-        return trackingSheetDto;
     }
 
     @Override
     public boolean delete(String id) {
         try {
-            ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(id).delete();
+            ApiFuture<WriteResult> writeResultApiFuture = this.collectionReference.document(id).delete();
 
             return writeResultApiFuture.get() != null;
         } catch (ExecutionException | InterruptedException e) {
@@ -99,26 +99,17 @@ public class TrackingSheetServiceImpl implements TrackingSheetService {
         }
     }
 
-
-    /*@Override
-    public RepComAgentDto findById(String id) {
-        return null;
-    }*/
-
-    private CollectionReference getCollection() {
-        return firebase.getFirestore().collection("tracking_sheet");
-    }
-
-    private Map<String, Object> getDocData(TrackingSheetForm answer) {
+    private Map<String, Object> getDocData(TrackingSheetDto trackingSheetDto) {
         Map<String, Object> docData = new HashMap<>();
-        docData.put("names", answer.getNames());
-        docData.put("lastnames", answer.getLastnames());
-        docData.put("identification_type", answer.getIdentification_type());
-        docData.put("n_identification", answer.getN_identification());
-        docData.put("type_route", answer.getType_route());
-        docData.put("referred_entity", answer.getReferred_entity());
-        docData.put("attention_status", answer.getAttention_status());
-        docData.put("recommendations_suggestions", answer.getRecommendations_suggestions());
+
+        docData.put(NAMES, trackingSheetDto.getNames());
+        docData.put(LASTNAMES, trackingSheetDto.getLastnames());
+        docData.put(TYPE, trackingSheetDto.getType());
+        docData.put(IDENTIFICATION, trackingSheetDto.getIdentification());
+        docData.put(TYPE_ROUTE, trackingSheetDto.getTypeRoute());
+        docData.put(REFERRED_ENTITY, trackingSheetDto.getReferredEntity());
+        docData.put(ATTENTION_STATUS, trackingSheetDto.getAttentionStatus());
+        docData.put(RECOMMENDATIONS, trackingSheetDto.getRecommendations());
         return docData;
     }
 }

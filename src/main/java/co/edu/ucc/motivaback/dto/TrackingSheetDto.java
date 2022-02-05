@@ -1,23 +1,19 @@
 package co.edu.ucc.motivaback.dto;
 
-public class TrackingSheetDto {
-    private String documentTrackingSheetId;
+import com.google.gson.annotations.SerializedName;
+
+public class TrackingSheetDto extends AbstractDto {
     private String names;
     private String lastnames;
-    private String identification_type;
-    private int n_identification;
-    private String type_route;
-    private String referred_entity;
-    private String attention_status;
-    private String recommendations_suggestions;
-
-    public String getDocumentTrackingSheetId() {
-        return documentTrackingSheetId;
-    }
-
-    public void setDocumentTrackingSheetId(String documentTrackingSheetId) {
-        this.documentTrackingSheetId = documentTrackingSheetId;
-    }
+    private String type;
+    private String identification;
+    @SerializedName("type_route")
+    private String typeRoute;
+    @SerializedName("referred_entity")
+    private String referredEntity;
+    @SerializedName("attention_status")
+    private String attentionStatus;
+    private String recommendations;
 
     public String getNames() {
         return names;
@@ -35,51 +31,51 @@ public class TrackingSheetDto {
         this.lastnames = lastnames;
     }
 
-    public String getIdentification_type() {
-        return identification_type;
+    public String getType() {
+        return type;
     }
 
-    public void setIdentification_type(String identification_type) {
-        this.identification_type = identification_type;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public int getN_identification() {
-        return n_identification;
+    public String getIdentification() {
+        return identification;
     }
 
-    public void setN_identification(int n_identification) {
-        this.n_identification = n_identification;
+    public void setIdentification(String identification) {
+        this.identification = identification;
     }
 
-    public String getType_route() {
-        return type_route;
+    public String getTypeRoute() {
+        return typeRoute;
     }
 
-    public void setType_route(String type_route) {
-        this.type_route = type_route;
+    public void setTypeRoute(String typeRoute) {
+        this.typeRoute = typeRoute;
     }
 
-    public String getReferred_entity() {
-        return referred_entity;
+    public String getReferredEntity() {
+        return referredEntity;
     }
 
-    public void setReferred_entity(String referred_entity) {
-        this.referred_entity = referred_entity;
+    public void setReferredEntity(String referredEntity) {
+        this.referredEntity = referredEntity;
     }
 
-    public String getAttention_status() {
-        return attention_status;
+    public String getAttentionStatus() {
+        return attentionStatus;
     }
 
-    public void setAttention_status(String attention_status) {
-        this.attention_status = attention_status;
+    public void setAttentionStatus(String attentionStatus) {
+        this.attentionStatus = attentionStatus;
     }
 
-    public String getRecommendations_suggestions() {
-        return recommendations_suggestions;
+    public String getRecommendations() {
+        return recommendations;
     }
 
-    public void setRecommendations_suggestions(String recommendations_suggestions) {
-        this.recommendations_suggestions = recommendations_suggestions;
+    public void setRecommendations(String recommendations) {
+        this.recommendations = recommendations;
     }
 }

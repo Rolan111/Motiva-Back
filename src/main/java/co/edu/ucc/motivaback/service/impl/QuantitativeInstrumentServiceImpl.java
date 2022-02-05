@@ -1,12 +1,10 @@
 package co.edu.ucc.motivaback.service.impl;
 
 import co.edu.ucc.motivaback.dto.AnswerQuantitativeInstrumentDto;
-import co.edu.ucc.motivaback.dto.QuantitativeInstrumentDto;
 import co.edu.ucc.motivaback.dto.QuestionDto;
-import co.edu.ucc.motivaback.util.ConstantsFields;
 import co.edu.ucc.motivaback.payload.AnswerQuantitativeInstrumentForm;
-import co.edu.ucc.motivaback.payload.QuantitativeInstrumentForm;
 import co.edu.ucc.motivaback.service.QuantitativeInstrumentService;
+import co.edu.ucc.motivaback.util.CommonsService;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -43,11 +41,11 @@ public class QuantitativeInstrumentServiceImpl implements QuantitativeInstrument
             for (DocumentSnapshot doc : querySnapshotApiFuture.get().getDocuments()) {
                 AnswerQuantitativeInstrumentDto answer = new AnswerQuantitativeInstrumentDto();
 
-                answer.setIdAnswer((Long) doc.getData().get(ConstantsFields.ID_ANSWER));
-                answer.setIdQuestion((Long) doc.getData().get(ConstantsFields.ID_QUESTION));
-                answer.setIdOptionAnswer((Long) doc.getData().get(ConstantsFields.ID_OPTION_ANSWER));
-                answer.setOpenAnswer(doc.getData().get(ConstantsFields.OPEN_ANSWER).toString());
-                answer.setIdPoll((Long) doc.getData().get(ConstantsFields.ID_POLL));
+                answer.setIdAnswer((Long) doc.getData().get(CommonsService.ID_ANSWER));
+                answer.setIdQuestion((Long) doc.getData().get(CommonsService.ID_QUESTION));
+                answer.setIdOptionAnswer((Long) doc.getData().get(CommonsService.ID_OPTION_ANSWER));
+                answer.setOpenAnswer(doc.getData().get(CommonsService.OPEN_ANSWER).toString());
+                answer.setIdPoll((Long) doc.getData().get(CommonsService.ID_POLL));
 
                 response.add(answer);
             }
@@ -79,42 +77,6 @@ public class QuantitativeInstrumentServiceImpl implements QuantitativeInstrument
     }
 
     @Override
-    public QuantitativeInstrumentDto update(QuantitativeInstrumentForm quantitativeInstrumentForm) {
-        var quantitativeInstrumentDto = new QuantitativeInstrumentDto();
-        AnswerQuantitativeInstrumentForm answer = new AnswerQuantitativeInstrumentForm();
-
-        Map<String, Object> docData = getDocData(answer);
-        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(quantitativeInstrumentForm.getDocumentId()).set(docData);
-
-        try {
-            if (writeResultApiFuture.get() != null)
-                quantitativeInstrumentDto = modelMapper.map(quantitativeInstrumentForm, QuantitativeInstrumentDto.class);
-
-        } catch (ExecutionException | InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-
-        return quantitativeInstrumentDto;
-    }
-
-    @Override
-    public boolean delete(String id) {
-        try {
-            ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(id).delete();
-
-            return writeResultApiFuture.get() != null;
-        } catch (ExecutionException | InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return false;
-        }
-    }
-
-    @Override
-    public QuantitativeInstrumentDto findById(String id) {
-        return null;
-    }
-
-    @Override
     public List<QuestionDto> findAllQuestion() {
         List<QuestionDto> response = new ArrayList<>();
         ApiFuture<QuerySnapshot> querySnapshotApiFuture = getCollectionQuestion().get();
@@ -123,11 +85,11 @@ public class QuantitativeInstrumentServiceImpl implements QuantitativeInstrument
             for (DocumentSnapshot doc : querySnapshotApiFuture.get().getDocuments()) {
                 QuestionDto questionDto = new QuestionDto();
 
-                questionDto.setIdQuestion((Long) doc.getData().get(ConstantsFields.ID_QUESTION));
-                questionDto.setDescription(doc.getData().get(ConstantsFields.DESCRIPTION).toString());
-                questionDto.setIdFather((Long) doc.getData().get(ConstantsFields.ID_FATHER));
-                questionDto.setIdQuestionType((Long) doc.getData().get(ConstantsFields.ID_QUESTION_TYPE));
-                questionDto.setOrder((Long) doc.getData().get(ConstantsFields.ORDER));
+                questionDto.setIdQuestion((Long) doc.getData().get(CommonsService.ID_QUESTION));
+                questionDto.setDescription(doc.getData().get(CommonsService.DESCRIPTION).toString());
+                questionDto.setIdFather((Long) doc.getData().get(CommonsService.ID_FATHER));
+                questionDto.setIdQuestionType((Long) doc.getData().get(CommonsService.ID_QUESTION_TYPE));
+                questionDto.setOrder((Long) doc.getData().get(CommonsService.ORDER));
 
                 response.add(questionDto);
             }
@@ -149,11 +111,11 @@ public class QuantitativeInstrumentServiceImpl implements QuantitativeInstrument
     private Map<String, Object> getDocData(AnswerQuantitativeInstrumentForm answer) {
         Map<String, Object> docData = new HashMap<>();
 
-        docData.put(ConstantsFields.ID_ANSWER, answer.getIdAnswer());
-        docData.put(ConstantsFields.ID_QUESTION, answer.getIdQuestion());
-        docData.put(ConstantsFields.ID_OPTION_ANSWER, answer.getIdOptionAnswer());
-        docData.put(ConstantsFields.OPEN_ANSWER, answer.getOpenAnswer());
-        docData.put(ConstantsFields.ID_POLL, answer.getIdPoll());
+        docData.put(CommonsService.ID_ANSWER, answer.getIdAnswer());
+        docData.put(CommonsService.ID_QUESTION, answer.getIdQuestion());
+        docData.put(CommonsService.ID_OPTION_ANSWER, answer.getIdOptionAnswer());
+        docData.put(CommonsService.OPEN_ANSWER, answer.getOpenAnswer());
+        docData.put(CommonsService.ID_POLL, answer.getIdPoll());
 
         return docData;
     }

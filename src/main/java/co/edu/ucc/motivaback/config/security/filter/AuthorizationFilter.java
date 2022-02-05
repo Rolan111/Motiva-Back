@@ -1,7 +1,9 @@
 package co.edu.ucc.motivaback.config.security.filter;
 
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
+import co.edu.ucc.motivaback.dto.UserDto;
 import co.edu.ucc.motivaback.enums.TokenTypeEnum;
+import co.edu.ucc.motivaback.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -26,10 +28,12 @@ import java.util.LinkedList;
 
 public class AuthorizationFilter extends BasicAuthenticationFilter {
     private final KeyPair keyPair;
+    private UserService userService;
 
-    public AuthorizationFilter(AuthenticationManager authenticationManager, KeyPair keyPair) {
+    public AuthorizationFilter(AuthenticationManager authenticationManager, KeyPair keyPair, UserService userService) {
         super(authenticationManager);
         this.keyPair = keyPair;
+        this.userService = userService;
     }
 
     @Override
@@ -57,11 +61,12 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                 .parseClaimsJws(token);
         Collection<GrantedAuthority> authorities = new LinkedList<>();
         String username = decodedJWT.getBody().get("username", String.class);
-        String rol = decodedJWT.getBody().get("rol", String.class);
+        UserDto userDto = userService.findByUsername(username);
+        String rol = decodedJWT.getBody().get("job_profile", String.class);
 
         if (username != null) {
             return new UsernamePasswordAuthenticationToken(
-                    new AuthenticatedUser(username, rol),
+                    new AuthenticatedUser(userDto.getIdUser().toString(), rol),
                     null,
                     authorities);
         } else {

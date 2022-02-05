@@ -1,6 +1,7 @@
 package co.edu.ucc.motivaback.dto;
 
 import co.edu.ucc.motivaback.enums.UserRolEnum;
+import com.google.gson.annotations.SerializedName;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,28 +10,25 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class UserDto extends AbstractDto implements UserDetails {
-
-    private UserRolEnum job_profile;
-
+    @SerializedName("job_profile")
+    private UserRolEnum jobProfile;
     private String password;
-
     private String name;
-
-    private String last_name;
-
+    @SerializedName("last_name")
+    private String lastName;
     private String identification;
-
-    private String identification_type;
-
+    @SerializedName("identification_type")
+    private String identificationType;
+    @SerializedName("id_user")
     private Long idUser;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(job_profile.name()));
+        return Collections.singleton(new SimpleGrantedAuthority(jobProfile.name()));
     }
 
-    public String getLast_name() {
-        return this.last_name;
+    public String getLastName() {
+        return this.lastName;
     }
 
     @Override
@@ -58,12 +56,12 @@ public class UserDto extends AbstractDto implements UserDetails {
         return getIdentification();
     }
 
-    public UserRolEnum getJob_profile() {
-        return job_profile;
+    public UserRolEnum getJobProfile() {
+        return jobProfile;
     }
 
-    public void setJob_profile(UserRolEnum job_profile) {
-        this.job_profile = job_profile;
+    public void setJobProfile(UserRolEnum jobProfile) {
+        this.jobProfile = jobProfile;
     }
 
     public String getPassword() {
@@ -82,8 +80,8 @@ public class UserDto extends AbstractDto implements UserDetails {
         this.name = name;
     }
 
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getIdentification() {
@@ -94,12 +92,12 @@ public class UserDto extends AbstractDto implements UserDetails {
         this.identification = identification;
     }
 
-    public String getIdentification_type() {
-        return identification_type;
+    public String getIdentificationType() {
+        return identificationType;
     }
 
-    public void setIdentification_type(String identification_type) {
-        this.identification_type = identification_type;
+    public void setIdentificationType(String identificationType) {
+        this.identificationType = identificationType;
     }
 
     public Long getIdUser() {

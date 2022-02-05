@@ -25,15 +25,12 @@ public class RepComAgentServicetImpl implements RepComAgentService {
     @Override
     public List<RepComAgentDto> findAll() {
         List<RepComAgentDto> response = new ArrayList<>();
-        String id1 = "hola";
-        //ApiFuture<QuerySnapshot> querySnapshotApiFuture = getCollection().get();
         ApiFuture<QuerySnapshot> querySnapshotApiFuture = getCollection().get();
 
         try {
-            //for (DocumentSnapshot doc : querySnapshotApiFuture.get().getDocuments()) {
             for (DocumentSnapshot doc : querySnapshotApiFuture.get().getDocuments()) {
                 var repComAgentDto = doc.toObject(RepComAgentDto.class);
-                repComAgentDto.setDocumentRepComAgentId(doc.getId()); //SE DEBE AGREGAR UN ID AL BEAN?
+                repComAgentDto.setId(doc.getId());
                 response.add(repComAgentDto);
             }
             return response;
@@ -49,8 +46,7 @@ public class RepComAgentServicetImpl implements RepComAgentService {
         ApiFuture<DocumentSnapshot> futureDoc = ref.get();
         DocumentSnapshot document = futureDoc.get();
 
-        var repComAgentDto = document.toObject(RepComAgentDto.class);
-        return repComAgentDto;
+        return document.toObject(RepComAgentDto.class);
     }
 
     @Override
@@ -97,12 +93,6 @@ public class RepComAgentServicetImpl implements RepComAgentService {
             return false;
         }
     }
-
-
-    /*@Override
-    public RepComAgentDto findById(String id) {
-        return null;
-    }*/
 
     private CollectionReference getCollection() {
         return firebase.getFirestore().collection("rep_com_agent");

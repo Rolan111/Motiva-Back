@@ -2,6 +2,7 @@ package co.edu.ucc.motivaback.config.security;
 
 import co.edu.ucc.motivaback.config.security.filter.AuthenticationFilter;
 import co.edu.ucc.motivaback.config.security.filter.AuthorizationFilter;
+import co.edu.ucc.motivaback.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,14 +17,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableTransactionManagement
 public class ApiSecurityConf extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
     private final KeyPairComponent keyPairComponent;
+    private UserService userService;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    public ApiSecurityConf(KeyPairComponent keyPairComponent) {
+    public ApiSecurityConf(KeyPairComponent keyPairComponent, UserService userService) {
         this.keyPairComponent = keyPairComponent;
+        this.userService = userService;
     }
 
     @Override
@@ -46,7 +49,7 @@ public class ApiSecurityConf extends WebSecurityConfigurerAdapter implements Web
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new AuthenticationFilter(authenticationManager(), this.keyPairComponent.getKeysPair(), "/auth"))
-                .addFilter(new AuthorizationFilter(authenticationManager(), this.keyPairComponent.getKeysPair()))
+                .addFilter(new AuthorizationFilter(authenticationManager(), this.keyPairComponent.getKeysPair(), this.userService))
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 }

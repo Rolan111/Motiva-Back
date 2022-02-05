@@ -1,44 +1,45 @@
 package co.edu.ucc.motivaback.dto;
 
-public class RepComAgentDto {
+import com.google.gson.annotations.SerializedName;
 
-    private String documentRepComAgentId;
-    private String activity_name;
-    private int activity_number;
+public class RepComAgentDto extends AbstractDto {
+    @SerializedName("activity_name")
+    private String activityName;
+    @SerializedName("activity_number")
+    private int activityNumber;
     private String date;
     private String duration;
     private String place;
-    private int number_attendees;
-    private String activity_objectives;
-    private String resources_used;
-    private String methodology_used;
-    private String activity_description_development;
-    private String resources_obtained;
+    @SerializedName("number_attendees")
+    private int numberAttendees;
+    @SerializedName("activity_objectives")
+    private String activityObjectives;
+    @SerializedName("resources_used")
+    private String resourcesUsed;
+    @SerializedName("methodology_used")
+    private String methodologyUsed;
+    @SerializedName("activity_description_development")
+    private String activityDescriptionDevelopment;
+    @SerializedName("resources_obtained")
+    private String resourcesObtained;
     private String evidence;
-    private String activity_professional_incharge;
+    @SerializedName("activity_professional_incharge")
+    private String activityProfessionalIncharge;
 
-    public String getDocumentRepComAgentId() {
-        return documentRepComAgentId;
+    public String getActivityName() {
+        return activityName;
     }
 
-    public void setDocumentRepComAgentId(String documentRepComAgentId) {
-        this.documentRepComAgentId = documentRepComAgentId;
+    public void setActivityName(String activityName) {
+        this.activityName = activityName;
     }
 
-    public String getActivity_name() {
-        return activity_name;
+    public int getActivityNumber() {
+        return activityNumber;
     }
 
-    public void setActivity_name(String activity_name) {
-        this.activity_name = activity_name;
-    }
-
-    public int getActivity_number() {
-        return activity_number;
-    }
-
-    public void setActivity_number(int activity_number) {
-        this.activity_number = activity_number;
+    public void setActivityNumber(int activityNumber) {
+        this.activityNumber = activityNumber;
     }
 
     public String getDate() {
@@ -65,52 +66,52 @@ public class RepComAgentDto {
         this.place = place;
     }
 
-    public int getNumber_attendees() {
-        return number_attendees;
+    public int getNumberAttendees() {
+        return numberAttendees;
     }
 
-    public void setNumber_attendees(int number_attendees) {
-        this.number_attendees = number_attendees;
+    public void setNumberAttendees(int numberAttendees) {
+        this.numberAttendees = numberAttendees;
     }
 
-    public String getActivity_objectives() {
-        return activity_objectives;
+    public String getActivityObjectives() {
+        return activityObjectives;
     }
 
-    public void setActivity_objectives(String activity_objectives) {
-        this.activity_objectives = activity_objectives;
+    public void setActivityObjectives(String activityObjectives) {
+        this.activityObjectives = activityObjectives;
     }
 
-    public String getResources_used() {
-        return resources_used;
+    public String getResourcesUsed() {
+        return resourcesUsed;
     }
 
-    public void setResources_used(String resources_used) {
-        this.resources_used = resources_used;
+    public void setResourcesUsed(String resourcesUsed) {
+        this.resourcesUsed = resourcesUsed;
     }
 
-    public String getMethodology_used() {
-        return methodology_used;
+    public String getMethodologyUsed() {
+        return methodologyUsed;
     }
 
-    public void setMethodology_used(String methodology_used) {
-        this.methodology_used = methodology_used;
+    public void setMethodologyUsed(String methodologyUsed) {
+        this.methodologyUsed = methodologyUsed;
     }
 
-    public String getActivity_description_development() {
-        return activity_description_development;
+    public String getActivityDescriptionDevelopment() {
+        return activityDescriptionDevelopment;
     }
 
-    public void setActivity_description_development(String activity_description_development) {
-        this.activity_description_development = activity_description_development;
+    public void setActivityDescriptionDevelopment(String activityDescriptionDevelopment) {
+        this.activityDescriptionDevelopment = activityDescriptionDevelopment;
     }
 
-    public String getResources_obtained() {
-        return resources_obtained;
+    public String getResourcesObtained() {
+        return resourcesObtained;
     }
 
-    public void setResources_obtained(String resources_obtained) {
-        this.resources_obtained = resources_obtained;
+    public void setResourcesObtained(String resourcesObtained) {
+        this.resourcesObtained = resourcesObtained;
     }
 
     public String getEvidence() {
@@ -121,11 +122,11 @@ public class RepComAgentDto {
         this.evidence = evidence;
     }
 
-    public String getActivity_professional_incharge() {
-        return activity_professional_incharge;
+    public String getActivityProfessionalIncharge() {
+        return activityProfessionalIncharge;
     }
 
-    public void setActivity_professional_incharge(String activity_professional_incharge) {
-        this.activity_professional_incharge = activity_professional_incharge;
+    public void setActivityProfessionalIncharge(String activityProfessionalIncharge) {
+        this.activityProfessionalIncharge = activityProfessionalIncharge;
     }
 }

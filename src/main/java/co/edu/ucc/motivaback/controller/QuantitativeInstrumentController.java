@@ -1,14 +1,16 @@
 package co.edu.ucc.motivaback.controller;
 
+import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.AnswerQuantitativeInstrumentDto;
-import co.edu.ucc.motivaback.dto.QuantitativeInstrumentDto;
 import co.edu.ucc.motivaback.dto.QuestionDto;
+import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.payload.AnswerQuantitativeInstrumentForm;
-import co.edu.ucc.motivaback.payload.QuantitativeInstrumentForm;
 import co.edu.ucc.motivaback.service.QuantitativeInstrumentService;
+import co.edu.ucc.motivaback.util.CommonsService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -58,54 +60,26 @@ public class QuantitativeInstrumentController {
         }
     }
 
-    @PostMapping("/quantitative-instrument-update")
-    public ResponseEntity<GeneralBodyResponse<QuantitativeInstrumentDto>> update(@Valid @RequestBody QuantitativeInstrumentForm quantitativeInstrumentForm) {
-        try {
-            var quantitativeInstrumentDto = this.quantitativeInstrumentService.update(quantitativeInstrumentForm);
-
-            return new ResponseEntity<>(new GeneralBodyResponse<>(quantitativeInstrumentDto, "update", null), HttpStatus.OK);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @PostMapping("quantitative-instrument-delete")
-    public ResponseEntity<GeneralBodyResponse<Boolean>> delete(@Valid @RequestBody QuantitativeInstrumentForm quantitativeInstrumentForm) {
-        try {
-            if (this.quantitativeInstrumentService.delete(quantitativeInstrumentForm.getDocumentId()))
-                return new ResponseEntity<>(new GeneralBodyResponse<>(true, "delete ok", null), HttpStatus.OK);
-            else
-                return new ResponseEntity<>(new GeneralBodyResponse<>(false, "not delete", null), HttpStatus.BAD_REQUEST);
-
-        } catch (Exception ex) {
-            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @GetMapping("quantitative-instrument/{id}")
-    public ResponseEntity<GeneralBodyResponse<QuantitativeInstrumentDto>> findById(@PathVariable String id) {
-        try {
-            var quantitativeInstrumentDto = this.quantitativeInstrumentService.findById(id);
-
-            return new ResponseEntity<>(new GeneralBodyResponse<>(quantitativeInstrumentDto, "find quantitative-instrument", null), HttpStatus.OK);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
-        }
-    }
-
     @GetMapping(value = "/quantitative-instrument-questions")
-    public ResponseEntity<GeneralBodyResponse<List<QuestionDto>>> getAllQuestion() {
-        try {
-            List<QuestionDto> postDTOS = this.quantitativeInstrumentService.findAllQuestion();
+    public ResponseEntity<GeneralBodyResponse<List<QuestionDto>>> getAllQuestion(@AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
 
-            if (!postDTOS.isEmpty())
-                return new ResponseEntity<>(new GeneralBodyResponse<>(postDTOS, "list questions", null), HttpStatus.OK);
-            else
-                return new ResponseEntity<>(new GeneralBodyResponse<>(null, "empty", null), HttpStatus.BAD_REQUEST);
+        if (authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()) || authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name())) {
+            try {
+                List<QuestionDto> postDTOS = this.quantitativeInstrumentService.findAllQuestion();
 
-        } catch (Exception ex) {
-            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+                if (!postDTOS.isEmpty())
+                    return new ResponseEntity<>(new GeneralBodyResponse<>(postDTOS, "list questions", null), HttpStatus.OK);
+                else
+                    return new ResponseEntity<>(new GeneralBodyResponse<>(null, "empty", null), HttpStatus.BAD_REQUEST);
+
+            } catch (Exception ex) {
+                return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+            }
+
+        } else {
+            return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
         }
+
     }
 }
 
