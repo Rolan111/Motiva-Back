@@ -19,4 +19,6 @@ public interface AnswerQuantitativeInstrumentService {
     List<QuestionDto> findAllQuestions();
 
     SequenceDto getLastSequences();
+
+    List<AnswerQuantitativeInstrumentDto> getAnswersByIdPoll(Integer idPoll);
 }

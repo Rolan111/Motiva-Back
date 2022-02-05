@@ -66,7 +66,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 
         if (username != null) {
             return new UsernamePasswordAuthenticationToken(
-                    new AuthenticatedUser(userDto.getIdUser().toString(), rol),
+                    new AuthenticatedUser(userDto.getId(), rol, userDto.getIdUser().intValue()),
                     null,
                     authorities);
         } else {

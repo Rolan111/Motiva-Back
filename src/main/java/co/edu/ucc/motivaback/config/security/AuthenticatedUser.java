@@ -1,12 +1,14 @@
 package co.edu.ucc.motivaback.config.security;
 
 public class AuthenticatedUser {
-    private String id;
+    private String idFireBase;
+    private Integer id;
     private String rol;
 
-    public AuthenticatedUser(String id, String rol) {
-        this.id = id;
+    public AuthenticatedUser(String idFireBase, String rol, Integer id) {
+        this.idFireBase = idFireBase;
         this.rol = rol;
+        this.id = id;
     }
 
     public String getRol() {
@@ -17,11 +19,19 @@ public class AuthenticatedUser {
         this.rol = rol;
     }
 
-    public String getId() {
+    public String getIdFireBase() {
+        return idFireBase;
+    }
+
+    public void setIdFireBase(String idFireBase) {
+        this.idFireBase = idFireBase;
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 }

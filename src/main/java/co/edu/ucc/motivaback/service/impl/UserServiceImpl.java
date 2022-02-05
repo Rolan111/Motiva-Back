@@ -2,7 +2,6 @@ package co.edu.ucc.motivaback.service.impl;
 
 import co.edu.ucc.motivaback.dto.UserDto;
 import co.edu.ucc.motivaback.service.UserService;
-import co.edu.ucc.motivaback.util.CommonsService;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
@@ -10,9 +9,12 @@ import com.google.cloud.firestore.QuerySnapshot;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
-import static co.edu.ucc.motivaback.util.CommonsService.USER_NOT_FOUND;
+import static co.edu.ucc.motivaback.util.CommonsService.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,22 +34,32 @@ public class UserServiceImpl implements UserService {
                     .findFirst().orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND));
 
             return getUserDto(doc);
-
         } catch (InterruptedException | ExecutionException e) {
             Thread.currentThread().interrupt();
             throw new UsernameNotFoundException(USER_NOT_FOUND);
         }
     }
 
+    @Override
+    public List<UserDto> findAllByIdSupervisor(Integer idSupervisor) {
+        try {
+            return getFirebaseCollection(this.firebase, USER).get().get().getDocuments()
+                    .stream().filter(doc -> doc.getData().get(ID_SUPERVISOR).equals(idSupervisor))
+                    .map(this::getUserDto).collect(Collectors.toList());
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
+            return Collections.emptyList();
+        }
+    }
+
     private UserDto getUserDto(QueryDocumentSnapshot doc) {
-        var jsonString = CommonsService.getGson().toJson(doc.getData());
-        UserDto userDto = CommonsService.getGson().fromJson(jsonString, UserDto.class);
+        var userDto = getGson().fromJson(getGson().toJson(doc.getData()), UserDto.class);
 
         userDto.setId(doc.getId());
         return userDto;
     }
 
     private CollectionReference getCollection() {
-        return firebase.getFirestore().collection("user");
+        return firebase.getFirestore().collection(USER);
     }
 }

@@ -7,11 +7,13 @@ import co.edu.ucc.motivaback.service.AnswerQuantitativeInstrumentService;
 import co.edu.ucc.motivaback.util.CommonsService;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.WriteResult;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static co.edu.ucc.motivaback.util.CommonsService.*;
 
@@ -116,6 +118,22 @@ public class AnswerQuantitativeInstrumentServiceImpl implements AnswerQuantitati
             Thread.currentThread().interrupt();
             return null;
         }
+    }
+
+    @Override
+    public List<AnswerQuantitativeInstrumentDto> getAnswersByIdPoll(Integer idPoll) {
+        try {
+            return getFirebaseCollection(this.firebase, ANSWER).get().get().getDocuments()
+                    .stream().filter(doc -> doc.getData().get(ID_POLL).equals(idPoll))
+                    .map(this::getAnswerQuantitativeInstrumentDto).collect(Collectors.toList());
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
+            return Collections.emptyList();
+        }
+    }
+
+    private AnswerQuantitativeInstrumentDto getAnswerQuantitativeInstrumentDto(QueryDocumentSnapshot doc) {
+        return getGson().fromJson(getGson().toJson(doc.getData()), AnswerQuantitativeInstrumentDto.class);
     }
 
     private Map<String, Object> getDocData(AnswerQuantitativeInstrumentDto dto) {

@@ -104,6 +104,25 @@ public class AnswerQuantitativeInstrumentController {
         }
     }
 
+    @GetMapping(value = "/quantitative-answers-by-poll/{idPoll}")
+    public ResponseEntity<GeneralBodyResponse<List<AnswerQuantitativeInstrumentDto>>> getAnswersByIdPoll(
+            @PathVariable Integer idPoll,
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        var notAccess = (ResponseEntity<GeneralBodyResponse<List<AnswerQuantitativeInstrumentDto>>>) hasAccess(authenticatedUser);
+        if (notAccess != null) return notAccess;
+
+        try {
+            List<AnswerQuantitativeInstrumentDto> list = this.answerQuantitativeInstrumentService.getAnswersByIdPoll(idPoll);
+
+            if (!list.isEmpty())
+                return new ResponseEntity<>(new GeneralBodyResponse<>(list, LIST_OK, null), HttpStatus.OK);
+            else
+                return new ResponseEntity<>(new GeneralBodyResponse<>(list, EMPTY_LIST, null), HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     private ResponseEntity<?> hasAccess(AuthenticatedUser authenticatedUser) {
         if (!authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()) && !authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name())) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);

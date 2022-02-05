@@ -21,6 +21,8 @@ public class UserDto extends AbstractDto implements UserDetails {
     private String identificationType;
     @SerializedName("id_user")
     private Long idUser;
+    @SerializedName("id_supervisor")
+    private Long idSupervisor;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -106,5 +108,13 @@ public class UserDto extends AbstractDto implements UserDetails {
 
     public void setIdUser(Long idUser) {
         this.idUser = idUser;
+    }
+
+    public Long getIdSupervisor() {
+        return idSupervisor;
+    }
+
+    public void setIdSupervisor(Long idSupervisor) {
+        this.idSupervisor = idSupervisor;
     }
 }

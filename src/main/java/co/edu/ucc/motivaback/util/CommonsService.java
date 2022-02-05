@@ -32,8 +32,10 @@ public class CommonsService {
     public static final String ORDER = "order";
 
     // User Fields Dto
+    public static final String USER = "user";
     public static final String USER_NOT_FOUND = "El usuario no existe";
     public static final String LAST_NAME = "last_name";
+    public static final String ID_SUPERVISOR = "id_supervisor";
 
     // Tracking Fields Dto
     public static final String COLLECTION_NAME_TRACKING_SHEET = "tracking_sheet";
@@ -48,6 +50,10 @@ public class CommonsService {
 
     // Poll Fields Dto
     public static final String POLL = "poll";
+    public static final String APPROVAL_DOC = "approval_doc";
+    public static final String DATE = "date";
+    public static final String EVIDENCE = "evidence";
+    public static final String ID_USER = "id_user";
 
     // Msg
     public static final String NOT_ACCESS = "Acceso no autorizado";

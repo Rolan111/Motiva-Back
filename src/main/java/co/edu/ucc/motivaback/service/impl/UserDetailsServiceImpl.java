@@ -34,7 +34,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
             userDto.setId(doc.getId());
             return userDto;
-
         } catch (InterruptedException | ExecutionException e) {
             Thread.currentThread().interrupt();
             throw new UsernameNotFoundException(CommonsService.USER_NOT_FOUND);

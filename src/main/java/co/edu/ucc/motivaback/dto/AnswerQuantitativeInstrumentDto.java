@@ -1,15 +1,22 @@
 package co.edu.ucc.motivaback.dto;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * @author nagredo
  * @project motiva-back
  * @class AnswerQuantitativeInstrumentForm
  */
 public class AnswerQuantitativeInstrumentDto {
+    @SerializedName("id_answer")
     private Integer idAnswer;
+    @SerializedName("id_question")
     private Integer idQuestion;
+    @SerializedName("id_option_answer")
     private Integer idOptionAnswer;
+    @SerializedName("open_answer")
     private String openAnswer;
+    @SerializedName("id_poll")
     private Integer idPoll;
 
     public Integer getIdAnswer() {
