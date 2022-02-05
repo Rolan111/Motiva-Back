@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -39,6 +40,24 @@ public class PollServiceImpl implements PollService {
         try {
             List<QueryDocumentSnapshot> documents = getFirebaseCollection(this.firebase, POLL).get().get().getDocuments()
                     .stream().filter(doc -> doc.getData().get(ID_USER).equals(idUser)).collect(Collectors.toList());
+
+            return gePageFromList(pageable, documents);
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        }
+    }
+
+    @Override
+    public Page<PollDto> findAll(Pageable pageable, List<Long> idUsers) {
+        try {
+            List<QueryDocumentSnapshot> documents = new ArrayList<>();
+            
+            for (Long idUser : idUsers) {
+                documents.addAll(getFirebaseCollection(this.firebase, POLL).get().get().getDocuments()
+                        .stream().filter(doc -> doc.getData().get(ID_USER).equals(idUser.intValue()))
+                        .collect(Collectors.toList()));
+            }
 
             return gePageFromList(pageable, documents);
         } catch (ExecutionException | InterruptedException e) {
