@@ -12,12 +12,12 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @Service
-public class RepComAgentServicetImpl implements RepComAgentService {
+public class RepComAgentServiceImpl implements RepComAgentService {
 
     private final FirebaseInitializer firebase;
     private final ModelMapper modelMapper;
 
-    public RepComAgentServicetImpl(FirebaseInitializer firebase, ModelMapper modelMapper) {
+    public RepComAgentServiceImpl(FirebaseInitializer firebase, ModelMapper modelMapper) {
         this.firebase = firebase;
         this.modelMapper = modelMapper;
     }
