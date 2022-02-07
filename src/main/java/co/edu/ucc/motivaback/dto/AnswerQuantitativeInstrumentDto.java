@@ -11,39 +11,39 @@ import java.util.List;
  */
 public class AnswerQuantitativeInstrumentDto {
     @SerializedName("id_answer")
-    private Integer idAnswer;
+    private Long idAnswer;
     @SerializedName("id_question")
-    private Integer idQuestion;
+    private Long idQuestion;
     @SerializedName("id_option_answer")
-    private Integer idOptionAnswer;
+    private Long idOptionAnswer;
     @SerializedName("open_answer")
     private String openAnswer;
     @SerializedName("id_poll")
-    private Integer idPoll;
+    private Long idPoll;
     @SerializedName("multiple_answer")
-    private List<Integer> multipleAnswer;
+    private List<Long> multipleAnswer;
 
-    public Integer getIdAnswer() {
+    public Long getIdAnswer() {
         return idAnswer;
     }
 
-    public void setIdAnswer(Integer idAnswer) {
+    public void setIdAnswer(Long idAnswer) {
         this.idAnswer = idAnswer;
     }
 
-    public Integer getIdQuestion() {
+    public Long getIdQuestion() {
         return idQuestion;
     }
 
-    public void setIdQuestion(Integer idQuestion) {
+    public void setIdQuestion(Long idQuestion) {
         this.idQuestion = idQuestion;
     }
 
-    public Integer getIdOptionAnswer() {
+    public Long getIdOptionAnswer() {
         return idOptionAnswer;
     }
 
-    public void setIdOptionAnswer(Integer idOptionAnswer) {
+    public void setIdOptionAnswer(Long idOptionAnswer) {
         this.idOptionAnswer = idOptionAnswer;
     }
 
@@ -55,19 +55,19 @@ public class AnswerQuantitativeInstrumentDto {
         this.openAnswer = openAnswer;
     }
 
-    public Integer getIdPoll() {
+    public Long getIdPoll() {
         return idPoll;
     }
 
-    public void setIdPoll(Integer idPoll) {
+    public void setIdPoll(Long idPoll) {
         this.idPoll = idPoll;
     }
 
-    public List<Integer> getMultipleAnswer() {
+    public List<Long> getMultipleAnswer() {
         return multipleAnswer;
     }
 
-    public void setMultipleAnswer(List<Integer> multipleAnswer) {
+    public void setMultipleAnswer(List<Long> multipleAnswer) {
         this.multipleAnswer = multipleAnswer;
     }
 }

@@ -41,12 +41,12 @@ public class AnswerQuantitativeInstrumentServiceImpl implements AnswerQuantitati
                 if (map != null) {
                     var answer = new AnswerQuantitativeInstrumentDto();
 
-                    answer.setIdAnswer((Integer) map.get(CommonsService.ID_ANSWER));
-                    answer.setIdQuestion((Integer) map.get(CommonsService.ID_QUESTION));
-                    answer.setIdOptionAnswer((Integer) map.get(CommonsService.ID_OPTION_ANSWER));
+                    answer.setIdAnswer((Long) map.get(ID_ANSWER));
+                    answer.setIdQuestion((Long) map.get(CommonsService.ID_QUESTION));
+                    answer.setIdOptionAnswer((Long) map.get(CommonsService.ID_OPTION_ANSWER));
                     answer.setOpenAnswer(map.get(CommonsService.OPEN_ANSWER).toString());
-                    answer.setIdPoll((Integer) map.get(CommonsService.ID_POLL));
-                    answer.setMultipleAnswer((List<Integer>) map.get(MULTIPLE_ANSWER));
+                    answer.setIdPoll((Long) map.get(CommonsService.ID_POLL));
+                    answer.setMultipleAnswer((List<Long>) map.get(MULTIPLE_ANSWER));
                     response.add(answer);
                 }
             }
@@ -109,10 +109,10 @@ public class AnswerQuantitativeInstrumentServiceImpl implements AnswerQuantitati
         try {
             int idPoll = getFirebaseCollection(this.firebase, POLL)
                     .get()
-                    .get().getDocuments().size() + 1;
+                    .get().getDocuments().size();
             int idAnswer = getFirebaseCollection(this.firebase, ANSWER)
                     .get()
-                    .get().getDocuments().size() + 1;
+                    .get().getDocuments().size();
 
             return new SequenceDto(idAnswer, idPoll);
         } catch (ExecutionException | InterruptedException e) {
