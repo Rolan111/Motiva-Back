@@ -2,6 +2,8 @@ package co.edu.ucc.motivaback.dto;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 /**
  * @author nagredo
  * @project motiva-back
@@ -18,6 +20,8 @@ public class AnswerQuantitativeInstrumentDto {
     private String openAnswer;
     @SerializedName("id_poll")
     private Integer idPoll;
+    @SerializedName("multiple_answer")
+    private List<Integer> multipleAnswer;
 
     public Integer getIdAnswer() {
         return idAnswer;
@@ -57,5 +61,13 @@ public class AnswerQuantitativeInstrumentDto {
 
     public void setIdPoll(Integer idPoll) {
         this.idPoll = idPoll;
+    }
+
+    public List<Integer> getMultipleAnswer() {
+        return multipleAnswer;
+    }
+
+    public void setMultipleAnswer(List<Integer> multipleAnswer) {
+        this.multipleAnswer = multipleAnswer;
     }
 }

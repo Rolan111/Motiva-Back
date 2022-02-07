@@ -46,6 +46,7 @@ public class AnswerQuantitativeInstrumentServiceImpl implements AnswerQuantitati
                     answer.setIdOptionAnswer((Integer) map.get(CommonsService.ID_OPTION_ANSWER));
                     answer.setOpenAnswer(map.get(CommonsService.OPEN_ANSWER).toString());
                     answer.setIdPoll((Integer) map.get(CommonsService.ID_POLL));
+                    answer.setMultipleAnswer((List<Integer>) map.get(MULTIPLE_ANSWER));
                     response.add(answer);
                 }
             }
@@ -144,6 +145,7 @@ public class AnswerQuantitativeInstrumentServiceImpl implements AnswerQuantitati
         docData.put(ID_OPTION_ANSWER, dto.getIdOptionAnswer());
         docData.put(OPEN_ANSWER, dto.getOpenAnswer());
         docData.put(ID_POLL, dto.getIdPoll());
+        docData.put(MULTIPLE_ANSWER, dto.getMultipleAnswer());
         return docData;
     }
 }

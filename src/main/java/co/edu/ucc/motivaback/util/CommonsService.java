@@ -23,6 +23,7 @@ public class CommonsService {
     public static final String ID_OPTION_ANSWER = "id_option_answer";
     public static final String OPEN_ANSWER = "open_answer";
     public static final String ID_POLL = "id_poll";
+    public static final String MULTIPLE_ANSWER = "multiple_answer";
 
     // Question Fields Dto
     public static final String QUESTION = "question";
