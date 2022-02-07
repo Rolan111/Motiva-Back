@@ -1,39 +1,47 @@
 package co.edu.ucc.motivaback.service.impl;
 
 import co.edu.ucc.motivaback.dto.RepComAgentDto;
-import co.edu.ucc.motivaback.payload.RepComAgentForm;
 import co.edu.ucc.motivaback.service.RepComAgentService;
+import co.edu.ucc.motivaback.util.CommonsService;
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.*;
-import org.modelmapper.ModelMapper;
+import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.WriteResult;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import static co.edu.ucc.motivaback.util.CommonsService.*;
 
 @Service
 public class RepComAgentServiceImpl implements RepComAgentService {
 
     private final FirebaseInitializer firebase;
-    private final ModelMapper modelMapper;
+    private final CollectionReference collectionReference;
 
-    public RepComAgentServiceImpl(FirebaseInitializer firebase, ModelMapper modelMapper) {
+    public RepComAgentServiceImpl(FirebaseInitializer firebase) {
         this.firebase = firebase;
-        this.modelMapper = modelMapper;
+        this.collectionReference = getFirebaseCollection(this.firebase, CommonsService.COLLECTION_NAME_REP_COM_AGENT);
+    }
+
+    private RepComAgentDto getRepComAgentDto(DocumentSnapshot doc) {
+        var jsonString = getGson().toJson(doc.getData());
+        RepComAgentDto repComAgentDto = getGson().fromJson(jsonString, RepComAgentDto.class);
+
+        repComAgentDto.setId(doc.getId());
+        return repComAgentDto;
     }
 
     @Override
     public List<RepComAgentDto> findAll() {
-        List<RepComAgentDto> response = new ArrayList<>();
-        ApiFuture<QuerySnapshot> querySnapshotApiFuture = getCollection().get();
-
         try {
-            for (DocumentSnapshot doc : querySnapshotApiFuture.get().getDocuments()) {
-                var repComAgentDto = doc.toObject(RepComAgentDto.class);
-                repComAgentDto.setId(doc.getId());
-                response.add(repComAgentDto);
-            }
-            return response;
+            return this.collectionReference.get().get().getDocuments().stream().map(this::getRepComAgentDto)
+                    .collect(Collectors.toList());
         } catch (ExecutionException | InterruptedException e) {
             Thread.currentThread().interrupt();
             return Collections.emptyList();
@@ -41,51 +49,49 @@ public class RepComAgentServiceImpl implements RepComAgentService {
     }
 
     @Override
-    public RepComAgentDto findById(String id) throws ExecutionException, InterruptedException {
-        DocumentReference ref = getCollection().document(id);
-        ApiFuture<DocumentSnapshot> futureDoc = ref.get();
-        DocumentSnapshot document = futureDoc.get();
-
-        return document.toObject(RepComAgentDto.class);
+    public RepComAgentDto findById(String id) {
+        try {
+            return getRepComAgentDto(this.collectionReference.document(id).get().get());
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        }
     }
 
     @Override
-    public RepComAgentDto create(RepComAgentForm repComAgentForm) {
-        Map<String, Object> docData = getDocData(repComAgentForm);
-        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document().create(docData);
-        var repComAgentDto = new RepComAgentDto();
+    public RepComAgentDto create(RepComAgentDto inRepComAgentDto) {
         try {
-            if (writeResultApiFuture.get() != null)
-                repComAgentDto = modelMapper.map(repComAgentForm, RepComAgentDto.class);
+            ApiFuture<WriteResult> writeResultApiFuture = this.collectionReference.document().create(getDocData(inRepComAgentDto));
 
+            if (writeResultApiFuture.get() != null)
+                return inRepComAgentDto;
+            else
+                return null;
         } catch (ExecutionException | InterruptedException e) {
             Thread.currentThread().interrupt();
+            return null;
         }
-
-        return repComAgentDto;
     }
 
     @Override
-    public RepComAgentDto update(RepComAgentForm repComAgentForm) {
-        Map<String, Object> docData = getDocData(repComAgentForm);
-        ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(repComAgentForm.getDocumentRepComAgentId()).set(docData);
-        var repComAgentDto = new RepComAgentDto();
-
+    public RepComAgentDto update(RepComAgentDto repComAgentDto) {
         try {
-            if (writeResultApiFuture.get() != null)
-                repComAgentDto = modelMapper.map(repComAgentForm, RepComAgentDto.class);
+            ApiFuture<WriteResult> writeResultApiFuture = this.collectionReference.document(repComAgentDto.getId()).set(getDocData(repComAgentDto));
 
+            if (writeResultApiFuture.get() != null)
+                return repComAgentDto;
+            else
+                return null;
         } catch (ExecutionException | InterruptedException e) {
             Thread.currentThread().interrupt();
+            return null;
         }
-
-        return repComAgentDto;
     }
 
     @Override
     public boolean delete(String id) {
         try {
-            ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(id).delete();
+            ApiFuture<WriteResult> writeResultApiFuture = this.collectionReference.document(id).delete();
 
             return writeResultApiFuture.get() != null;
         } catch (ExecutionException | InterruptedException e) {
@@ -94,25 +100,22 @@ public class RepComAgentServiceImpl implements RepComAgentService {
         }
     }
 
-    private CollectionReference getCollection() {
-        return firebase.getFirestore().collection("rep_com_agent");
-    }
-
-    private Map<String, Object> getDocData(RepComAgentForm answer) {
+    private Map<String, Object> getDocData(RepComAgentDto repComAgentDto) {
         Map<String, Object> docData = new HashMap<>();
-        docData.put("activity_name", answer.getActivity_name());
-        docData.put("activity_number", answer.getActivity_number());
-        docData.put("date", answer.getDate());
-        docData.put("duration", answer.getDuration());
-        docData.put("place", answer.getPlace());
-        docData.put("number_attendees", answer.getNumber_attendees());
-        docData.put("activity_objectives", answer.getActivity_objectives());
-        docData.put("resources_used", answer.getResources_used());
-        docData.put("methodology_used", answer.getMethodology_used());
-        docData.put("activity_description_development", answer.getActivity_description_development());
-        docData.put("resources_obtained", answer.getResources_obtained());
-        docData.put("evidence", answer.getEvidence());
-        docData.put("activity_professional_incharge", answer.getActivity_professional_incharge());
+
+        docData.put(ACTIVITY_NAME, repComAgentDto.getActivityName());
+        docData.put(ACTIVITY_NUMBER, repComAgentDto.getActivityNumber());
+        docData.put(DATE, repComAgentDto.getDate());
+        docData.put(DURATION, repComAgentDto.getDuration());
+        docData.put(PLACE, repComAgentDto.getPlace());
+        docData.put(NUMBER_ATTENDEES, repComAgentDto.getNumberAttendees());
+        docData.put(ACTIVITY_OBJECTIVES, repComAgentDto.getActivityObjectives());
+        docData.put(RESOURCES_USED, repComAgentDto.getResourcesUsed());
+        docData.put(METHODOLOGY_USED, repComAgentDto.getMethodologyUsed());
+        docData.put(ACTIVITY_DESCRIPTION_DEVELOPMENT, repComAgentDto.getActivityDescriptionDevelopment());
+        docData.put(RESOURCES_OBTAINED, repComAgentDto.getResourcesObtained());
+        docData.put(EVIDENCE, repComAgentDto.getEvidence());
+        docData.put(ACTIVITY_PROFESSIONAL_INCHARGE, repComAgentDto.getActivityProfessionalIncharge());
         return docData;
     }
 }

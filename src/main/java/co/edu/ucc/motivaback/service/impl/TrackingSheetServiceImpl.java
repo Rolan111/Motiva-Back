@@ -20,6 +20,7 @@ import static co.edu.ucc.motivaback.util.CommonsService.*;
 
 @Service
 public class TrackingSheetServiceImpl implements TrackingSheetService {
+
     private final FirebaseInitializer firebase;
     private final CollectionReference collectionReference;
 

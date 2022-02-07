@@ -1,7 +1,6 @@
 package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.dto.RepComAgentDto;
-import co.edu.ucc.motivaback.payload.RepComAgentForm;
 import co.edu.ucc.motivaback.service.RepComAgentService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
 import org.springframework.http.HttpStatus;
@@ -10,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static co.edu.ucc.motivaback.util.CommonsService.*;
 
 @RestController
 @RequestMapping("/api")
@@ -37,26 +38,27 @@ public class RepComAgentController {
     }
 
     @PostMapping(value = "/rep-com-agent-create")
-    public ResponseEntity<GeneralBodyResponse<RepComAgentDto>> create(@RequestBody RepComAgentForm repComAgentForm) {
+    public ResponseEntity<GeneralBodyResponse<RepComAgentDto>> create(@RequestBody RepComAgentDto repComAgentDto) {
         try {
-            var repComAgentDto = this.repComAgentService.create(repComAgentForm);
+            RepComAgentDto sheetDto = this.repComAgentService.create(repComAgentDto);
 
-            if (repComAgentDto != null)
-                return new ResponseEntity<>(new GeneralBodyResponse<>(repComAgentDto, "created", null), HttpStatus.OK);
+            if (sheetDto != null)
+                return new ResponseEntity<>(new GeneralBodyResponse<>(sheetDto, CREATED_OK, null), HttpStatus.OK);
             else
-                return new ResponseEntity<>(new GeneralBodyResponse<>(null, "not created", null), HttpStatus.BAD_REQUEST);
-
+                return new ResponseEntity<>(new GeneralBodyResponse<>(null, CREATED_FAIL, null), HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/rep-com-agent-update")
-    public ResponseEntity<GeneralBodyResponse<RepComAgentDto>> update(@Valid @RequestBody RepComAgentForm repComAgentForm) {
+    public ResponseEntity<GeneralBodyResponse<RepComAgentDto>> update(@Valid @RequestBody RepComAgentDto repComAgentDto) {
         try {
-            var repComAgentDto = this.repComAgentService.update(repComAgentForm);
-
-            return new ResponseEntity<>(new GeneralBodyResponse<>(repComAgentDto, "update Rep Com Agent", null), HttpStatus.OK);
+            var sheetDto = this.repComAgentService.update(repComAgentDto);
+            if (sheetDto != null)
+                return new ResponseEntity<>(new GeneralBodyResponse<>(this.repComAgentService.update(repComAgentDto), UPDATED_OK, null), HttpStatus.OK);
+            else
+                return new ResponseEntity<>(new GeneralBodyResponse<>(null, UPDATED_FAIL, null), HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }

@@ -49,6 +49,22 @@ public class CommonsService {
     public static final String REFERRED_ENTITY = "referred_entity";
     public static final String RECOMMENDATIONS = "recommendations";
 
+    //RepComAgent Fields Dto
+    public static final String COLLECTION_NAME_REP_COM_AGENT = "rep_com_agent";
+    public static final String ACTIVITY_NAME = "name";
+    public static final String ACTIVITY_NUMBER = "activity_number";
+    //public static final String DATE = "date"; *** Se comenta porque ya está declarada
+    public static final String DURATION = "duration";
+    public static final String PLACE = "place";
+    public static final String NUMBER_ATTENDEES = "number_attendees";
+    public static final String ACTIVITY_OBJECTIVES = "activity_objectives";
+    public static final String RESOURCES_USED = "resources_used";
+    public static final String METHODOLOGY_USED = "methodology_used";
+    public static final String ACTIVITY_DESCRIPTION_DEVELOPMENT = "activity_description_development";
+    public static final String RESOURCES_OBTAINED = "resources_obtained";
+    //public static final String EVIDENCE = "evidence";
+    public static final String ACTIVITY_PROFESSIONAL_INCHARGE = "activity_professional_incharge";
+
     // Poll Fields Dto
     public static final String POLL = "poll";
     public static final String APPROVAL_DOC = "approval_doc";

@@ -5,6 +5,7 @@ import co.edu.ucc.motivaback.dto.TrackingSheetDto;
 import java.util.List;
 
 public interface TrackingSheetService {
+
     List<TrackingSheetDto> findAll();
 
     TrackingSheetDto create(TrackingSheetDto trackingSheetDto);
