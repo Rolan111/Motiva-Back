@@ -9,19 +9,17 @@ import java.util.List;
  * @project motiva-back
  * @class AnswerQuantitativeInstrumentForm
  */
-public class AnswerQuantitativeInstrumentDto {
+public class AnswerDto {
     @SerializedName("id_answer")
     private Long idAnswer;
     @SerializedName("id_question")
     private Long idQuestion;
-    @SerializedName("id_option_answer")
-    private Long idOptionAnswer;
     @SerializedName("open_answer")
     private String openAnswer;
     @SerializedName("id_poll")
     private Long idPoll;
-    @SerializedName("multiple_answer")
-    private List<Long> multipleAnswer;
+    @SerializedName("id_option_answers")
+    private List<Long> idOptionAnswers;
 
     public Long getIdAnswer() {
         return idAnswer;
@@ -37,14 +35,6 @@ public class AnswerQuantitativeInstrumentDto {
 
     public void setIdQuestion(Long idQuestion) {
         this.idQuestion = idQuestion;
-    }
-
-    public Long getIdOptionAnswer() {
-        return idOptionAnswer;
-    }
-
-    public void setIdOptionAnswer(Long idOptionAnswer) {
-        this.idOptionAnswer = idOptionAnswer;
     }
 
     public String getOpenAnswer() {
@@ -63,11 +53,11 @@ public class AnswerQuantitativeInstrumentDto {
         this.idPoll = idPoll;
     }
 
-    public List<Long> getMultipleAnswer() {
-        return multipleAnswer;
+    public List<Long> getIdOptionAnswers() {
+        return idOptionAnswers;
     }
 
-    public void setMultipleAnswer(List<Long> multipleAnswer) {
-        this.multipleAnswer = multipleAnswer;
+    public void setIdOptionAnswers(List<Long> idOptionAnswers) {
+        this.idOptionAnswers = idOptionAnswers;
     }
 }

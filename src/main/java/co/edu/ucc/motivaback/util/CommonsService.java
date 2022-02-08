@@ -20,10 +20,9 @@ public class CommonsService {
     // Answer Fields Dto
     public static final String ANSWER = "answer";
     public static final String ID_ANSWER = "id_answer";
-    public static final String ID_OPTION_ANSWER = "id_option_answer";
+    public static final String ID_OPTION_ANSWERS = "id_option_answers";
     public static final String OPEN_ANSWER = "open_answer";
     public static final String ID_POLL = "id_poll";
-    public static final String MULTIPLE_ANSWER = "multiple_answer";
 
     // Question Fields Dto
     public static final String QUESTION = "question";
@@ -53,7 +52,7 @@ public class CommonsService {
     public static final String COLLECTION_NAME_REP_COM_AGENT = "rep_com_agent";
     public static final String ACTIVITY_NAME = "name";
     public static final String ACTIVITY_NUMBER = "activity_number";
-    //public static final String DATE = "date"; *** Se comenta porque ya está declarada
+
     public static final String DURATION = "duration";
     public static final String PLACE = "place";
     public static final String NUMBER_ATTENDEES = "number_attendees";
@@ -62,15 +61,17 @@ public class CommonsService {
     public static final String METHODOLOGY_USED = "methodology_used";
     public static final String ACTIVITY_DESCRIPTION_DEVELOPMENT = "activity_description_development";
     public static final String RESOURCES_OBTAINED = "resources_obtained";
-    //public static final String EVIDENCE = "evidence";
     public static final String ACTIVITY_PROFESSIONAL_INCHARGE = "activity_professional_incharge";
 
     // Poll Fields Dto
     public static final String POLL = "poll";
-    public static final String APPROVAL_DOC = "approval_doc";
     public static final String DATE = "date";
     public static final String EVIDENCE = "evidence";
     public static final String ID_USER = "id_user";
+
+    // Option Answers Dto
+    public static final String OPTION_ANSWER = "option_answer";
+    public static final String ID_OPTION_ANSWER = "id_option_answer";
 
     // Msg
     public static final String NOT_ACCESS = "Acceso no autorizado";
