@@ -51,12 +51,14 @@ public class QuestionServiceImpl implements QuestionService {
                     questionDto.setOrder((Long) data.get(ORDER));
                     questionDto.setType(data.get(TYPE).toString());
 
-                    questionDto.setOptionAnswerDtoList(getFirebaseCollection(this.firebase, OPTION_ANSWER).get().get()
-                            .getDocuments().stream()
-                            .filter(opt -> opt.getData().get(ID_QUESTION).equals(idQuestion))
-                            .collect(Collectors.toList()).stream()
-                            .map(opt -> getGson().fromJson(getGson().toJson(opt.getData()), OptionAnswerDto.class))
-                            .collect(Collectors.toList()));
+                    if (!questionDto.getQuestionTypeDto().getDescription().equals(QuestionTypeEnum.OPEN.name()))
+                        questionDto.setOptionAnswerDtoList(getFirebaseCollection(this.firebase, OPTION_ANSWER).get().get()
+                                .getDocuments().stream()
+                                .filter(opt -> opt.getData().get(ID_QUESTION).equals(idQuestion))
+                                .collect(Collectors.toList()).stream()
+                                .map(opt -> getGson().fromJson(getGson().toJson(opt.getData()), OptionAnswerDto.class))
+                                .collect(Collectors.toList()));
+                    
                     response.add(questionDto);
                 }
             }
