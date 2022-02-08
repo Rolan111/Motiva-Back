@@ -8,6 +8,7 @@ public class OptionAnswerDto {
     @SerializedName("id_question")
     private Long idQuestion;
     private String description;
+    private Long order;
 
     public Long getIdOptionAnswer() {
         return idOptionAnswer;
@@ -31,5 +32,13 @@ public class OptionAnswerDto {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Long getOrder() {
+        return order;
+    }
+
+    public void setOrder(Long order) {
+        this.order = order;
     }
 }
