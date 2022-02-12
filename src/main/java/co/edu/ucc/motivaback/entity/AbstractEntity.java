@@ -1,39 +1,24 @@
-package co.edu.ucc.motivaback.dto;
+package co.edu.ucc.motivaback.entity;
 
 import co.edu.ucc.motivaback.enums.RegisterStatusEnum;
-import co.edu.ucc.motivaback.log.DadLog;
-import com.google.gson.annotations.SerializedName;
+import com.google.cloud.firestore.annotation.DocumentId;
+import com.google.cloud.firestore.annotation.PropertyName;
 
 import java.util.Date;
 
-public abstract class AbstractDto {
+public abstract class AbstractEntity {
+    @DocumentId
     private String id;
-    @SerializedName("created_by")
     private Long createdBy;
-    @SerializedName("created_at")
     private Date createdAt;
-    @SerializedName("updated_by")
     private Long updatedBy;
-    @SerializedName("updated_at")
     private Date updatedAt;
     private RegisterStatusEnum status;
 
-    protected AbstractDto() {
+    protected AbstractEntity() {
         setCreatedAt(new Date());
         setCreatedBy(1L);
         setStatus(RegisterStatusEnum.ACTIVE);
-    }
-
-    protected AbstractDto(RegisterStatusEnum status) {
-        this.status = status;
-    }
-
-    protected AbstractDto(DadLog dadLog) {
-        this.createdAt = dadLog.getCreatedAt();
-        this.createdBy = dadLog.getCreatedBy();
-        this.updatedAt = dadLog.getUpdatedAt();
-        this.updatedBy = dadLog.getUpdatedBy();
-        this.status = dadLog.getStatus();
     }
 
     public String getId() {
@@ -44,34 +29,42 @@ public abstract class AbstractDto {
         this.id = id;
     }
 
+    @PropertyName("created_by")
     public Long getCreatedBy() {
         return createdBy;
     }
 
+    @PropertyName("created_by")
     public void setCreatedBy(Long createdBy) {
         this.createdBy = createdBy;
     }
 
+    @PropertyName("created_at")
     public Date getCreatedAt() {
         return createdAt;
     }
 
+    @PropertyName("created_at")
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
+    @PropertyName("updated_by")
     public Long getUpdatedBy() {
         return updatedBy;
     }
 
+    @PropertyName("updated_by")
     public void setUpdatedBy(Long updatedBy) {
         this.updatedBy = updatedBy;
     }
 
+    @PropertyName("updated_at")
     public Date getUpdatedAt() {
         return updatedAt;
     }
 
+    @PropertyName("updated_at")
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }

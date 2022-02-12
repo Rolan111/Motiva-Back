@@ -1,7 +1,7 @@
 package co.edu.ucc.motivaback.config.security.filter;
 
 import co.edu.ucc.motivaback.config.security.GeneratedAccessToken;
-import co.edu.ucc.motivaback.dto.UserDto;
+import co.edu.ucc.motivaback.entity.UserEntity;
 import co.edu.ucc.motivaback.enums.TokenTypeEnum;
 import co.edu.ucc.motivaback.payload.LoginForm;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -66,7 +66,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) {
         try {
-            var userDto = (UserDto) auth.getPrincipal();
+            var userDto = (UserEntity) auth.getPrincipal();
             var expiration = new Date(System.currentTimeMillis() + 3600000);
             var subject = UUID.randomUUID().toString();
             var token = Jwts.builder()

@@ -1,46 +1,38 @@
 package co.edu.ucc.motivaback.service.impl;
 
-import co.edu.ucc.motivaback.dto.UserDto;
+import co.edu.ucc.motivaback.entity.UserEntity;
+import co.edu.ucc.motivaback.repository.UserRepository;
 import co.edu.ucc.motivaback.util.CommonsService;
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.QuerySnapshot;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
-import java.util.concurrent.ExecutionException;
+import java.util.List;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
+    private final UserRepository userRepository;
 
-    private final FirebaseInitializer firebase;
-
-    public UserDetailsServiceImpl(FirebaseInitializer firebase) {
-        this.firebase = firebase;
+    public UserDetailsServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String identification) throws UsernameNotFoundException {
-        ApiFuture<QuerySnapshot> querySnapshotApiFuture = getCollection().get();
+        Flux<UserEntity> byIdentification = this.userRepository.findByIdentification(identification);
 
         try {
-            var doc = querySnapshotApiFuture.get().getDocuments()
-                    .stream().filter(row -> row.toObject(UserDto.class).getIdentification().equals(identification))
-                    .findFirst().orElseThrow(() -> new UsernameNotFoundException(CommonsService.USER_NOT_FOUND));
-            var jsonString = CommonsService.getGson().toJson(doc.getData());
-            var userDto = CommonsService.getGson().fromJson(jsonString, UserDto.class);
+            List<UserEntity> userEntities = byIdentification.collectList().block();
 
-            userDto.setId(doc.getId());
-            return userDto;
-        } catch (InterruptedException | ExecutionException e) {
-            Thread.currentThread().interrupt();
+            if (userEntities != null && !userEntities.isEmpty()) {
+                return userEntities.get(0);
+            } else {
+                throw new UsernameNotFoundException(CommonsService.USER_NOT_FOUND);
+            }
+        } catch (Exception e) {
             throw new UsernameNotFoundException(CommonsService.USER_NOT_FOUND);
         }
-    }
-
-    private CollectionReference getCollection() {
-        return firebase.getFirestore().collection("user");
     }
 }

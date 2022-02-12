@@ -1,6 +1,7 @@
 package co.edu.ucc.motivaback.service.impl;
 
 import co.edu.ucc.motivaback.dto.UserDto;
+import co.edu.ucc.motivaback.entity.UserEntity;
 import co.edu.ucc.motivaback.service.UserService;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
@@ -30,7 +31,7 @@ public class UserServiceImpl implements UserService {
 
         try {
             var doc = querySnapshotApiFuture.get().getDocuments()
-                    .stream().filter(row -> row.toObject(UserDto.class).getUsername().equals(username))
+                    .stream().filter(row -> row.toObject(UserEntity.class).getUsername().equals(username))
                     .findFirst().orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND));
 
             return getUserDto(doc);
