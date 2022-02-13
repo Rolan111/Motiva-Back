@@ -9,7 +9,13 @@ import java.util.List;
 public interface PollService {
     Page<PollDto> findAll(Pageable pageable);
 
-    Page<PollDto> findAll(Pageable pageable, List<Long> idUsers);
+    Page<PollDto> findAllByIdCity(Pageable pageable, Integer idCity);
 
-    Page<PollDto> findAll(Pageable pageable, Integer idUser);
+    Page<PollDto> findAllByIdCityAndIdUser(Pageable pageable, Integer idCity, Integer idUser);
+
+    Page<PollDto> findAllByIdUsers(Pageable pageable, List<Long> idUsers);
+
+    Page<PollDto> findAllByIdUser(Pageable pageable, Integer idUser);
+
+    PollDto save(PollDto pollDto);
 }

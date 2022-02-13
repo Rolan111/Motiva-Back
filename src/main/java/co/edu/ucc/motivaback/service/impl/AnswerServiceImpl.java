@@ -86,8 +86,7 @@ public class AnswerServiceImpl implements AnswerService {
         List<OptionAnswerEntity> optionAnswerEntityList = this.optionAnswerRepository
                 .findAllByIdQuestion(answerDto.getIdQuestion().intValue()).collectList().block();
 
-        if (optionAnswerEntityList != null && !optionAnswerEntityList.isEmpty()) {
+        if (optionAnswerEntityList != null && !optionAnswerEntityList.isEmpty())
             answerDto.setOptionAnswerDtoList(ObjectMapperUtils.mapAll(optionAnswerEntityList, OptionAnswerDto.class));
-        }
     }
 }

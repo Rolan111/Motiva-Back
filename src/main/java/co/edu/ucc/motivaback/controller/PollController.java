@@ -13,15 +13,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.stream.Collectors;
 
-import static co.edu.ucc.motivaback.util.CommonsService.EMPTY_LIST;
-import static co.edu.ucc.motivaback.util.CommonsService.LIST_OK;
+import static co.edu.ucc.motivaback.util.CommonsService.*;
 
 /**
  * @author dsolano
@@ -48,7 +45,7 @@ public class PollController {
         try {
             var idUsers = this.userService.findAllByIdSupervisor(authenticatedUser.getId())
                     .stream().map(UserDto::getIdUser).collect(Collectors.toList());
-            Page<PollDto> list = this.pollService.findAll(pageable, idUsers);
+            Page<PollDto> list = this.pollService.findAllByIdUsers(pageable, idUsers);
 
             if (!list.getContent().isEmpty())
                 return new ResponseEntity<>(new GeneralBodyResponse<>(list, LIST_OK, null), HttpStatus.OK);
@@ -60,18 +57,75 @@ public class PollController {
     }
 
     @GetMapping(value = "/polls-by-pcampo/{idUser}")
-    public ResponseEntity<GeneralBodyResponse<Page<PollDto>>> getAll(@PathVariable Integer idUser,
-                                                                     @AuthenticationPrincipal AuthenticatedUser authenticatedUser, Pageable pageable) {
+    public ResponseEntity<GeneralBodyResponse<Page<PollDto>>> getAllByIdUser(@PathVariable Integer idUser,
+                                                                             @AuthenticationPrincipal AuthenticatedUser authenticatedUser, Pageable pageable) {
         if (!authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()) && !authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()))
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
 
         try {
-            Page<PollDto> list = this.pollService.findAll(pageable, idUser);
+            Page<PollDto> list = this.pollService.findAllByIdUser(pageable, idUser);
 
             if (!list.getContent().isEmpty())
                 return new ResponseEntity<>(new GeneralBodyResponse<>(list, LIST_OK, null), HttpStatus.OK);
             else
                 return new ResponseEntity<>(new GeneralBodyResponse<>(null, EMPTY_LIST, null), HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping(value = "/polls-by-city/{idCity}")
+    public ResponseEntity<GeneralBodyResponse<Page<PollDto>>> getAllByIdCity(@PathVariable Integer idCity,
+                                                                             @AuthenticationPrincipal AuthenticatedUser authenticatedUser, Pageable pageable) {
+        if (!authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()) && !authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()))
+            return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
+
+        try {
+            Page<PollDto> list = this.pollService.findAllByIdCity(pageable, idCity);
+
+            if (!list.getContent().isEmpty())
+                return new ResponseEntity<>(new GeneralBodyResponse<>(list, LIST_OK, null), HttpStatus.OK);
+            else
+                return new ResponseEntity<>(new GeneralBodyResponse<>(null, EMPTY_LIST, null), HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping(value = "/polls-by-user/{idUser}/city/{idCity}")
+    public ResponseEntity<GeneralBodyResponse<Page<PollDto>>> getAllByIdUserAndIdCity(@PathVariable Integer idUser, @PathVariable Integer idCity,
+                                                                                      @AuthenticationPrincipal AuthenticatedUser authenticatedUser, Pageable pageable) {
+        if (!authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()) && !authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()))
+            return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
+
+        try {
+            Page<PollDto> list = this.pollService.findAllByIdCityAndIdUser(pageable, idCity, idUser);
+
+            if (!list.getContent().isEmpty())
+                return new ResponseEntity<>(new GeneralBodyResponse<>(list, LIST_OK, null), HttpStatus.OK);
+            else
+                return new ResponseEntity<>(new GeneralBodyResponse<>(null, EMPTY_LIST, null), HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping(value = "poll")
+    public ResponseEntity<GeneralBodyResponse<PollDto>> save(@Valid @RequestBody PollDto pollDto,
+                                                             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()) && !authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()))
+            return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
+
+        try {
+            pollDto.setCreatedBy(authenticatedUser.getId().longValue());
+            pollDto.setIdUser(authenticatedUser.getId());
+
+            var save = this.pollService.save(pollDto);
+
+            if (save != null)
+                return new ResponseEntity<>(new GeneralBodyResponse<>(save, CREATED_OK, null), HttpStatus.OK);
+            else
+                return new ResponseEntity<>(new GeneralBodyResponse<>(null, CREATED_FAIL, null), HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }

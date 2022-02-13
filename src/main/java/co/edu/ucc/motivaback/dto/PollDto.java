@@ -1,6 +1,6 @@
 package co.edu.ucc.motivaback.dto;
 
-import com.google.gson.annotations.SerializedName;
+import co.edu.ucc.motivaback.enums.TypeQuestionaryEnum;
 
 import java.util.Date;
 
@@ -11,12 +11,21 @@ import java.util.Date;
  */
 public class PollDto extends AbstractDto {
     private Integer idPoll;
-    @SerializedName("approval_doc")
     private String approvalDoc;
     private Date date;
     private String evidence;
-    @SerializedName("id_user")
     private Integer idUser;
+    private TypeQuestionaryEnum type;
+    private Integer idCity;
+    private CityDto cityDto;
+
+    public Integer getIdCity() {
+        return idCity;
+    }
+
+    public void setIdCity(Integer idCity) {
+        this.idCity = idCity;
+    }
 
     public Integer getIdPoll() {
         return idPoll;
@@ -56,5 +65,21 @@ public class PollDto extends AbstractDto {
 
     public void setIdUser(Integer idUser) {
         this.idUser = idUser;
+    }
+
+    public CityDto getCityDto() {
+        return cityDto;
+    }
+
+    public void setCityDto(CityDto cityDto) {
+        this.cityDto = cityDto;
+    }
+
+    public TypeQuestionaryEnum getType() {
+        return type;
+    }
+
+    public void setType(TypeQuestionaryEnum type) {
+        this.type = type;
     }
 }

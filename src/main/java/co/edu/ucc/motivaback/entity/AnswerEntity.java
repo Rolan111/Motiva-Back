@@ -17,7 +17,6 @@ public class AnswerEntity extends AbstractEntity {
     private String openAnswer;
     private Long idPoll;
     private List<Long> idOptionAnswers;
-    private String city;
 
     @PropertyName("id_answer")
     public Long getIdAnswer() {
@@ -67,13 +66,5 @@ public class AnswerEntity extends AbstractEntity {
     @PropertyName("id_option_answers")
     public void setIdOptionAnswers(List<Long> idOptionAnswers) {
         this.idOptionAnswers = idOptionAnswers;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
     }
 }

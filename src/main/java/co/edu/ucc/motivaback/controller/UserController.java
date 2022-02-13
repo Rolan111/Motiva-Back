@@ -33,9 +33,8 @@ public class UserController {
     @GetMapping(value = "/users-by-supervisor")
     public ResponseEntity<GeneralBodyResponse<List<UserDto>>> getAll(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name())) {
+        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()))
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
-        }
 
         try {
             var list = this.userService.findAllByIdSupervisor(authenticatedUser.getId());
@@ -52,9 +51,8 @@ public class UserController {
     @GetMapping(value = "/users-by-other-supervisor/{idSupervisor}")
     public ResponseEntity<GeneralBodyResponse<List<UserDto>>> getAll(@PathVariable Integer idSupervisor,
                                                                      @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name())) {
+        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()))
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
-        }
 
         try {
             var list = this.userService.findAllByIdSupervisor(idSupervisor);
@@ -71,9 +69,8 @@ public class UserController {
     @PostMapping(value = "user")
     public ResponseEntity<GeneralBodyResponse<UserDto>> save(@Valid @RequestBody UserDto userDto,
                                                              @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name())) {
+        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()))
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
-        }
 
         try {
             var save = this.userService.save(userDto, authenticatedUser.getId());

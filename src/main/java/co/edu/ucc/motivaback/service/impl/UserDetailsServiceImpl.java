@@ -26,11 +26,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         try {
             List<UserEntity> userEntities = byIdentification.collectList().block();
 
-            if (userEntities != null && !userEntities.isEmpty()) {
+            if (userEntities != null && !userEntities.isEmpty())
                 return userEntities.get(0);
-            } else {
+            else
                 throw new UsernameNotFoundException(CommonsService.USER_NOT_FOUND);
-            }
         } catch (Exception e) {
             throw new UsernameNotFoundException(CommonsService.USER_NOT_FOUND);
         }

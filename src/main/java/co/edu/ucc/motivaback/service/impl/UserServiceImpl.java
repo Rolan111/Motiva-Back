@@ -32,11 +32,10 @@ public class UserServiceImpl implements UserService {
         try {
             var userEntities = byUsername.collectList().block();
 
-            if (userEntities != null && !userEntities.isEmpty()) {
+            if (userEntities != null && !userEntities.isEmpty())
                 return userEntities.get(0);
-            } else {
+            else
                 throw new UsernameNotFoundException(CommonsService.USER_NOT_FOUND);
-            }
         } catch (Exception e) {
             throw new UsernameNotFoundException(CommonsService.USER_NOT_FOUND);
         }
@@ -49,11 +48,10 @@ public class UserServiceImpl implements UserService {
         try {
             var userEntities = byUsername.collectList().block();
 
-            if (userEntities != null && !userEntities.isEmpty()) {
+            if (userEntities != null && !userEntities.isEmpty())
                 return ObjectMapperUtils.mapAll(userEntities, UserDto.class);
-            } else {
+            else
                 return Collections.emptyList();
-            }
         } catch (Exception e) {
             return Collections.emptyList();
         }
@@ -62,12 +60,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto save(UserDto userDto, Integer id) {
         var userEntity = ObjectMapperUtils.map(userDto, UserEntity.class);
+        Long count = this.userRepository.count().block();
 
         userEntity.setCreatedAt(new Date());
         userEntity.setCreatedBy(id.longValue());
         userEntity.setStatus(RegisterStatusEnum.ACTIVE);
         userEntity.setIdSupervisor(id.longValue());
-        userEntity.setIdUser(this.userRepository.count().block() != null ? this.userRepository.count().block() + 1 : 1);
+        userEntity.setIdUser(count != null ? count + 1 : 1);
         userEntity.setPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
         return ObjectMapperUtils.map(this.userRepository.save(userEntity).block(), UserDto.class);
     }
