@@ -1,40 +1,16 @@
 package co.edu.ucc.motivaback.dto;
 
 import co.edu.ucc.motivaback.enums.RegisterStatusEnum;
-import co.edu.ucc.motivaback.log.DadLog;
-import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
 
 public abstract class AbstractDto {
     private String id;
-    @SerializedName("created_by")
     private Long createdBy;
-    @SerializedName("created_at")
     private Date createdAt;
-    @SerializedName("updated_by")
     private Long updatedBy;
-    @SerializedName("updated_at")
     private Date updatedAt;
     private RegisterStatusEnum status;
-
-    protected AbstractDto() {
-        setCreatedAt(new Date());
-        setCreatedBy(1L);
-        setStatus(RegisterStatusEnum.ACTIVE);
-    }
-
-    protected AbstractDto(RegisterStatusEnum status) {
-        this.status = status;
-    }
-
-    protected AbstractDto(DadLog dadLog) {
-        this.createdAt = dadLog.getCreatedAt();
-        this.createdBy = dadLog.getCreatedBy();
-        this.updatedAt = dadLog.getUpdatedAt();
-        this.updatedBy = dadLog.getUpdatedBy();
-        this.status = dadLog.getStatus();
-    }
 
     public String getId() {
         return id;

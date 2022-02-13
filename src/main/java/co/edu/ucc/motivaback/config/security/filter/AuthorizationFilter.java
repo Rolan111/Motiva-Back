@@ -1,7 +1,6 @@
 package co.edu.ucc.motivaback.config.security.filter;
 
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
-import co.edu.ucc.motivaback.dto.UserDto;
 import co.edu.ucc.motivaback.enums.TokenTypeEnum;
 import co.edu.ucc.motivaback.service.UserService;
 import io.jsonwebtoken.Claims;
@@ -61,7 +60,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                 .parseClaimsJws(token);
         Collection<GrantedAuthority> authorities = new LinkedList<>();
         String username = decodedJWT.getBody().get("username", String.class);
-        UserDto userDto = userService.findByUsername(username);
+        var userDto = userService.findByIdentification(username);
         String rol = decodedJWT.getBody().get("job_profile", String.class);
 
         if (username != null) {

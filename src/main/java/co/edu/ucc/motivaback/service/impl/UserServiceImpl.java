@@ -2,65 +2,73 @@ package co.edu.ucc.motivaback.service.impl;
 
 import co.edu.ucc.motivaback.dto.UserDto;
 import co.edu.ucc.motivaback.entity.UserEntity;
+import co.edu.ucc.motivaback.enums.RegisterStatusEnum;
+import co.edu.ucc.motivaback.repository.UserRepository;
 import co.edu.ucc.motivaback.service.UserService;
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
+import co.edu.ucc.motivaback.util.CommonsService;
+import co.edu.ucc.motivaback.util.ObjectMapperUtils;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
-
-import static co.edu.ucc.motivaback.util.CommonsService.*;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final FirebaseInitializer firebase;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserServiceImpl(FirebaseInitializer firebase) {
-        this.firebase = firebase;
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
-    public UserDto findByUsername(String username) throws UsernameNotFoundException {
-        ApiFuture<QuerySnapshot> querySnapshotApiFuture = getCollection().get();
+    public UserEntity findByIdentification(String identification) throws UsernameNotFoundException {
+        var byUsername = this.userRepository.findByIdentification(identification);
 
         try {
-            var doc = querySnapshotApiFuture.get().getDocuments()
-                    .stream().filter(row -> row.toObject(UserEntity.class).getUsername().equals(username))
-                    .findFirst().orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND));
+            var userEntities = byUsername.collectList().block();
 
-            return getUserDto(doc);
-        } catch (InterruptedException | ExecutionException e) {
-            Thread.currentThread().interrupt();
-            throw new UsernameNotFoundException(USER_NOT_FOUND);
+            if (userEntities != null && !userEntities.isEmpty()) {
+                return userEntities.get(0);
+            } else {
+                throw new UsernameNotFoundException(CommonsService.USER_NOT_FOUND);
+            }
+        } catch (Exception e) {
+            throw new UsernameNotFoundException(CommonsService.USER_NOT_FOUND);
         }
     }
 
     @Override
     public List<UserDto> findAllByIdSupervisor(Integer idSupervisor) {
+        var byUsername = this.userRepository.findAllByIdSupervisor(idSupervisor);
+
         try {
-            return getFirebaseCollection(this.firebase, USER).get().get().getDocuments()
-                    .stream().filter(doc -> doc.getData().get(ID_SUPERVISOR).equals(idSupervisor))
-                    .map(this::getUserDto).collect(Collectors.toList());
-        } catch (InterruptedException | ExecutionException e) {
-            Thread.currentThread().interrupt();
+            var userEntities = byUsername.collectList().block();
+
+            if (userEntities != null && !userEntities.isEmpty()) {
+                return ObjectMapperUtils.mapAll(userEntities, UserDto.class);
+            } else {
+                return Collections.emptyList();
+            }
+        } catch (Exception e) {
             return Collections.emptyList();
         }
     }
 
-    private UserDto getUserDto(QueryDocumentSnapshot doc) {
-        var userDto = getGson().fromJson(getGson().toJson(doc.getData()), UserDto.class);
+    @Override
+    public UserDto save(UserDto userDto, Integer id) {
+        var userEntity = ObjectMapperUtils.map(userDto, UserEntity.class);
 
-        userDto.setId(doc.getId());
-        return userDto;
-    }
-
-    private CollectionReference getCollection() {
-        return firebase.getFirestore().collection(USER);
+        userEntity.setCreatedAt(new Date());
+        userEntity.setCreatedBy(id.longValue());
+        userEntity.setStatus(RegisterStatusEnum.ACTIVE);
+        userEntity.setIdSupervisor(id.longValue());
+        userEntity.setIdUser(this.userRepository.count().block() != null ? this.userRepository.count().block() + 1 : 1);
+        userEntity.setPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
+        return ObjectMapperUtils.map(this.userRepository.save(userEntity).block(), UserDto.class);
     }
 }

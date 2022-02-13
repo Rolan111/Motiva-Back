@@ -3,12 +3,10 @@ package co.edu.ucc.motivaback.config.security;
 import co.edu.ucc.motivaback.config.security.filter.AuthenticationFilter;
 import co.edu.ucc.motivaback.config.security.filter.AuthorizationFilter;
 import co.edu.ucc.motivaback.service.UserService;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -18,11 +16,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class ApiSecurityConf extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
     private final KeyPairComponent keyPairComponent;
     private UserService userService;
-
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     public ApiSecurityConf(KeyPairComponent keyPairComponent, UserService userService) {
         this.keyPairComponent = keyPairComponent;

@@ -1,6 +1,7 @@
 package co.edu.ucc.motivaback.entity;
 
 import co.edu.ucc.motivaback.enums.UserRolEnum;
+import com.google.cloud.firestore.annotation.Exclude;
 import com.google.cloud.firestore.annotation.PropertyName;
 import com.google.cloud.spring.data.firestore.Document;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,6 +33,7 @@ public class UserEntity extends AbstractEntity implements UserDetails {
     }
 
     @Override
+    @Exclude
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singleton(new SimpleGrantedAuthority(jobProfile.name()));
     }
@@ -41,26 +43,31 @@ public class UserEntity extends AbstractEntity implements UserDetails {
     }
 
     @Override
+    @Exclude
     public String getUsername() {
         return this.identification;
     }
 
     @Override
+    @Exclude
     public boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
+    @Exclude
     public boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
+    @Exclude
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
+    @Exclude
     public boolean isEnabled() {
         return true;
     }

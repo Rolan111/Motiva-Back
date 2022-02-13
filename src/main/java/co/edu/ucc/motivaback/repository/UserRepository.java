@@ -7,5 +7,9 @@ import reactor.core.publisher.Flux;
 
 @Repository
 public interface UserRepository extends FirestoreReactiveRepository<UserEntity> {
+    Flux<UserEntity> findByUsername(String username);
+
     Flux<UserEntity> findByIdentification(String identification);
+
+    Flux<UserEntity> findAllByIdSupervisor(Integer idSupervisor);
 }

@@ -1,22 +1,18 @@
 package co.edu.ucc.motivaback.dto;
 
 import co.edu.ucc.motivaback.enums.UserRolEnum;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserDto extends AbstractDto {
-    @SerializedName("job_profile")
     private UserRolEnum jobProfile;
-    private String password;
     private String name;
-    @SerializedName("last_name")
     private String lastName;
     private String identification;
-    @SerializedName("identification_type")
     private String identificationType;
-    @SerializedName("id_user")
     private Long idUser;
-    @SerializedName("id_supervisor")
     private Long idSupervisor;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String password;
 
     public UserRolEnum getJobProfile() {
         return jobProfile;
@@ -26,20 +22,16 @@ public class UserDto extends AbstractDto {
         this.jobProfile = jobProfile;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
     public void setLastName(String lastName) {
@@ -76,5 +68,13 @@ public class UserDto extends AbstractDto {
 
     public void setIdSupervisor(Long idSupervisor) {
         this.idSupervisor = idSupervisor;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

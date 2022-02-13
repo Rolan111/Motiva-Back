@@ -9,15 +9,12 @@ import co.edu.ucc.motivaback.util.GeneralBodyResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
-import static co.edu.ucc.motivaback.util.CommonsService.EMPTY_LIST;
-import static co.edu.ucc.motivaback.util.CommonsService.LIST_OK;
+import static co.edu.ucc.motivaback.util.CommonsService.*;
 
 /**
  * @author dsolano
@@ -41,7 +38,7 @@ public class UserController {
         }
 
         try {
-            List<UserDto> list = this.userService.findAllByIdSupervisor(authenticatedUser.getId());
+            var list = this.userService.findAllByIdSupervisor(authenticatedUser.getId());
 
             if (!list.isEmpty())
                 return new ResponseEntity<>(new GeneralBodyResponse<>(list, LIST_OK, null), HttpStatus.OK);
@@ -60,12 +57,31 @@ public class UserController {
         }
 
         try {
-            List<UserDto> list = this.userService.findAllByIdSupervisor(idSupervisor);
+            var list = this.userService.findAllByIdSupervisor(idSupervisor);
 
             if (!list.isEmpty())
                 return new ResponseEntity<>(new GeneralBodyResponse<>(list, LIST_OK, null), HttpStatus.OK);
             else
                 return new ResponseEntity<>(new GeneralBodyResponse<>(null, EMPTY_LIST, null), HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping(value = "user")
+    public ResponseEntity<GeneralBodyResponse<UserDto>> save(@Valid @RequestBody UserDto userDto,
+                                                             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name())) {
+            return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
+        }
+
+        try {
+            var save = this.userService.save(userDto, authenticatedUser.getId());
+
+            if (save != null)
+                return new ResponseEntity<>(new GeneralBodyResponse<>(save, CREATED_OK, null), HttpStatus.OK);
+            else
+                return new ResponseEntity<>(new GeneralBodyResponse<>(null, CREATED_FAIL, null), HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }

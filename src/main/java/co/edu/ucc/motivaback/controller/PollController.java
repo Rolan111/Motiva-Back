@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static co.edu.ucc.motivaback.util.CommonsService.EMPTY_LIST;
@@ -47,7 +46,7 @@ public class PollController {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
 
         try {
-            List<Long> idUsers = this.userService.findAllByIdSupervisor(authenticatedUser.getId())
+            var idUsers = this.userService.findAllByIdSupervisor(authenticatedUser.getId())
                     .stream().map(UserDto::getIdUser).collect(Collectors.toList());
             Page<PollDto> list = this.pollService.findAll(pageable, idUsers);
 

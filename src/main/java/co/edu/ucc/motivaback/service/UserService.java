@@ -1,6 +1,7 @@
 package co.edu.ucc.motivaback.service;
 
 import co.edu.ucc.motivaback.dto.UserDto;
+import co.edu.ucc.motivaback.entity.UserEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
@@ -11,7 +12,9 @@ import java.util.List;
  * @class UserService
  */
 public interface UserService {
-    UserDto findByUsername(String username) throws UsernameNotFoundException;
+    UserEntity findByIdentification(String identification) throws UsernameNotFoundException;
 
     List<UserDto> findAllByIdSupervisor(Integer idSupervisor);
+
+    UserDto save(UserDto userDto, Integer id);
 }
