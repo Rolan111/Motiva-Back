@@ -1,20 +1,19 @@
 package co.edu.ucc.motivaback.service.impl;
 
 import co.edu.ucc.motivaback.dto.AnswerDto;
+import co.edu.ucc.motivaback.dto.OptionAnswerDto;
 import co.edu.ucc.motivaback.dto.SequenceDto;
+import co.edu.ucc.motivaback.entity.AnswerEntity;
+import co.edu.ucc.motivaback.entity.OptionAnswerEntity;
+import co.edu.ucc.motivaback.repository.AnswerRepository;
+import co.edu.ucc.motivaback.repository.OptionAnswerRepository;
+import co.edu.ucc.motivaback.repository.PollRepository;
 import co.edu.ucc.motivaback.service.AnswerService;
-import co.edu.ucc.motivaback.util.CommonsService;
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.WriteResult;
+import co.edu.ucc.motivaback.util.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
-
-import static co.edu.ucc.motivaback.util.CommonsService.*;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author nagredo
@@ -23,100 +22,72 @@ import static co.edu.ucc.motivaback.util.CommonsService.*;
  */
 @Service
 public class AnswerServiceImpl implements AnswerService {
-    private final FirebaseInitializer firebase;
+    private final AnswerRepository answerRepository;
+    private final PollRepository pollRepository;
+    private final OptionAnswerRepository optionAnswerRepository;
 
-    public AnswerServiceImpl(FirebaseInitializer firebase) {
-        this.firebase = firebase;
+    public AnswerServiceImpl(AnswerRepository answerRepository, PollRepository pollRepository, OptionAnswerRepository optionAnswerRepository) {
+        this.answerRepository = answerRepository;
+        this.pollRepository = pollRepository;
+        this.optionAnswerRepository = optionAnswerRepository;
     }
 
     @Override
     public List<AnswerDto> findAll() {
-        List<AnswerDto> response = new ArrayList<>();
+        List<AnswerEntity> answerRepositoryAll = this.answerRepository.findAll().collectList().block();
 
-        try {
-            for (DocumentSnapshot doc : getFirebaseCollection(this.firebase, ANSWER).get().get().getDocuments()) {
-                Map<String, Object> map = doc.getData();
+        if (answerRepositoryAll != null && !answerRepositoryAll.isEmpty()) {
+            List<AnswerDto> answerDtoList = ObjectMapperUtils.mapAll(answerRepositoryAll, AnswerDto.class);
 
-                if (map != null) {
-                    var answer = new AnswerDto();
-
-                    answer.setIdAnswer((Long) map.get(ID_ANSWER));
-                    answer.setIdQuestion((Long) map.get(CommonsService.ID_QUESTION));
-                    answer.setOpenAnswer(map.get(CommonsService.OPEN_ANSWER).toString());
-                    answer.setIdPoll((Long) map.get(CommonsService.ID_POLL));
-                    answer.setIdOptionAnswers((List<Long>) map.get(ID_OPTION_ANSWERS));
-                    response.add(answer);
-                }
-            }
-        } catch (ExecutionException | InterruptedException e) {
-            Thread.currentThread().interrupt();
+            answerDtoList.forEach(this::getOptionAnswerEntityList);
+            return answerDtoList;
+        } else {
             return Collections.emptyList();
         }
-
-        return response;
     }
 
     @Override
-    public List<AnswerDto> create(List<AnswerDto> quantitativeInstrumentDtos) {
-        List<AnswerDto> response = new ArrayList<>();
+    public List<AnswerDto> create(List<AnswerDto> answerDtoList) {
+        List<AnswerEntity> answerEntities = ObjectMapperUtils.mapAll(answerDtoList, AnswerEntity.class);
+        List<AnswerEntity> block = this.answerRepository.saveAll(answerEntities).collectList().block();
 
-        for (AnswerDto dto : quantitativeInstrumentDtos) {
-            ApiFuture<WriteResult> writeResultApiFuture = getFirebaseCollection(this.firebase, ANSWER).document().
-                    create(getDocData(dto));
-
-            try {
-                if (writeResultApiFuture.get() != null)
-                    response.add(dto);
-            } catch (ExecutionException | InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return Collections.emptyList();
-            }
-        }
-
-        return response;
+        if (block != null)
+            return ObjectMapperUtils.mapAll(block, AnswerDto.class);
+        else
+            return Collections.emptyList();
     }
 
     @Override
     public SequenceDto getLastSequences() {
-        try {
-            int idPoll = getFirebaseCollection(this.firebase, POLL)
-                    .get()
-                    .get().getDocuments().size();
-            int idAnswer = getFirebaseCollection(this.firebase, ANSWER)
-                    .get()
-                    .get().getDocuments().size();
+        var sequenceDto = new SequenceDto();
+        Long pollCount = this.pollRepository.count().block();
+        Long answerCount = this.answerRepository.count().block();
 
-            return new SequenceDto(idAnswer, idPoll);
-        } catch (ExecutionException | InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return null;
-        }
+        sequenceDto.setIdPoll(pollCount != null ? pollCount.intValue() + 1 : -1);
+        sequenceDto.setIdAnswer(answerCount != null ? answerCount.intValue() + 1 : -1);
+        return sequenceDto;
     }
 
     @Override
     public List<AnswerDto> getAnswersByIdPoll(Integer idPoll) {
-        try {
-            return getFirebaseCollection(this.firebase, ANSWER).get().get().getDocuments()
-                    .stream().filter(doc -> doc.getData().get(ID_POLL).equals(idPoll))
-                    .map(this::getAnswerQuantitativeInstrumentDto).collect(Collectors.toList());
-        } catch (InterruptedException | ExecutionException e) {
-            Thread.currentThread().interrupt();
+        List<AnswerEntity> answerEntities = this.answerRepository.findAllByIdPoll(idPoll).collectList().block();
+
+        if (answerEntities != null && !answerEntities.isEmpty()) {
+            List<AnswerDto> answerDtoList = ObjectMapperUtils.mapAll(answerEntities, AnswerDto.class);
+
+            answerDtoList.forEach(this::getOptionAnswerEntityList);
+            return answerDtoList;
+        } else {
             return Collections.emptyList();
         }
     }
 
-    private AnswerDto getAnswerQuantitativeInstrumentDto(QueryDocumentSnapshot doc) {
-        return getGson().fromJson(getGson().toJson(doc.getData()), AnswerDto.class);
-    }
+    private void getOptionAnswerEntityList(AnswerDto answerDto) {
+        List<OptionAnswerEntity> optionAnswerEntityList = this.optionAnswerRepository
+                .findAllByIdQuestion(answerDto.getIdQuestion().intValue()).collectList().block();
 
-    private Map<String, Object> getDocData(AnswerDto dto) {
-        Map<String, Object> docData = new HashMap<>();
-
-        docData.put(ID_ANSWER, dto.getIdAnswer());
-        docData.put(ID_QUESTION, dto.getIdQuestion());
-        docData.put(OPEN_ANSWER, dto.getOpenAnswer());
-        docData.put(ID_POLL, dto.getIdPoll());
-        docData.put(ID_OPTION_ANSWERS, dto.getIdOptionAnswers());
-        return docData;
+        if (optionAnswerEntityList != null && !optionAnswerEntityList.isEmpty()) {
+            answerDto.setOptionAnswerDtoList(ObjectMapperUtils.mapAll(optionAnswerEntityList, OptionAnswerDto.class));
+        }
     }
 }

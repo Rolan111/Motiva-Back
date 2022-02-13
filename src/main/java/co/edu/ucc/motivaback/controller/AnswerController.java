@@ -38,7 +38,7 @@ public class AnswerController {
         if (notAccess != null) return notAccess;
 
         try {
-            List<AnswerDto> list = this.answerService.findAll();
+            var list = this.answerService.findAll();
 
             if (!list.isEmpty())
                 return new ResponseEntity<>(new GeneralBodyResponse<>(list, LIST_OK, null), HttpStatus.OK);
@@ -56,7 +56,7 @@ public class AnswerController {
         if (notAccess != null) return notAccess;
 
         try {
-            List<AnswerDto> responseList = this.answerService.create(answerList);
+            var responseList = this.answerService.create(answerList);
 
             if (!responseList.isEmpty())
                 return new ResponseEntity<>(new GeneralBodyResponse<>(responseList, CREATED_OK, null), HttpStatus.OK);
@@ -74,7 +74,7 @@ public class AnswerController {
         if (notAccess != null) return notAccess;
 
         try {
-            SequenceDto sequences = this.answerService.getLastSequences();
+            var sequences = this.answerService.getLastSequences();
 
             if (sequences != null)
                 return new ResponseEntity<>(new GeneralBodyResponse<>(sequences, FOUND_OBJECT, null), HttpStatus.OK);
@@ -94,7 +94,7 @@ public class AnswerController {
         if (notAccess != null) return notAccess;
 
         try {
-            List<AnswerDto> list = this.answerService.getAnswersByIdPoll(idPoll);
+            var list = this.answerService.getAnswersByIdPoll(idPoll);
 
             if (!list.isEmpty())
                 return new ResponseEntity<>(new GeneralBodyResponse<>(list, LIST_OK, null), HttpStatus.OK);

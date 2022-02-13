@@ -4,11 +4,6 @@ public class SequenceDto {
     private Integer idAnswer;
     private Integer idPoll;
 
-    public SequenceDto(Integer idAnswer, Integer idPoll) {
-        this.idAnswer = idAnswer;
-        this.idPoll = idPoll;
-    }
-
     public Integer getIdAnswer() {
         return idAnswer;
     }
