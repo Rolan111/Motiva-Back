@@ -1,28 +1,30 @@
-package co.edu.ucc.motivaback.dto;
+package co.edu.ucc.motivaback.entity;
 
 import co.edu.ucc.motivaback.enums.QuestionTypeEnum;
 import co.edu.ucc.motivaback.enums.TypeQuestionaryEnum;
-
-import java.util.List;
+import com.google.cloud.firestore.annotation.PropertyName;
+import com.google.cloud.spring.data.firestore.Document;
 
 /**
  * @author nagredo
  * @project motiva-back
  * @class QuestionDto
  */
-public class QuestionDto extends AbstractDto {
+@Document(collectionName = "question")
+public class QuestionEntity extends AbstractEntity {
     private Long idQuestion;
     private String description;
     private Long idFather;
     private Long order;
     private TypeQuestionaryEnum type;
     private QuestionTypeEnum questionaryType;
-    private List<OptionAnswerDto> optionAnswerDtoList;
 
+    @PropertyName("id_question")
     public Long getIdQuestion() {
         return idQuestion;
     }
 
+    @PropertyName("id_question")
     public void setIdQuestion(Long idQuestion) {
         this.idQuestion = idQuestion;
     }
@@ -35,10 +37,12 @@ public class QuestionDto extends AbstractDto {
         this.description = description;
     }
 
+    @PropertyName("id_father")
     public Long getIdFather() {
         return idFather;
     }
 
+    @PropertyName("id_father")
     public void setIdFather(Long idFather) {
         this.idFather = idFather;
     }
@@ -51,14 +55,6 @@ public class QuestionDto extends AbstractDto {
         this.order = order;
     }
 
-    public List<OptionAnswerDto> getOptionAnswerDtoList() {
-        return optionAnswerDtoList;
-    }
-
-    public void setOptionAnswerDtoList(List<OptionAnswerDto> optionAnswerDtoList) {
-        this.optionAnswerDtoList = optionAnswerDtoList;
-    }
-
     public TypeQuestionaryEnum getType() {
         return type;
     }
@@ -67,10 +63,12 @@ public class QuestionDto extends AbstractDto {
         this.type = type;
     }
 
+    @PropertyName("questionary_type")
     public QuestionTypeEnum getQuestionaryType() {
         return questionaryType;
     }
 
+    @PropertyName("questionary_type")
     public void setQuestionaryType(QuestionTypeEnum questionaryType) {
         this.questionaryType = questionaryType;
     }

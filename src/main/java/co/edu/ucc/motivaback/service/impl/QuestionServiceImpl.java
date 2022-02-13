@@ -2,80 +2,50 @@ package co.edu.ucc.motivaback.service.impl;
 
 import co.edu.ucc.motivaback.dto.OptionAnswerDto;
 import co.edu.ucc.motivaback.dto.QuestionDto;
-import co.edu.ucc.motivaback.dto.QuestionTypeDto;
-import co.edu.ucc.motivaback.enums.QuestionTypeEnum;
+import co.edu.ucc.motivaback.entity.OptionAnswerEntity;
+import co.edu.ucc.motivaback.entity.QuestionEntity;
+import co.edu.ucc.motivaback.repository.OptionAnswerRepository;
+import co.edu.ucc.motivaback.repository.QuestionRepository;
 import co.edu.ucc.motivaback.service.QuestionService;
+import co.edu.ucc.motivaback.util.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-
-import static co.edu.ucc.motivaback.util.CommonsService.*;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
-    private final FirebaseInitializer firebase;
+    private final QuestionRepository questionRepository;
+    private final OptionAnswerRepository optionAnswerRepository;
 
-    public QuestionServiceImpl(FirebaseInitializer firebase) {
-        this.firebase = firebase;
+    public QuestionServiceImpl(QuestionRepository questionRepository, OptionAnswerRepository optionAnswerRepository) {
+        this.questionRepository = questionRepository;
+        this.optionAnswerRepository = optionAnswerRepository;
     }
 
     @Override
     public List<QuestionDto> findAllQuestionary(String type) {
-        List<QuestionDto> response = new ArrayList<>();
+        List<QuestionEntity> questionEntities = this.questionRepository.findAllByType(type).collectList().block();
 
-        try {
-            List<QuestionDto> documents = getFirebaseCollection(this.firebase, QUESTION).get().get()
-                    .getDocuments().stream()
-                    .filter(doc -> doc.getData().get(TYPE).equals(type))
-                    .map(opt -> getGson().fromJson(getGson().toJson(opt.getData()), QuestionDto.class))
-                    .sorted(Comparator.comparingLong(QuestionDto::getOrder))
-                    .collect(Collectors.toList());
+        if (questionEntities != null && !questionEntities.isEmpty()) {
+            List<QuestionEntity> entityListOrder = questionEntities.stream()
+                    .sorted(Comparator.comparingLong(QuestionEntity::getIdQuestion)).collect(Collectors.toList());
+            List<QuestionDto> questionDtoList = ObjectMapperUtils.mapAll(entityListOrder, QuestionDto.class);
 
-            for (QuestionDto questionDto : documents) {
-                Long idQuestionType = questionDto.getIdQuestionType();
-                Long idQuestion = questionDto.getIdQuestion();
-
-                questionDto.setQuestionTypeDto(getQuestionTypeDto(idQuestionType));
-
-                if (!questionDto.getQuestionTypeDto().getDescription().equals(QuestionTypeEnum.OPEN.name()))
-                    questionDto.setOptionAnswerDtoList(getFirebaseCollection(this.firebase, OPTION_ANSWER).get().get()
-                            .getDocuments().stream()
-                            .filter(opt -> opt.getData().get(ID_QUESTION).equals(idQuestion))
-                            .collect(Collectors.toList()).stream()
-                            .map(opt -> getGson().fromJson(getGson().toJson(opt.getData()), OptionAnswerDto.class))
-                            .sorted(Comparator.comparingLong(OptionAnswerDto::getOrder))
-                            .collect(Collectors.toList()));
-
-                response.add(questionDto);
-            }
-
-
-            return response;
-        } catch (ExecutionException |
-                InterruptedException e) {
-            Thread.currentThread().interrupt();
+            questionDtoList.forEach(this::getOptionAnswerEntityList);
+            return questionDtoList;
+        } else {
             return Collections.emptyList();
         }
     }
 
-    private QuestionTypeDto getQuestionTypeDto(Long idQuestionType) {
-        QuestionTypeDto questionTypeDto = new QuestionTypeDto();
+    private void getOptionAnswerEntityList(QuestionDto questionDto) {
+        List<OptionAnswerEntity> optionAnswerEntityList = this.optionAnswerRepository
+                .findAllByIdQuestion(questionDto.getIdQuestion().intValue()).collectList().block();
 
-        questionTypeDto.setIdQuestionType(idQuestionType);
-
-        if (idQuestionType == 1) {
-            questionTypeDto.setDescription(QuestionTypeEnum.UNIQUE.name());
-        } else if (idQuestionType == 2) {
-            questionTypeDto.setDescription(QuestionTypeEnum.MULTIPLE.name());
-        } else {
-            questionTypeDto.setDescription(QuestionTypeEnum.OPEN.name());
-        }
-
-        return questionTypeDto;
+        if (optionAnswerEntityList != null && !optionAnswerEntityList.isEmpty())
+            questionDto.setOptionAnswerDtoList(ObjectMapperUtils.mapAll(optionAnswerEntityList, OptionAnswerDto.class));
     }
 }

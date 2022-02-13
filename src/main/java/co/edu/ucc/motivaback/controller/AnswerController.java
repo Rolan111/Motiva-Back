@@ -31,7 +31,7 @@ public class AnswerController {
         this.answerService = answerService;
     }
 
-    @GetMapping(value = "/quantitative-instruments")
+    @GetMapping(value = "/answers")
     public ResponseEntity<GeneralBodyResponse<List<AnswerDto>>> getAll(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         var notAccess = (ResponseEntity<GeneralBodyResponse<List<AnswerDto>>>) hasAccess(authenticatedUser);
@@ -49,7 +49,7 @@ public class AnswerController {
         }
     }
 
-    @PostMapping(value = "/quantitative-instrument-create")
+    @PostMapping(value = "/answer")
     public ResponseEntity<GeneralBodyResponse<List<AnswerDto>>> create(
             @Valid @RequestBody List<AnswerDto> answerList, @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         var notAccess = (ResponseEntity<GeneralBodyResponse<List<AnswerDto>>>) hasAccess(authenticatedUser);
@@ -67,7 +67,7 @@ public class AnswerController {
         }
     }
 
-    @GetMapping(value = "/quantitative-last-sequences")
+    @GetMapping(value = "/last-sequences")
     public ResponseEntity<GeneralBodyResponse<SequenceDto>> getLastSequence(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         var notAccess = (ResponseEntity<GeneralBodyResponse<SequenceDto>>) hasAccess(authenticatedUser);
@@ -85,7 +85,7 @@ public class AnswerController {
         }
     }
 
-    @GetMapping(value = "/quantitative-answers-by-poll/{idPoll}")
+    @GetMapping(value = "/answers-by-poll/{idPoll}")
     public ResponseEntity<GeneralBodyResponse<List<AnswerDto>>> getAnswersByIdPoll(
             @PathVariable Integer idPoll,
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
