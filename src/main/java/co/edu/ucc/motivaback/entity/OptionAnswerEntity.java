@@ -9,6 +9,7 @@ public class OptionAnswerEntity extends AbstractEntity {
     private Long idQuestion;
     private String description;
     private Long order;
+    private String type;
 
     @PropertyName("id_option_answer")
     public Long getIdOptionAnswer() {
@@ -44,5 +45,13 @@ public class OptionAnswerEntity extends AbstractEntity {
 
     public void setOrder(Long order) {
         this.order = order;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

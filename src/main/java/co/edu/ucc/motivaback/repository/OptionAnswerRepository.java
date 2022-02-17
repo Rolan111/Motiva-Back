@@ -7,5 +7,5 @@ import reactor.core.publisher.Flux;
 
 @Repository
 public interface OptionAnswerRepository extends FirestoreReactiveRepository<OptionAnswerEntity> {
-    Flux<OptionAnswerEntity> findAllByIdQuestion(Integer idQuestion);
+    Flux<OptionAnswerEntity> findAllByIdQuestionAndType(Integer idQuestion, String type);
 }

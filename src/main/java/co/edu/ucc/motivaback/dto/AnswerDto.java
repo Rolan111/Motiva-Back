@@ -1,5 +1,7 @@
 package co.edu.ucc.motivaback.dto;
 
+import co.edu.ucc.motivaback.enums.TypeQuestionaryEnum;
+
 import java.util.List;
 
 /**
@@ -12,6 +14,7 @@ public class AnswerDto extends AbstractDto {
     private Long idQuestion;
     private String openAnswer;
     private Long idPoll;
+    private TypeQuestionaryEnum type;
     private List<Long> idOptionAnswers;
     private List<OptionAnswerDto> optionAnswerDtoList;
 
@@ -45,6 +48,14 @@ public class AnswerDto extends AbstractDto {
 
     public void setIdPoll(Long idPoll) {
         this.idPoll = idPoll;
+    }
+
+    public TypeQuestionaryEnum getType() {
+        return type;
+    }
+
+    public void setType(TypeQuestionaryEnum type) {
+        this.type = type;
     }
 
     public List<Long> getIdOptionAnswers() {

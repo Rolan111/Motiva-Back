@@ -43,7 +43,8 @@ public class QuestionServiceImpl implements QuestionService {
 
     private void getOptionAnswerEntityList(QuestionDto questionDto) {
         List<OptionAnswerEntity> optionAnswerEntityList = this.optionAnswerRepository
-                .findAllByIdQuestion(questionDto.getIdQuestion().intValue()).collectList().block();
+                .findAllByIdQuestionAndType(questionDto.getIdQuestion().intValue(), questionDto.getType().toString())
+                .collectList().block();
 
         if (optionAnswerEntityList != null && !optionAnswerEntityList.isEmpty())
             questionDto.setOptionAnswerDtoList(ObjectMapperUtils.mapAll(optionAnswerEntityList, OptionAnswerDto.class));
