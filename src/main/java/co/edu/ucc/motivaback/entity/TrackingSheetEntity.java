@@ -1,6 +1,10 @@
-package co.edu.ucc.motivaback.dto;
+package co.edu.ucc.motivaback.entity;
 
-public class TrackingSheetDto extends AbstractDto {
+import com.google.cloud.firestore.annotation.PropertyName;
+import com.google.cloud.spring.data.firestore.Document;
+
+@Document(collectionName = "tracking_sheet")
+public class TrackingSheetEntity extends AbstractEntity {
 
     private int idTrackingSheet;
     private String names;
@@ -36,6 +40,16 @@ public class TrackingSheetDto extends AbstractDto {
         this.lastnames = lastnames;
     }
 
+    @PropertyName("identification_type")
+    public String getIdentificationType() {
+        return identificationType;
+    }
+
+    @PropertyName("identification_type")
+    public void setIdentificationType(String identificationType) {
+        this.identificationType = identificationType;
+    }
+
     public String getIdentification() {
         return identification;
     }
@@ -44,26 +58,32 @@ public class TrackingSheetDto extends AbstractDto {
         this.identification = identification;
     }
 
+    @PropertyName("type_route")
     public String getTypeRoute() {
         return typeRoute;
     }
 
+    @PropertyName("type_route")
     public void setTypeRoute(String typeRoute) {
         this.typeRoute = typeRoute;
     }
 
+    @PropertyName("refered_entity")
     public String getReferredEntity() {
         return referredEntity;
     }
 
+    @PropertyName("refered_entity")
     public void setReferredEntity(String referredEntity) {
         this.referredEntity = referredEntity;
     }
 
+    @PropertyName("attention_status")
     public String getAttentionStatus() {
         return attentionStatus;
     }
 
+    @PropertyName("attention_status")
     public void setAttentionStatus(String attentionStatus) {
         this.attentionStatus = attentionStatus;
     }
@@ -74,13 +94,5 @@ public class TrackingSheetDto extends AbstractDto {
 
     public void setRecommendations(String recommendations) {
         this.recommendations = recommendations;
-    }
-
-    public String getIdentificationType() {
-        return identificationType;
-    }
-
-    public void setIdentificationType(String identificationType) {
-        this.identificationType = identificationType;
     }
 }

@@ -41,7 +41,7 @@ public class CommonsService {
     public static final String COLLECTION_NAME_TRACKING_SHEET = "tracking_sheet";
     public static final String NAMES = "names";
     public static final String LASTNAMES = "lastnames";
-    public static final String TYPE = "type";
+    public static final String IDENTIFICATION_TYPE = "identificationType";
     public static final String IDENTIFICATION = "identification";
     public static final String ATTENTION_STATUS = "attention_status";
     public static final String TYPE_ROUTE = "type_route";

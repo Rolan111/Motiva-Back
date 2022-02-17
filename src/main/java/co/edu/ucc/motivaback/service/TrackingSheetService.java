@@ -6,13 +6,7 @@ import java.util.List;
 
 public interface TrackingSheetService {
 
-    List<TrackingSheetDto> findAll();
+    List<TrackingSheetDto> getAll();
 
-    TrackingSheetDto create(TrackingSheetDto trackingSheetDto);
-
-    TrackingSheetDto update(TrackingSheetDto trackingSheetDto);
-
-    boolean delete(String id);
-
-    TrackingSheetDto findById(String id);
+    TrackingSheetDto save(TrackingSheetDto trackingSheetDto);
 }
