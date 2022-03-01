@@ -6,6 +6,7 @@ import co.edu.ucc.motivaback.repository.TrackingSheetRepository;
 import co.edu.ucc.motivaback.service.TrackingSheetService;
 import co.edu.ucc.motivaback.util.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.Date;
@@ -28,6 +29,18 @@ public class TrackingSheetServiceImpl implements TrackingSheetService {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    @Override
+    public Mono<TrackingSheetEntity> getAll2() {
+        Mono<TrackingSheetEntity> trackingSheetEntities = this.trackingSheetRepository.findById("KV4oQSV7GKQ5cBU9f3pB");
+        /*if (trackingSheetEntities != null) {
+            return trackingSheetEntities;
+        } else {
+            return null;
+        }*/
+        //return "hola mundo";
+        return this.trackingSheetRepository.findById("");
     }
 
     @Override

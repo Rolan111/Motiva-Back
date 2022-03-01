@@ -1,8 +1,17 @@
 package co.edu.ucc.motivaback.dto;
 
+import javax.print.Doc;
+import javax.swing.text.Document;
+import java.util.ArrayList;
+import java.util.Map;
+
 public class TrackingSheetDto extends AbstractDto {
 
+    //@DocumentId
+    private String id;
+
     private int idTrackingSheet;
+
     private String names;
     private String lastnames;
     private String identificationType;
@@ -11,6 +20,25 @@ public class TrackingSheetDto extends AbstractDto {
     private String referredEntity;
     private String attentionStatus;
     private String recommendations;
+    private Map<String, String> comments;
+
+    public Map<String, String> getComments() {
+        return comments;
+    }
+
+    public void setComments(Map<String, String> comments) {
+        this.comments = comments;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public int getIdTrackingSheet() {
         return idTrackingSheet;

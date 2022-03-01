@@ -3,17 +3,29 @@ package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.TrackingSheetDto;
+import co.edu.ucc.motivaback.entity.CommentsEntity;
+import co.edu.ucc.motivaback.entity.TrackingSheetEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
+import co.edu.ucc.motivaback.repository.TrackingSheetRepository;
 import co.edu.ucc.motivaback.service.TrackingSheetService;
 import co.edu.ucc.motivaback.util.CommonsService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
+import com.google.cloud.spring.data.firestore.FirestoreReactiveOperations;
+import com.google.cloud.spring.data.firestore.FirestoreTemplate;
+import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static co.edu.ucc.motivaback.util.CommonsService.*;
 
@@ -24,9 +36,19 @@ public class TrackingSheetController {
 
     private final TrackingSheetService trackingSheetService;
 
-    public TrackingSheetController(TrackingSheetService trackingSheetService) {
+    //Adicional
+    private final TrackingSheetRepository trackingSheetRepository;
+    private final FirestoreTemplate firestoreTemplate;
+    FirestoreReactiveOperations firestoreTemplate2;
+
+
+    public TrackingSheetController(TrackingSheetService trackingSheetService, TrackingSheetRepository trackingSheetRepository, FirestoreTemplate firestoreTemplate) {
         this.trackingSheetService = trackingSheetService;
+        this.trackingSheetRepository = trackingSheetRepository;
+        this.firestoreTemplate = firestoreTemplate;
     }
+
+
 
     @GetMapping(value = "/tracking-sheets")
     public ResponseEntity<GeneralBodyResponse<List<TrackingSheetDto>>> getAll(
@@ -46,6 +68,37 @@ public class TrackingSheetController {
         }
     }
 
+    @GetMapping(value = "/tracking-sheets2")
+    public ResponseEntity<GeneralBodyResponse<TrackingSheetDto>> getAll2(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()) && !authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()))
+            return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
+
+        try {
+            var trackingSheetDtoList = this.trackingSheetService.getAll2();
+
+                return new ResponseEntity(new GeneralBodyResponse<>(trackingSheetDtoList, LIST_OK, null), HttpStatus.OK);
+
+        } catch (Exception ex) {
+            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    @GetMapping(value = "/tracking-sheets3")
+    private Flux<TrackingSheetEntity> getAllUsers() {
+        return trackingSheetRepository.findAll();
+    }
+
+    @GetMapping("/tracking-sheet/{id}")
+    private Mono<TrackingSheetEntity> getTrackingById(@PathVariable String id) {
+        return trackingSheetRepository.findById(id);
+    }
+
+    @GetMapping("/tracking-sheets3/{typeRoute}")
+    private Flux<TrackingSheetEntity> getUsersByAge(@PathVariable String typeRoute) {
+        return trackingSheetRepository.findByTypeRoute(typeRoute);
+    }
 
     @PostMapping(value = "/tracking-sheet-create")
     public ResponseEntity<GeneralBodyResponse<TrackingSheetDto>> save(@Valid @RequestBody TrackingSheetDto trackingSheetDto,

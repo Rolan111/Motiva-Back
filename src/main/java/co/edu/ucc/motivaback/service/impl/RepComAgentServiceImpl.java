@@ -1,6 +1,10 @@
 package co.edu.ucc.motivaback.service.impl;
 
+import co.edu.ucc.motivaback.dto.AnswerDto;
+import co.edu.ucc.motivaback.dto.OptionAnswerDto;
 import co.edu.ucc.motivaback.dto.RepComAgentDto;
+import co.edu.ucc.motivaback.entity.AnswerEntity;
+import co.edu.ucc.motivaback.entity.OptionAnswerEntity;
 import co.edu.ucc.motivaback.entity.RepComAgentEntity;
 import co.edu.ucc.motivaback.repository.RepComAgentRepository;
 import co.edu.ucc.motivaback.service.RepComAgentService;
@@ -30,6 +34,17 @@ public class RepComAgentServiceImpl implements RepComAgentService {
         }
     }
 
+    /*
+    @Override
+    public List<RepComAgentDto> getAll2() {
+        List<RepComAgentEntity> repComAgentEntities = this.repComAgentRepository.finAll2().collectList().block();
+        if (repComAgentEntities != null && !repComAgentEntities.isEmpty()) {
+            return ObjectMapperUtils.mapAll(repComAgentEntities, RepComAgentDto.class);
+        } else {
+            return Collections.emptyList();
+        }
+    }*/
+
     @Override
     public RepComAgentDto save(RepComAgentDto repComAgentDto) {
         RepComAgentEntity repComAgentEntity = ObjectMapperUtils.map(repComAgentDto, RepComAgentEntity.class);
@@ -44,4 +59,5 @@ public class RepComAgentServiceImpl implements RepComAgentService {
         else
             return null;
     }
+
 }

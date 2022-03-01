@@ -1,18 +1,28 @@
 package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
+import co.edu.ucc.motivaback.dto.CommentsDto;
 import co.edu.ucc.motivaback.dto.RepComAgentDto;
+import co.edu.ucc.motivaback.entity.CommentsEntity;
+import co.edu.ucc.motivaback.entity.RepComAgentEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
+import co.edu.ucc.motivaback.repository.RepComAgentRepository;
 import co.edu.ucc.motivaback.service.RepComAgentService;
 import co.edu.ucc.motivaback.util.CommonsService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
+import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static co.edu.ucc.motivaback.util.CommonsService.*;
 
@@ -21,9 +31,11 @@ import static co.edu.ucc.motivaback.util.CommonsService.*;
 public class RepComAgentController {
 
     private final RepComAgentService repComAgentService;
+    private final RepComAgentRepository repComAgentRepository;
 
-    public RepComAgentController(RepComAgentService repComAgentService) {
+    public RepComAgentController(RepComAgentService repComAgentService, RepComAgentRepository repComAgentRepository) {
         this.repComAgentService = repComAgentService;
+        this.repComAgentRepository = repComAgentRepository;
     }
 
     @GetMapping(value = "/rep-com-agents")
@@ -42,6 +54,31 @@ public class RepComAgentController {
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/rep-com-agent/{id}")
+    private Mono<RepComAgentEntity> getReportById(@PathVariable String id) {
+        return repComAgentRepository.findById(id);
+    }
+
+
+    @GetMapping(value = "/rep-com-agent-forum-comments/{idReport}")
+
+    private List<CommentsEntity> getSubcollection(@PathVariable String idReport) throws ExecutionException, InterruptedException {
+        List<CommentsEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("rep_com_agent").document(idReport)
+                .collection("comments");
+        ApiFuture<QuerySnapshot> future = documentReference.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            CommentsEntity commentsDto = doc.toObject(CommentsEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+
     }
 
     @PostMapping(value = "/rep-com-agent-create")
@@ -63,6 +100,15 @@ public class RepComAgentController {
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping(value = "/rep-com-agent-comments-create/{id}")
+    public String saveComment(@PathVariable String id, @RequestBody CommentsEntity commentsEntity) throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+        //ApiFuture<WriteResult> collectionApiFuture = db.collection("rep_com_agent").document(id).collection("comments").document().set(commentsDto);
+        db.collection("rep_com_agent").document(id).collection("comments").document().set(commentsEntity);
+        return "Hola mundo";
+        //return collectionApiFuture.get().getUpdateTime().toString();
     }
 
     private ResponseEntity<?> hasAccess(AuthenticatedUser authenticatedUser) {

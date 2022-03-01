@@ -1,12 +1,18 @@
 package co.edu.ucc.motivaback.entity;
 
+import co.edu.ucc.motivaback.dto.CommentsDto;
 import com.google.cloud.firestore.annotation.PropertyName;
 import com.google.cloud.spring.data.firestore.Document;
+
+import javax.print.Doc;
+import java.util.ArrayList;
+import java.util.Map;
 
 @Document(collectionName = "tracking_sheet")
 public class TrackingSheetEntity extends AbstractEntity {
 
-    private int idTrackingSheet;
+    private String idTrackingSheet;
+
     private String names;
     private String lastnames;
     private String identificationType;
@@ -15,12 +21,21 @@ public class TrackingSheetEntity extends AbstractEntity {
     private String referredEntity;
     private String attentionStatus;
     private String recommendations;
+    private Map<String, String> comments;
 
-    public int getIdTrackingSheet() {
+    public Map<String, String> getComments() {
+        return comments;
+    }
+
+    public void setComments(Map<String, String> comments) {
+        this.comments = comments;
+    }
+
+    public String getIdTrackingSheet() {
         return idTrackingSheet;
     }
 
-    public void setIdTrackingSheet(int idTrackingSheet) {
+    public void setIdTrackingSheet(String idTrackingSheet) {
         this.idTrackingSheet = idTrackingSheet;
     }
 
