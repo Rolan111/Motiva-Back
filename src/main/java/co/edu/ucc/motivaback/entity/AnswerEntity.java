@@ -1,5 +1,6 @@
 package co.edu.ucc.motivaback.entity;
 
+import co.edu.ucc.motivaback.enums.TypeQuestionaryEnum;
 import com.google.cloud.firestore.annotation.PropertyName;
 import com.google.cloud.spring.data.firestore.Document;
 
@@ -16,6 +17,7 @@ public class AnswerEntity extends AbstractEntity {
     private Long idQuestion;
     private String openAnswer;
     private Long idPoll;
+    private TypeQuestionaryEnum type;
     private List<Long> idOptionAnswers;
 
     @PropertyName("id_answer")
@@ -56,6 +58,16 @@ public class AnswerEntity extends AbstractEntity {
     @PropertyName("id_poll")
     public void setIdPoll(Long idPoll) {
         this.idPoll = idPoll;
+    }
+
+    @PropertyName("type")
+    public TypeQuestionaryEnum getType() {
+        return type;
+    }
+
+    @PropertyName("type")
+    public void setType(TypeQuestionaryEnum type) {
+        this.type = type;
     }
 
     @PropertyName("id_option_answers")
