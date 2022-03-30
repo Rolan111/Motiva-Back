@@ -11,6 +11,7 @@ import co.edu.ucc.motivaback.service.RepComAgentService;
 import co.edu.ucc.motivaback.util.CommonsService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
 import com.google.api.core.ApiFuture;
+import com.google.api.core.ApiFutures;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -109,6 +111,22 @@ public class RepComAgentController {
         db.collection("rep_com_agent").document(id).collection("comments").document().set(commentsEntity);
         return "Hola mundo";
         //return collectionApiFuture.get().getUpdateTime().toString();
+    }
+
+    @GetMapping(value = "/rep-com-agent-pruebas")
+    public void pruebas() throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore(); //rep_com_agent  number_attendees
+        //Create a reference to the cities collection
+        CollectionReference cities = db.collection("rep_com_agent");
+// Create a query against the collection.
+        Query query = cities.whereEqualTo("number_attendees", 4).whereEqualTo("activity_name","Actividad dos");
+// retrieve  query results asynchronously using query.get()
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+
+        for (DocumentSnapshot document : querySnapshot.get().getDocuments()) {
+            System.out.println(document.getData());
+        }
+
     }
 
     private ResponseEntity<?> hasAccess(AuthenticatedUser authenticatedUser) {
