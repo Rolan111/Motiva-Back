@@ -77,7 +77,7 @@ public class CareSheetController {
 
     //ESPACIO DE PRUEBAS
 
-    @GetMapping(value = "/care-sheet-pruebas")
+    @GetMapping(value = "/care-sheet-instrument-answers")
     public List<CareSheetAnswerEntity> pruebas() throws ExecutionException, InterruptedException {
         List<CareSheetAnswerEntity> commentsEntities = new ArrayList<>();
 
@@ -94,7 +94,7 @@ public class CareSheetController {
         return commentsEntities;
     }
 
-    @GetMapping(value = "/care-sheet-opciones-respuestas/{id}")
+    @GetMapping(value = "/care-sheet-options-answers/{id}")
     public List<CareSheetOptionAnwerEntity> opcionesRespuestas(@PathVariable Integer id) throws ExecutionException, InterruptedException {
         List<CareSheetOptionAnwerEntity> commentsEntities = new ArrayList<>();
 
