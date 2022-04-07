@@ -114,13 +114,9 @@ public class CareSheetController {
 
     @GetMapping(value = "/care-sheet-pruebas-consola")
     public void pruebasConsola() throws ExecutionException, InterruptedException {
-        Firestore db = FirestoreClient.getFirestore(); //rep_com_agent  number_attendees
-        //Create a reference to the cities collection
+        Firestore db = FirestoreClient.getFirestore();
         CollectionReference cities = db.collection("answer");
-// Create a query against the collection.
-        //Query query = cities.whereEqualTo("id_poll", 29).whereEqualTo("activity_name","Actividad dos");
         Query query = cities.whereEqualTo("id_poll", 29);
-// retrieve  query results asynchronously using query.get()
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
 
         for (DocumentSnapshot document : querySnapshot.get().getDocuments()) {
@@ -132,10 +128,8 @@ public class CareSheetController {
     @PostMapping(value = "/care-sheet-answer-psychosocial-create")
     public String saveComment(@RequestBody CareSheetAnswerPsychosocial commentsEntity) throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
-        //ApiFuture<WriteResult> collectionApiFuture = db.collection("rep_com_agent").document(id).collection("comments").document().set(commentsDto);
         db.collection("answer_psychosocial").document().set(commentsEntity);
         return "Hola mundo";
-        //return collectionApiFuture.get().getUpdateTime().toString();
     }
 
     private ResponseEntity<?> hasAccess(AuthenticatedUser authenticatedUser) {

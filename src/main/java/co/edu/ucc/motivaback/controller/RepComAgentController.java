@@ -1,7 +1,6 @@
 package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
-import co.edu.ucc.motivaback.dto.CommentsDto;
 import co.edu.ucc.motivaback.dto.RepComAgentDto;
 import co.edu.ucc.motivaback.entity.CommentsEntity;
 import co.edu.ucc.motivaback.entity.RepComAgentEntity;
@@ -11,7 +10,6 @@ import co.edu.ucc.motivaback.service.RepComAgentService;
 import co.edu.ucc.motivaback.util.CommonsService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
 import com.google.api.core.ApiFuture;
-import com.google.api.core.ApiFutures;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
@@ -22,7 +20,6 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 

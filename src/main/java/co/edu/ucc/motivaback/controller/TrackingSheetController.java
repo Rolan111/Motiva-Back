@@ -3,18 +3,14 @@ package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.TrackingSheetDto;
-import co.edu.ucc.motivaback.entity.CommentsEntity;
 import co.edu.ucc.motivaback.entity.TrackingSheetEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.repository.TrackingSheetRepository;
 import co.edu.ucc.motivaback.service.TrackingSheetService;
 import co.edu.ucc.motivaback.util.CommonsService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.*;
 import com.google.cloud.spring.data.firestore.FirestoreReactiveOperations;
 import com.google.cloud.spring.data.firestore.FirestoreTemplate;
-import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,9 +19,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import static co.edu.ucc.motivaback.util.CommonsService.*;
 
