@@ -3,11 +3,15 @@ package co.edu.ucc.motivaback.controller;
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.PollDto;
 import co.edu.ucc.motivaback.dto.UserDto;
+import co.edu.ucc.motivaback.entity.PollEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.PollService;
 import co.edu.ucc.motivaback.service.UserService;
 import co.edu.ucc.motivaback.util.CommonsService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
+import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,6 +20,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static co.edu.ucc.motivaback.util.CommonsService.*;
@@ -72,6 +79,23 @@ public class PollController {
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping(value = "/pollById/{id}")
+    public List<PollEntity> pollById(@PathVariable Integer id) throws ExecutionException, InterruptedException {
+        List<PollEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("poll");
+        Query query = documentReference.whereEqualTo("id_poll", id);
+        ApiFuture<QuerySnapshot> future = query.get();
+
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        for (QueryDocumentSnapshot doc : documents){
+            PollEntity commentsDto = doc.toObject(PollEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
     }
 
     @GetMapping(value = "/polls-by-city/{idCity}")

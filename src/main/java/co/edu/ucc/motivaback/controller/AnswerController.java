@@ -3,17 +3,24 @@ package co.edu.ucc.motivaback.controller;
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.AnswerDto;
 import co.edu.ucc.motivaback.dto.SequenceDto;
+import co.edu.ucc.motivaback.entity.AnswerEntity;
+import co.edu.ucc.motivaback.entity.PollEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.AnswerService;
 import co.edu.ucc.motivaback.util.CommonsService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
+import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static co.edu.ucc.motivaback.util.CommonsService.*;
 
@@ -102,6 +109,23 @@ public class AnswerController {
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping(value = "/answerByIdPollAndIdQuestion/{idPoll}/{idQuestion}")
+    public List<AnswerEntity> answerByIdAndIdQuestion(@PathVariable Integer idPoll, @PathVariable Integer idQuestion) throws ExecutionException, InterruptedException {
+        List<AnswerEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("answer");
+        Query query = documentReference.whereEqualTo("id_poll", idPoll).whereEqualTo("id_question", idQuestion);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            AnswerEntity commentsDto = doc.toObject(AnswerEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
     }
 
     private ResponseEntity<?> hasAccess(AuthenticatedUser authenticatedUser) {

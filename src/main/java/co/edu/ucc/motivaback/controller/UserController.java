@@ -2,17 +2,23 @@ package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.UserDto;
+import co.edu.ucc.motivaback.entity.UserEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.UserService;
 import co.edu.ucc.motivaback.util.CommonsService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
+import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static co.edu.ucc.motivaback.util.CommonsService.*;
 
@@ -64,6 +70,24 @@ public class UserController {
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping(value = "/userById/{id}")
+    public List<UserEntity> opcionesRespuestas(@PathVariable Integer id) throws ExecutionException, InterruptedException {
+        List<UserEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("user");
+        Query query = documentReference.whereEqualTo("id_user", id);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            UserEntity commentsDto = doc.toObject(UserEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+
     }
 
     @PostMapping(value = "user")
