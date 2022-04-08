@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author nagredo
  * @project motiva-back
- * @class AnswerQuantitativeInstrumentForm
+ * @class AnswerDto
  */
 public class AnswerDto extends AbstractDto {
     private Long idAnswer;
