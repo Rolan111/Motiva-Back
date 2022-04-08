@@ -36,6 +36,19 @@ public class AlertController {
         this.alertEntity = alertEntity;
     }
 
+    int tamanioLista;
+
+    @GetMapping(value = "/alerts_size") //Consultamos la cantidad de registros
+    public int alertsSize() throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("alert_pruebas");
+        ApiFuture<QuerySnapshot> future = documentReference.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        System.out.println("El tamanio del array es: "+documents.size());
+        tamanioLista = documents.size();
+        return tamanioLista;
+    }
+
     @GetMapping(value = "/alerts")
     public List<AlertEntity> getAlerts() throws ExecutionException, InterruptedException {
         List<AlertEntity> commentsEntities = new ArrayList<>();
@@ -70,5 +83,12 @@ public class AlertController {
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping(value = "/alert-create_prueba")
+    public String saveAlerts(@RequestBody AlertEntity alertsEntity) throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+        db.collection("alert_pruebas").document().set(alertsEntity);
+        return "Hola mundo";
     }
 }
