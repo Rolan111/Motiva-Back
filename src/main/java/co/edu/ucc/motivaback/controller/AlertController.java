@@ -38,7 +38,7 @@ public class AlertController {
 
     int tamanioLista;
 
-    @GetMapping(value = "/alerts_size") //Consultamos la cantidad de registros
+    @GetMapping(value = "/alerts-size") //Consultamos la cantidad de registros
     public int alertsSize() throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("alert_pruebas");
@@ -55,6 +55,23 @@ public class AlertController {
 
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("alert");
+        ApiFuture<QuerySnapshot> future = documentReference.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents) {
+            AlertEntity commentsDto = doc.toObject(AlertEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+    }
+
+    //GET ALERTS de PRUEBA
+    @GetMapping(value = "/alerts-pruebas")
+    public List<AlertEntity> getAlertsPrueba() throws ExecutionException, InterruptedException {
+        List<AlertEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("alert_pruebas");
         ApiFuture<QuerySnapshot> future = documentReference.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
@@ -85,7 +102,7 @@ public class AlertController {
         }
     }
 
-    @PostMapping(value = "/alert-create_prueba")
+    @PostMapping(value = "/alert-create-pruebas")
     public String saveAlerts(@RequestBody AlertEntity alertsEntity) throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
         db.collection("alert_pruebas").document().set(alertsEntity);
