@@ -4,10 +4,19 @@ import java.util.List;
 
 public class CareSheetAnswerEntity extends AbstractEntity {
 
+    private int id_answer;
     private int id_question;
     private List<Integer> id_option_answers;
     private String open_answer;
     private int id_poll;
+
+    public int getId_answer() {
+        return id_answer;
+    }
+
+    public void setId_answer(int id_answer) {
+        this.id_answer = id_answer;
+    }
 
     public int getId_question() {
         return id_question;

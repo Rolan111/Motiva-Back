@@ -44,7 +44,6 @@ public class AlertController {
         CollectionReference documentReference = db.collection("alert_pruebas");
         ApiFuture<QuerySnapshot> future = documentReference.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-        System.out.println("El tamanio del array es: "+documents.size());
         tamanioLista = documents.size();
         return tamanioLista;
     }

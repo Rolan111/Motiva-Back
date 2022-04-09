@@ -4,6 +4,8 @@ import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.AnswerDto;
 import co.edu.ucc.motivaback.dto.SequenceDto;
 import co.edu.ucc.motivaback.entity.AnswerEntity;
+import co.edu.ucc.motivaback.entity.CareSheetAnswerEntity;
+import co.edu.ucc.motivaback.entity.CareSheetAnswerPsychosocial;
 import co.edu.ucc.motivaback.entity.PollEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.AnswerService;
@@ -56,6 +58,8 @@ public class AnswerController {
         }
     }
 
+
+
     @PostMapping(value = "/answer")
     public ResponseEntity<GeneralBodyResponse<List<AnswerDto>>> create(
             @Valid @RequestBody List<AnswerDto> answerList, @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
@@ -72,6 +76,14 @@ public class AnswerController {
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    //COLECCIÓN DE PRUEBA
+    @PostMapping(value = "/answers-pruebas")
+    public String saveComment(@RequestBody CareSheetAnswerEntity commentsEntity) throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+        db.collection("answer_pruebas").document().set(commentsEntity);
+        return "Hola mundo";
     }
 
     @GetMapping(value = "/last-sequences")
@@ -116,7 +128,7 @@ public class AnswerController {
         List<AnswerEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("answer");
+        CollectionReference documentReference = db.collection("answer_pruebas");
         Query query = documentReference.whereEqualTo("id_poll", idPoll).whereEqualTo("id_question", idQuestion);
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
