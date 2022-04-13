@@ -5,7 +5,6 @@ public class CareSheetAnswerPsychosocial extends AbstractEntity {
     private Integer id_question;
     private Integer id_option_answer;
     private String open_answer;
-    private Integer id_clinic_history;
     private Integer id_poll;
 
     public Integer getId_question() {
@@ -30,14 +29,6 @@ public class CareSheetAnswerPsychosocial extends AbstractEntity {
 
     public void setOpen_answer(String open_answer) {
         this.open_answer = open_answer;
-    }
-
-    public Integer getId_clinic_history() {
-        return id_clinic_history;
-    }
-
-    public void setId_clinic_history(Integer id_clinic_history) {
-        this.id_clinic_history = id_clinic_history;
     }
 
     public Integer getId_poll() {

@@ -2,19 +2,24 @@ package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.QuestionDto;
+import co.edu.ucc.motivaback.entity.CareSheetAnswerPsychosocial;
+import co.edu.ucc.motivaback.entity.QuestionEntity;
+import co.edu.ucc.motivaback.entity.QuestionEntityPrueba;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.QuestionService;
 import co.edu.ucc.motivaback.util.CommonsService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
+import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static co.edu.ucc.motivaback.util.CommonsService.EMPTY_LIST;
 import static co.edu.ucc.motivaback.util.CommonsService.LIST_OK;
@@ -50,6 +55,24 @@ public class QuestionController {
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping(value = "/questionByIdQuestion/{id_question}")
+    public List<QuestionEntityPrueba> answerPsychosocialByIdPoll(@PathVariable Integer id_question) throws ExecutionException, InterruptedException {
+        List<QuestionEntityPrueba> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("question");
+        Query query = documentReference.whereEqualTo("id_question", id_question);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            QuestionEntityPrueba commentsDto = doc.toObject(QuestionEntityPrueba.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+
     }
 
     private ResponseEntity<?> hasAccess(AuthenticatedUser authenticatedUser) {

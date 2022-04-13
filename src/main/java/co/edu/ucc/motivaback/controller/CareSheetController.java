@@ -78,13 +78,13 @@ public class CareSheetController {
     //ESPACIO DE PRUEBAS
 
     @GetMapping(value = "/care-sheet-instrument-answers")
-    public List<CareSheetAnswerEntity> pruebas() throws ExecutionException, InterruptedException {
+    public List<CareSheetAnswerEntity> instrumentAnswers() throws ExecutionException, InterruptedException {
         List<CareSheetAnswerEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("answer");
-        Query query = documentReference.whereEqualTo("id_poll", 29);
-        ApiFuture<QuerySnapshot> future = query.get();
+        //Query query = documentReference.whereEqualTo("id_poll", 29);
+        ApiFuture<QuerySnapshot> future = documentReference.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
         for (QueryDocumentSnapshot doc : documents){
@@ -93,6 +93,7 @@ public class CareSheetController {
         }
         return commentsEntities;
     }
+
 
     @GetMapping(value = "/care-sheet-options-answers/{id}")
     public List<CareSheetOptionAnwerEntity> opcionesRespuestas(@PathVariable Integer id) throws ExecutionException, InterruptedException {
@@ -122,6 +123,40 @@ public class CareSheetController {
         for (DocumentSnapshot document : querySnapshot.get().getDocuments()) {
             System.out.println(document.getData());
         }
+
+    }
+
+    @GetMapping(value = "/answer-psychosocial-all")
+    public List<CareSheetAnswerPsychosocial> answerPsychosocialByIdPoll() throws ExecutionException, InterruptedException {
+        List<CareSheetAnswerPsychosocial> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("answer_psychosocial");
+        ApiFuture<QuerySnapshot> future = documentReference.orderBy("id_question").get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            CareSheetAnswerPsychosocial commentsDto = doc.toObject(CareSheetAnswerPsychosocial.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+
+    }
+
+    @GetMapping(value = "/answer-psychosocial-ByIdPoll/{id}")
+    public List<CareSheetAnswerPsychosocial> answerPsychosocialByIdPoll(@PathVariable Integer id) throws ExecutionException, InterruptedException {
+        List<CareSheetAnswerPsychosocial> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("answer_psychosocial");
+        ApiFuture<QuerySnapshot> future = documentReference.whereEqualTo("id_poll", id).orderBy("id_question").get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            CareSheetAnswerPsychosocial commentsDto = doc.toObject(CareSheetAnswerPsychosocial.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
 
     }
 
