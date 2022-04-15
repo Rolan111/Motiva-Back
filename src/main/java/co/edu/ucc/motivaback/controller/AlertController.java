@@ -110,11 +110,46 @@ public class AlertController {
         return "Hola mundo";
     }
 
+    @DeleteMapping(value = "/alert-delete/{idPoll}")
+    public List<AlertEntity> deleteAlerts(@PathVariable Integer idPoll) throws ExecutionException, InterruptedException {
+        List<AlertEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("alert_pruebas");
+        ApiFuture<QuerySnapshot> future = documentReference.whereEqualTo("id_poll",idPoll).get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents) {
+            AlertEntity commentsDto = doc.toObject(AlertEntity.class);
+            commentsEntities.add(commentsDto);
+            doc.getReference().delete();
+        }
+        return commentsEntities;
+    }
+    //********************
+
     //INACTIVE ALERTS
+    @GetMapping(value = "/inactive-alert")
+    public List<InactiveAlertEntity> getInactiveAlerts() throws ExecutionException, InterruptedException {
+        List<InactiveAlertEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("inactive_alert");
+        ApiFuture<QuerySnapshot> future = documentReference.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents) {
+            InactiveAlertEntity commentsDto = doc.toObject(InactiveAlertEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+    }
+
     @PostMapping(value = "/inactive-alert-create")
     public String saveComment(@RequestBody InactiveAlertEntity inactiveAlertEntity) throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
         db.collection("inactive_alert").document().set(inactiveAlertEntity);
         return "Hola mundo";
     }
+
 }
