@@ -178,10 +178,9 @@ public class CareSheetController {
     }
 
     @PostMapping(value = "/care-sheet-answer-psychosocial-create")
-    public String saveComment(@RequestBody CareSheetAnswerPsychosocial commentsEntity) throws ExecutionException, InterruptedException {
+    public void saveComment(@RequestBody CareSheetAnswerPsychosocial commentsEntity) throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
         db.collection("answer_psychosocial").document().set(commentsEntity);
-        return "Hola mundo";
     }
 
     private ResponseEntity<?> hasAccess(AuthenticatedUser authenticatedUser) {
