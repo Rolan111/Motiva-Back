@@ -88,7 +88,6 @@ public class RepComAgentController {
 
         try {
             repComAgentDto.setCreatedBy(authenticatedUser.getId().longValue());
-            //repComAgentDto.setIdRepComAgent(authenticatedUser.getId());
 
             var save = this.repComAgentService.save(repComAgentDto);
 
@@ -104,20 +103,15 @@ public class RepComAgentController {
     @PostMapping(value = "/rep-com-agent-comments-create/{id}")
     public String saveComment(@PathVariable String id, @RequestBody CommentsEntity commentsEntity) throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
-        //ApiFuture<WriteResult> collectionApiFuture = db.collection("rep_com_agent").document(id).collection("comments").document().set(commentsDto);
         db.collection("rep_com_agent").document(id).collection("comments").document().set(commentsEntity);
         return "Hola mundo";
-        //return collectionApiFuture.get().getUpdateTime().toString();
     }
 
     @GetMapping(value = "/rep-com-agent-pruebas")
     public void pruebas() throws ExecutionException, InterruptedException {
-        Firestore db = FirestoreClient.getFirestore(); //rep_com_agent  number_attendees
-        //Create a reference to the cities collection
+        Firestore db = FirestoreClient.getFirestore();
         CollectionReference cities = db.collection("rep_com_agent");
-// Create a query against the collection.
         Query query = cities.whereEqualTo("number_attendees", 4).whereEqualTo("activity_name","Actividad dos");
-// retrieve  query results asynchronously using query.get()
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
 
         for (DocumentSnapshot document : querySnapshot.get().getDocuments()) {

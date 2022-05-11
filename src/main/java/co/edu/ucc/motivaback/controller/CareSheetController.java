@@ -83,7 +83,6 @@ public class CareSheetController {
 
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("answer");
-        //Query query = documentReference.whereEqualTo("id_poll", 29);
         ApiFuture<QuerySnapshot> future = documentReference.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
