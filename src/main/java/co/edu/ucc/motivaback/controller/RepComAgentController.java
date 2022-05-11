@@ -56,14 +56,14 @@ public class RepComAgentController {
     }
 
     @GetMapping("/rep-com-agent/{id}")
-    private Mono<RepComAgentEntity> getReportById(@PathVariable String id) {
+    public Mono<RepComAgentEntity> getReportById(@PathVariable String id) {
         return repComAgentRepository.findById(id);
     }
 
 
     @GetMapping(value = "/rep-com-agent-forum-comments/{idReport}")
 
-    private List<CommentsEntity> getSubcollection(@PathVariable String idReport) throws ExecutionException, InterruptedException {
+    public List<CommentsEntity> getSubcollection(@PathVariable String idReport) throws ExecutionException, InterruptedException {
         List<CommentsEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
@@ -72,7 +72,7 @@ public class RepComAgentController {
         ApiFuture<QuerySnapshot> future = documentReference.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
-        for (QueryDocumentSnapshot doc : documents){
+        for (QueryDocumentSnapshot doc : documents) {
             CommentsEntity commentsDto = doc.toObject(CommentsEntity.class);
             commentsEntities.add(commentsDto);
         }
@@ -102,7 +102,7 @@ public class RepComAgentController {
     }
 
     @PostMapping(value = "/rep-com-agent-comments-create/{id}")
-    public String saveComment(@PathVariable String id, @RequestBody CommentsEntity commentsEntity) throws ExecutionException, InterruptedException {
+    public String saveComment(@PathVariable String id, @RequestBody CommentsEntity commentsEntity) {
         Firestore db = FirestoreClient.getFirestore();
         //ApiFuture<WriteResult> collectionApiFuture = db.collection("rep_com_agent").document(id).collection("comments").document().set(commentsDto);
         db.collection("rep_com_agent").document(id).collection("comments").document().set(commentsEntity);

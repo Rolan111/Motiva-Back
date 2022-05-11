@@ -1,7 +1,5 @@
 package co.edu.ucc.motivaback.controller;
 
-import co.edu.ucc.motivaback.entity.AlertEntity;
-import co.edu.ucc.motivaback.entity.InactiveAlertEntity;
 import co.edu.ucc.motivaback.entity.RASMEntity;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
@@ -36,7 +34,7 @@ public class RASMController {
     }
 
     @PostMapping(value = "/rasm-create")
-    public String saveRASM(@RequestBody RASMEntity rasmEntity) throws ExecutionException, InterruptedException {
+    public String saveRASM(@RequestBody RASMEntity rasmEntity) {
         Firestore db = FirestoreClient.getFirestore();
         db.collection("rasm").document().set(rasmEntity);
         return "Hola mundo";

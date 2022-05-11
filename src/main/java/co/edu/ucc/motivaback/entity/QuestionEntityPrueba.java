@@ -1,15 +1,19 @@
 package co.edu.ucc.motivaback.entity;
 
+import com.google.cloud.firestore.annotation.PropertyName;
+
 public class QuestionEntityPrueba extends AbstractEntity {
-    private int id_quetion;
+    private int idQuetion;
     private String description;
 
-    public int getId_quetion() {
-        return id_quetion;
+    @PropertyName("id_quetion")
+    public int getIdQuetion() {
+        return idQuetion;
     }
 
-    public void setId_quetion(int id_quetion) {
-        this.id_quetion = id_quetion;
+    @PropertyName("id_quetion")
+    public void setIdQuetion(int idQuetion) {
+        this.idQuetion = idQuetion;
     }
 
     public String getDescription() {

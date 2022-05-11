@@ -1,22 +1,28 @@
 package co.edu.ucc.motivaback.entity;
 
+import com.google.cloud.firestore.annotation.PropertyName;
+
 public class RASMEntity extends AbstractEntity {
-    private int id_poll;
-    private String type_rasm;
+    private int idPoll;
+    private String typeRasm;
 
-    public int getId_poll() {
-        return id_poll;
+    @PropertyName("id_poll")
+    public int getIdPoll() {
+        return idPoll;
     }
 
-    public void setId_poll(int id_poll) {
-        this.id_poll = id_poll;
+    @PropertyName("id_poll")
+    public void setIdPoll(int idPoll) {
+        this.idPoll = idPoll;
     }
 
-    public String getType_rasm() {
-        return type_rasm;
+    @PropertyName("type_rasm")
+    public String getTypeRasm() {
+        return typeRasm;
     }
 
-    public void setType_rasm(String type_rasm) {
-        this.type_rasm = type_rasm;
+    @PropertyName("type_rasm")
+    public void setTypeRasm(String typeRasm) {
+        this.typeRasm = typeRasm;
     }
 }

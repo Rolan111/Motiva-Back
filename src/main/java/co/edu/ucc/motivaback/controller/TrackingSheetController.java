@@ -82,17 +82,17 @@ public class TrackingSheetController {
 
 
     @GetMapping(value = "/tracking-sheets3")
-    private Flux<TrackingSheetEntity> getAllUsers() {
+    public Flux<TrackingSheetEntity> getAllUsers() {
         return trackingSheetRepository.findAll();
     }
 
     @GetMapping("/tracking-sheet/{id}")
-    private Mono<TrackingSheetEntity> getTrackingById(@PathVariable String id) {
+    public Mono<TrackingSheetEntity> getTrackingById(@PathVariable String id) {
         return trackingSheetRepository.findById(id);
     }
 
     @GetMapping("/tracking-sheets3/{typeRoute}")
-    private Flux<TrackingSheetEntity> getUsersByAge(@PathVariable String typeRoute) {
+    public Flux<TrackingSheetEntity> getUsersByAge(@PathVariable String typeRoute) {
         return trackingSheetRepository.findByTypeRoute(typeRoute);
     }
 
