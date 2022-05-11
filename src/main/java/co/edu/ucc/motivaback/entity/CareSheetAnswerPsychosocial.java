@@ -1,41 +1,51 @@
 package co.edu.ucc.motivaback.entity;
 
+import com.google.cloud.firestore.annotation.PropertyName;
+
 public class CareSheetAnswerPsychosocial extends AbstractEntity {
 
-    private Integer id_question;
-    private Integer id_option_answer;
-    private String open_answer;
-    private Integer id_poll;
+    private Integer idQuestion;
+    private Integer idOptionAnswer;
+    private String openAnswer;
+    private Integer idPoll;
 
-    public Integer getId_question() {
-        return id_question;
+    @PropertyName("id_question")
+    public Integer getIdQuestion() {
+        return idQuestion;
     }
 
-    public void setId_question(Integer id_question) {
-        this.id_question = id_question;
+    @PropertyName("id_question")
+    public void setIdQuestion(Integer idQuestion) {
+        this.idQuestion = idQuestion;
     }
 
-    public Integer getId_option_answer() {
-        return id_option_answer;
+    @PropertyName("id_option_answer")
+    public Integer getIdOptionAnswer() {
+        return idOptionAnswer;
     }
 
-    public void setId_option_answer(Integer id_option_answer) {
-        this.id_option_answer = id_option_answer;
+    @PropertyName("id_option_answer")
+    public void setIdOptionAnswer(Integer idOptionAnswer) {
+        this.idOptionAnswer = idOptionAnswer;
     }
 
-    public String getOpen_answer() {
-        return open_answer;
+    @PropertyName("open_answer")
+    public String getOpenAnswer() {
+        return openAnswer;
     }
 
-    public void setOpen_answer(String open_answer) {
-        this.open_answer = open_answer;
+    @PropertyName("open_answer")
+    public void setOpenAnswer(String openAnswer) {
+        this.openAnswer = openAnswer;
     }
 
-    public Integer getId_poll() {
-        return id_poll;
+    @PropertyName("id_poll")
+    public Integer getIdPoll() {
+        return idPoll;
     }
 
-    public void setId_poll(Integer id_poll) {
-        this.id_poll = id_poll;
+    @PropertyName("id_poll")
+    public void setIdPoll(Integer idPoll) {
+        this.idPoll = idPoll;
     }
 }

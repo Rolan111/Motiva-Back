@@ -1,52 +1,64 @@
 package co.edu.ucc.motivaback.entity;
 
+import com.google.cloud.firestore.annotation.PropertyName;
+
 import java.util.List;
 
 public class CareSheetAnswerEntity extends AbstractEntity {
 
-    private int id_answer;
-    private int id_question;
-    private List<Integer> id_option_answers;
-    private String open_answer;
-    private int id_poll;
+    private int idAnswer;
+    private int idQuestion;
+    private List<Integer> idOptionAnswers;
+    private String openAnswer;
+    private int idPoll;
 
-    public int getId_answer() {
-        return id_answer;
+    @PropertyName("id_answer")
+    public int getIdAnswer() {
+        return idAnswer;
     }
 
-    public void setId_answer(int id_answer) {
-        this.id_answer = id_answer;
+    @PropertyName("id_answer")
+    public void setIdAnswer(int idAnswer) {
+        this.idAnswer = idAnswer;
     }
 
-    public int getId_question() {
-        return id_question;
+    @PropertyName("id_question")
+    public int getIdQuestion() {
+        return idQuestion;
     }
 
-    public void setId_question(int id_question) {
-        this.id_question = id_question;
+    @PropertyName("id_question")
+    public void setIdQuestion(int idQuestion) {
+        this.idQuestion = idQuestion;
     }
 
-    public List<Integer> getId_option_answers() {
-        return id_option_answers;
+    @PropertyName("id_option_answers")
+    public List<Integer> getIdOptionAnswers() {
+        return idOptionAnswers;
     }
 
-    public void setId_option_answers(List<Integer> id_option_answers) {
-        this.id_option_answers = id_option_answers;
+    @PropertyName("id_option_answers")
+    public void setIdOptionAnswers(List<Integer> idOptionAnswers) {
+        this.idOptionAnswers = idOptionAnswers;
     }
 
-    public String getOpen_answer() {
-        return open_answer;
+    @PropertyName("open_answer")
+    public String getOpenAnswer() {
+        return openAnswer;
     }
 
-    public void setOpen_answer(String open_answer) {
-        this.open_answer = open_answer;
+    @PropertyName("open_answer")
+    public void setOpenAnswer(String openAnswer) {
+        this.openAnswer = openAnswer;
     }
 
-    public int getId_poll() {
-        return id_poll;
+    @PropertyName("id_poll")
+    public int getIdPoll() {
+        return idPoll;
     }
 
-    public void setId_poll(int id_poll) {
-        this.id_poll = id_poll;
+    @PropertyName("id_poll")
+    public void setIdPoll(int idPoll) {
+        this.idPoll = idPoll;
     }
 }
