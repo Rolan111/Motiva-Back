@@ -5,8 +5,6 @@ import co.edu.ucc.motivaback.dto.AnswerDto;
 import co.edu.ucc.motivaback.dto.SequenceDto;
 import co.edu.ucc.motivaback.entity.AnswerEntity;
 import co.edu.ucc.motivaback.entity.CareSheetAnswerEntity;
-import co.edu.ucc.motivaback.entity.CareSheetAnswerPsychosocial;
-import co.edu.ucc.motivaback.entity.PollEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.AnswerService;
 import co.edu.ucc.motivaback.util.CommonsService;
@@ -80,7 +78,7 @@ public class AnswerController {
 
     //COLECCIÓN DE PRUEBA
     @PostMapping(value = "/answers-pruebas")
-    public String saveComment(@RequestBody CareSheetAnswerEntity commentsEntity) throws ExecutionException, InterruptedException {
+    public String saveComment(@RequestBody CareSheetAnswerEntity commentsEntity) {
         Firestore db = FirestoreClient.getFirestore();
         db.collection("answer_pruebas").document().set(commentsEntity);
         return "Hola mundo";

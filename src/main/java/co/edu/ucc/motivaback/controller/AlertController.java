@@ -3,7 +3,6 @@ package co.edu.ucc.motivaback.controller;
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.AlertDto;
 import co.edu.ucc.motivaback.entity.AlertEntity;
-import co.edu.ucc.motivaback.entity.CareSheetAnswerEntity;
 import co.edu.ucc.motivaback.entity.InactiveAlertEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.AlertService;
@@ -104,7 +103,7 @@ public class AlertController {
     }
 
     @PostMapping(value = "/alert-create-pruebas")
-    public String saveAlerts(@RequestBody AlertEntity alertsEntity) throws ExecutionException, InterruptedException {
+    public String saveAlerts(@RequestBody AlertEntity alertsEntity) {
         Firestore db = FirestoreClient.getFirestore();
         db.collection("alert_pruebas").document().set(alertsEntity);
         return "Hola mundo";
@@ -146,7 +145,7 @@ public class AlertController {
     }
 
     @PostMapping(value = "/inactive-alert-create")
-    public String saveComment(@RequestBody InactiveAlertEntity inactiveAlertEntity) throws ExecutionException, InterruptedException {
+    public String saveComment(@RequestBody InactiveAlertEntity inactiveAlertEntity) {
         Firestore db = FirestoreClient.getFirestore();
         db.collection("inactive_alert").document().set(inactiveAlertEntity);
         return "Hola mundo";

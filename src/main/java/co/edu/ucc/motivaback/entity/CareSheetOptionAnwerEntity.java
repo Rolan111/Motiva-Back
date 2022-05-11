@@ -1,31 +1,39 @@
 package co.edu.ucc.motivaback.entity;
 
-public class CareSheetOptionAnwerEntity extends AbstractEntity{
+import com.google.cloud.firestore.annotation.PropertyName;
 
-    public int id_option_answer;
-    public int id_question;
-    public String description;
+public class CareSheetOptionAnwerEntity extends AbstractEntity {
 
-    public int getId_option_answer() {
-        return id_option_answer;
+    private int idOptionAnswer;
+    private int idQuestion;
+    private String description;
+
+    @PropertyName("id_option_answer")
+    public int getIdOptionAnswer() {
+        return idOptionAnswer;
     }
 
-    public void setId_option_answer(int id_option_answer) {
-        this.id_option_answer = id_option_answer;
+    @PropertyName("id_option_answer")
+    public void setIdOptionAnswer(int idOptionAnswer) {
+        this.idOptionAnswer = idOptionAnswer;
     }
 
-    public int getId_question() {
-        return id_question;
+    @PropertyName("id_question")
+    public int getIdQuestion() {
+        return idQuestion;
     }
 
-    public void setId_question(int id_question) {
-        this.id_question = id_question;
+    @PropertyName("id_question")
+    public void setIdQuestion(int idQuestion) {
+        this.idQuestion = idQuestion;
     }
 
+    @PropertyName("description")
     public String getDescription() {
         return description;
     }
 
+    @PropertyName("description")
     public void setDescription(String description) {
         this.description = description;
     }

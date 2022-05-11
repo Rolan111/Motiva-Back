@@ -1,10 +1,6 @@
 package co.edu.ucc.motivaback.service.impl;
 
-import co.edu.ucc.motivaback.dto.AnswerDto;
-import co.edu.ucc.motivaback.dto.OptionAnswerDto;
 import co.edu.ucc.motivaback.dto.RepComAgentDto;
-import co.edu.ucc.motivaback.entity.AnswerEntity;
-import co.edu.ucc.motivaback.entity.OptionAnswerEntity;
 import co.edu.ucc.motivaback.entity.RepComAgentEntity;
 import co.edu.ucc.motivaback.repository.RepComAgentRepository;
 import co.edu.ucc.motivaback.service.RepComAgentService;
@@ -48,7 +44,6 @@ public class RepComAgentServiceImpl implements RepComAgentService {
     @Override
     public RepComAgentDto save(RepComAgentDto repComAgentDto) {
         RepComAgentEntity repComAgentEntity = ObjectMapperUtils.map(repComAgentDto, RepComAgentEntity.class);
-        Long count = this.repComAgentRepository.count().block();
 
         repComAgentEntity.setCreatedAt(new Date());
 

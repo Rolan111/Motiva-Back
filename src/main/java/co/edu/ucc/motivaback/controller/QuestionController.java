@@ -2,8 +2,6 @@ package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.QuestionDto;
-import co.edu.ucc.motivaback.entity.CareSheetAnswerPsychosocial;
-import co.edu.ucc.motivaback.entity.QuestionEntity;
 import co.edu.ucc.motivaback.entity.QuestionEntityPrueba;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.QuestionService;
@@ -58,16 +56,16 @@ public class QuestionController {
     }
 
     @GetMapping(value = "/questionByIdQuestion/{id_question}")
-    public List<QuestionEntityPrueba> answerPsychosocialByIdPoll(@PathVariable Integer id_question) throws ExecutionException, InterruptedException {
+    public List<QuestionEntityPrueba> answerPsychosocialByIdPoll(@PathVariable("id_question") Integer idQuestion) throws ExecutionException, InterruptedException {
         List<QuestionEntityPrueba> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("question");
-        Query query = documentReference.whereEqualTo("id_question", id_question);
+        Query query = documentReference.whereEqualTo("id_question", idQuestion);
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
-        for (QueryDocumentSnapshot doc : documents){
+        for (QueryDocumentSnapshot doc : documents) {
             QuestionEntityPrueba commentsDto = doc.toObject(QuestionEntityPrueba.class);
             commentsEntities.add(commentsDto);
         }

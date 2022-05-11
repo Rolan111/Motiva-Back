@@ -1,8 +1,5 @@
 package co.edu.ucc.motivaback.dto;
 
-import javax.print.Doc;
-import javax.swing.text.Document;
-import java.util.ArrayList;
 import java.util.Map;
 
 public class TrackingSheetDto extends AbstractDto {

@@ -9,7 +9,6 @@ import co.edu.ucc.motivaback.util.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author nagredo
@@ -23,11 +22,6 @@ public class AlertServiceImpl implements AlertService {
 
     public AlertServiceImpl(AlertRepository alertRepository) {
         this.alertRepository = alertRepository;
-    }
-
-    @Override
-    public List<AlertDto> findAll() {
-        return null;
     }
 
     @Override

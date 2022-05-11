@@ -1,13 +1,17 @@
 package co.edu.ucc.motivaback.entity;
 
-public class InactiveAlertEntity extends  AbstractEntity {
-    private int id_poll;
+import com.google.cloud.firestore.annotation.PropertyName;
 
-    public int getId_poll() {
-        return id_poll;
+public class InactiveAlertEntity extends AbstractEntity {
+    private int idPoll;
+
+    @PropertyName("id_poll")
+    public int getIdPoll() {
+        return idPoll;
     }
 
-    public void setId_poll(int id_poll) {
-        this.id_poll = id_poll;
+    @PropertyName("id_poll")
+    public void setIdPoll(int idPoll) {
+        this.idPoll = idPoll;
     }
 }
