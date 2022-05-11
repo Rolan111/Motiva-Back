@@ -1,11 +1,8 @@
 package co.edu.ucc.motivaback.entity;
 
-import co.edu.ucc.motivaback.dto.CommentsDto;
 import com.google.cloud.firestore.annotation.PropertyName;
 import com.google.cloud.spring.data.firestore.Document;
 
-import javax.print.Doc;
-import java.util.ArrayList;
 import java.util.Map;
 
 @Document(collectionName = "tracking_sheet")

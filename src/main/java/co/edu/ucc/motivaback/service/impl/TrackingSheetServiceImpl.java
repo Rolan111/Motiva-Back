@@ -33,7 +33,6 @@ public class TrackingSheetServiceImpl implements TrackingSheetService {
 
     @Override
     public Mono<TrackingSheetEntity> getAll2() {
-        Mono<TrackingSheetEntity> trackingSheetEntities = this.trackingSheetRepository.findById("KV4oQSV7GKQ5cBU9f3pB");
         /*if (trackingSheetEntities != null) {
             return trackingSheetEntities;
         } else {
@@ -46,7 +45,6 @@ public class TrackingSheetServiceImpl implements TrackingSheetService {
     @Override
     public TrackingSheetDto save(TrackingSheetDto trackingSheetDto) {
         TrackingSheetEntity trackingSheetEntity = ObjectMapperUtils.map(trackingSheetDto, TrackingSheetEntity.class);
-        Long count = this.trackingSheetRepository.count().block();
 
         trackingSheetEntity.setCreatedAt(new Date());
 

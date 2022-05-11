@@ -33,7 +33,6 @@ public class CareSheetServiceImpl implements CareSheetService {
     @Override
     public CareSheetDto save(CareSheetDto careSheetDto) {
         CareSheetEntity careSheetEntity = ObjectMapperUtils.map(careSheetDto, CareSheetEntity.class);
-        Long count = this.careSheetRepository.count().block();
 
         careSheetEntity.setCreatedAt(new Date());
 

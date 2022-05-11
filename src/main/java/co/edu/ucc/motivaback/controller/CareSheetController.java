@@ -2,7 +2,8 @@ package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.CareSheetDto;
-import co.edu.ucc.motivaback.entity.*;
+import co.edu.ucc.motivaback.entity.CareSheetAnswerEntity;
+import co.edu.ucc.motivaback.entity.CareSheetAnswerPsychosocial;
 import co.edu.ucc.motivaback.entity.CareSheetOptionAnwerEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.CareSheetService;
@@ -22,7 +23,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static co.edu.ucc.motivaback.util.CommonsService.*;
-import static co.edu.ucc.motivaback.util.CommonsService.CREATED_FAIL;
 
 @RestController
 @RequestMapping("/api")
@@ -178,7 +178,7 @@ public class CareSheetController {
     }
 
     @PostMapping(value = "/care-sheet-answer-psychosocial-create")
-    public void saveComment(@RequestBody CareSheetAnswerPsychosocial commentsEntity) throws ExecutionException, InterruptedException {
+    public void saveComment(@RequestBody CareSheetAnswerPsychosocial commentsEntity) {
         Firestore db = FirestoreClient.getFirestore();
         db.collection("answer_psychosocial").document().set(commentsEntity);
     }
