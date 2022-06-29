@@ -32,6 +32,7 @@ import static co.edu.ucc.motivaback.util.CommonsService.*;
 @RestController
 @RequestMapping("/api")
 public class AnswerController {
+
     private final AnswerService answerService;
 
     public AnswerController(AnswerService answerService) {
@@ -74,6 +75,23 @@ public class AnswerController {
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping(value = "/answerByIdPollAndIdQuestion/{idPoll}/{idQuestion}")
+    public List<AnswerEntity> answerByIdAndIdQuestion(@PathVariable String idPoll, @PathVariable Integer idQuestion) throws ExecutionException, InterruptedException {
+        List<AnswerEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("answer");
+        Query query = documentReference.whereEqualTo("id_poll", idPoll).whereEqualTo("id_question", idQuestion);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            AnswerEntity commentsDto = doc.toObject(AnswerEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
     }
 
     //COLECCIÓN DE PRUEBA
@@ -121,13 +139,13 @@ public class AnswerController {
         }
     }
 
-    @GetMapping(value = "/answerByIdPollAndIdQuestion/{idPoll}/{idQuestion}")
-    public List<AnswerEntity> answerByIdAndIdQuestion(@PathVariable Integer idPoll, @PathVariable Integer idQuestion) throws ExecutionException, InterruptedException {
+    @GetMapping(value = "/answerByIdPoll/{idPoll}")
+    public List<AnswerEntity> answerByIdPoll(@PathVariable Integer idPoll) throws ExecutionException, InterruptedException {
         List<AnswerEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("answer_pruebas");
-        Query query = documentReference.whereEqualTo("id_poll", idPoll).whereEqualTo("id_question", idQuestion);
+        CollectionReference documentReference = db.collection("answer");
+        Query query = documentReference.whereEqualTo("id_poll", idPoll);
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
@@ -137,6 +155,7 @@ public class AnswerController {
         }
         return commentsEntities;
     }
+
 
     private ResponseEntity<?> hasAccess(AuthenticatedUser authenticatedUser) {
         if (!authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()) && !authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name())) {

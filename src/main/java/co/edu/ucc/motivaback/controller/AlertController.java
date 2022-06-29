@@ -42,7 +42,7 @@ public class AlertController {
     @GetMapping(value = "/alerts-size") //Consultamos la cantidad de registros
     public int alertsSize() throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("alert_pruebas");
+        CollectionReference documentReference = db.collection("alert");
         ApiFuture<QuerySnapshot> future = documentReference.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
         tamanioLista = documents.size();

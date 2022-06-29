@@ -3,7 +3,7 @@ package co.edu.ucc.motivaback.controller;
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.CareSheetDto;
 import co.edu.ucc.motivaback.entity.CareSheetAnswerEntity;
-import co.edu.ucc.motivaback.entity.CareSheetAnswerPsychosocial;
+import co.edu.ucc.motivaback.entity.CareSheetAnswerPsychosocialEntity;
 import co.edu.ucc.motivaback.entity.CareSheetOptionAnwerEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.CareSheetService;
@@ -126,16 +126,16 @@ public class CareSheetController {
     }
 
     @GetMapping(value = "/answer-psychosocial-all")
-    public List<CareSheetAnswerPsychosocial> answerPsychosocialByIdPoll() throws ExecutionException, InterruptedException {
-        List<CareSheetAnswerPsychosocial> commentsEntities = new ArrayList<>();
+    public List<CareSheetAnswerPsychosocialEntity> answerPsychosocialByIdPoll() throws ExecutionException, InterruptedException {
+        List<CareSheetAnswerPsychosocialEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("answer_psychosocial");
-        ApiFuture<QuerySnapshot> future = documentReference.orderBy("id_question").get();
+        ApiFuture<QuerySnapshot> future = documentReference.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
         for (QueryDocumentSnapshot doc : documents){
-            CareSheetAnswerPsychosocial commentsDto = doc.toObject(CareSheetAnswerPsychosocial.class);
+            CareSheetAnswerPsychosocialEntity commentsDto = doc.toObject(CareSheetAnswerPsychosocialEntity.class);
             commentsEntities.add(commentsDto);
         }
         return commentsEntities;
@@ -143,8 +143,8 @@ public class CareSheetController {
     }
 
     @GetMapping(value = "/answer-psychosocial-ByIdPoll/{id}")
-    public List<CareSheetAnswerPsychosocial> answerPsychosocialByIdPoll(@PathVariable Integer id) throws ExecutionException, InterruptedException {
-        List<CareSheetAnswerPsychosocial> commentsEntities = new ArrayList<>();
+    public List<CareSheetAnswerPsychosocialEntity> answerPsychosocialByIdPoll(@PathVariable Integer id) throws ExecutionException, InterruptedException {
+        List<CareSheetAnswerPsychosocialEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("answer_psychosocial");
@@ -152,7 +152,7 @@ public class CareSheetController {
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
         for (QueryDocumentSnapshot doc : documents){
-            CareSheetAnswerPsychosocial commentsDto = doc.toObject(CareSheetAnswerPsychosocial.class);
+            CareSheetAnswerPsychosocialEntity commentsDto = doc.toObject(CareSheetAnswerPsychosocialEntity.class);
             commentsEntities.add(commentsDto);
         }
         return commentsEntities;
@@ -160,8 +160,8 @@ public class CareSheetController {
     }
 
     @GetMapping(value = "/answer-psychosocial-ByIdPollAndIdQuestion/{idPoll}/{idQuestion}")
-    public List<CareSheetAnswerPsychosocial> pollById(@PathVariable Integer idPoll, @PathVariable Integer idQuestion) throws ExecutionException, InterruptedException {
-        List<CareSheetAnswerPsychosocial> commentsEntities = new ArrayList<>();
+    public List<CareSheetAnswerPsychosocialEntity> pollById(@PathVariable Integer idPoll, @PathVariable Integer idQuestion) throws ExecutionException, InterruptedException {
+        List<CareSheetAnswerPsychosocialEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("answer_psychosocial");
@@ -170,16 +170,16 @@ public class CareSheetController {
 
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
         for (QueryDocumentSnapshot doc : documents){
-            CareSheetAnswerPsychosocial commentsDto = doc.toObject(CareSheetAnswerPsychosocial.class);
+            CareSheetAnswerPsychosocialEntity commentsDto = doc.toObject(CareSheetAnswerPsychosocialEntity.class);
             commentsEntities.add(commentsDto);
         }
         return commentsEntities;
     }
 
     @PostMapping(value = "/care-sheet-answer-psychosocial-create")
-    public void saveComment(@RequestBody CareSheetAnswerPsychosocial commentsEntity) {
+    public void saveComment(@RequestBody CareSheetAnswerPsychosocialEntity careSheetAnswerPsychosocialEntity) {
         Firestore db = FirestoreClient.getFirestore();
-        db.collection("answer_psychosocial").document().set(commentsEntity);
+        db.collection("answer_psychosocial").document().set(careSheetAnswerPsychosocialEntity);
     }
 
     private ResponseEntity<?> hasAccess(AuthenticatedUser authenticatedUser) {

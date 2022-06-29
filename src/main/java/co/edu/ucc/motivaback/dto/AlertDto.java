@@ -7,7 +7,8 @@ package co.edu.ucc.motivaback.dto;
  */
 public class AlertDto extends AbstractDto {
     private int idAlert;
-    private int idPoll;
+//    private int idPoll;
+    private String idPoll;
     private int score;
 
     public int getIdAlert() {
@@ -18,11 +19,20 @@ public class AlertDto extends AbstractDto {
         this.idAlert = idAlert;
     }
 
-    public int getIdPoll() {
+//    public int getIdPoll() {
+//        return idPoll;
+//    }
+//
+//    public void setIdPoll(int idPoll) {
+//        this.idPoll = idPoll;
+//    }
+
+
+    public String getIdPoll() {
         return idPoll;
     }
 
-    public void setIdPoll(int idPoll) {
+    public void setIdPoll(String idPoll) {
         this.idPoll = idPoll;
     }
 

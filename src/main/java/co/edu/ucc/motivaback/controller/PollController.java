@@ -43,6 +43,22 @@ public class PollController {
         this.userService = userService;
     }
 
+    @GetMapping(value = "/polls")
+    public List<PollEntity> polls() throws ExecutionException, InterruptedException {
+        List<PollEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("poll");
+        ApiFuture<QuerySnapshot> future = documentReference.get();
+
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        for (QueryDocumentSnapshot doc : documents){
+            PollEntity commentsDto = doc.toObject(PollEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+    }
+
     @GetMapping(value = "/polls-by-supervisor")
     public ResponseEntity<GeneralBodyResponse<Page<PollDto>>> getAll(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser, Pageable pageable) {
@@ -82,7 +98,7 @@ public class PollController {
     }
 
     @GetMapping(value = "/pollById/{id}")
-    public List<PollEntity> pollById(@PathVariable Integer id) throws ExecutionException, InterruptedException {
+    public List<PollEntity> pollById(@PathVariable String id) throws ExecutionException, InterruptedException {
         List<PollEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();

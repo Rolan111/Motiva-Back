@@ -13,7 +13,8 @@ public class AnswerDto extends AbstractDto {
     private Long idAnswer;
     private Long idQuestion;
     private String openAnswer;
-    private Long idPoll;
+//    private Long idPoll;
+    private String idPoll;
     private TypeQuestionaryEnum type;
     private List<Long> idOptionAnswers;
     private List<OptionAnswerDto> optionAnswerDtoList;
@@ -42,11 +43,21 @@ public class AnswerDto extends AbstractDto {
         this.openAnswer = openAnswer;
     }
 
-    public Long getIdPoll() {
+
+//    public Long getIdPoll() {
+//        return idPoll;
+//    }
+//
+//    public void setIdPoll(Long idPoll) {
+//        this.idPoll = idPoll;
+//    }
+
+
+    public String getIdPoll() {
         return idPoll;
     }
 
-    public void setIdPoll(Long idPoll) {
+    public void setIdPoll(String idPoll) {
         this.idPoll = idPoll;
     }
 

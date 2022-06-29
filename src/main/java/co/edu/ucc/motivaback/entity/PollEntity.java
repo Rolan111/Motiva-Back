@@ -13,7 +13,8 @@ import java.util.Date;
  */
 @Document(collectionName = "poll")
 public class PollEntity extends AbstractEntity {
-    private Integer idPoll;
+//    private Integer idPoll;
+    private String idPoll;
     private String approvalDoc;
     private Date date;
     private String evidence;
@@ -21,13 +22,23 @@ public class PollEntity extends AbstractEntity {
     private TypeQuestionaryEnum type;
     private Integer idCity;
 
+//    @PropertyName("id_poll")
+//    public Integer getIdPoll() {
+//        return idPoll;
+//    }
+//
+//    @PropertyName("id_poll")
+//    public void setIdPoll(Integer idPoll) {
+//        this.idPoll = idPoll;
+//    }
+
     @PropertyName("id_poll")
-    public Integer getIdPoll() {
+    public String getIdPoll() {
         return idPoll;
     }
 
     @PropertyName("id_poll")
-    public void setIdPoll(Integer idPoll) {
+    public void setIdPoll(String idPoll) {
         this.idPoll = idPoll;
     }
 

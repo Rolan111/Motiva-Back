@@ -12,12 +12,14 @@ import com.google.cloud.spring.data.firestore.Document;
  */
 @Document(collectionName = "question")
 public class QuestionEntity extends AbstractEntity {
+
     private Long idQuestion;
     private String description;
     private Long idFather;
     private Long order;
-    private TypeQuestionaryEnum type;
     private QuestionTypeEnum questionaryType;
+    private TypeQuestionaryEnum type;
+
 
     @PropertyName("id_question")
     public Long getIdQuestion() {

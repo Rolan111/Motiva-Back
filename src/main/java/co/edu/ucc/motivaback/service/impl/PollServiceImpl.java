@@ -84,10 +84,10 @@ public class PollServiceImpl implements PollService {
         PollEntity pollEntity = ObjectMapperUtils.map(pollDto, PollEntity.class);
         Long count = this.pollRepository.count().block();
 
-        pollEntity.setDate(new Date());
+//        pollEntity.setDate(new Date());
         pollEntity.setCreatedAt(new Date());
         pollEntity.setStatus(RegisterStatusEnum.ACTIVE);
-        pollEntity.setIdPoll(count != null ? count.intValue() + 1 : (int) ((Math.random() * (Integer.MAX_VALUE - 100000)) + 100000));
+        //pollEntity.setIdPoll(count != null ? count.intValue() + 1 : (int) ((Math.random() * (Integer.MAX_VALUE - 100000)) + 100000));
 
         PollEntity entity = this.pollRepository.save(pollEntity).block();
 

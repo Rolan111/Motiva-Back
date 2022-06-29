@@ -13,12 +13,14 @@ import java.util.List;
  */
 @Document(collectionName = "answer")
 public class AnswerEntity extends AbstractEntity {
+
     private Long idAnswer;
     private Long idQuestion;
-    private String openAnswer;
-    private Long idPoll;
-    private TypeQuestionaryEnum type;
     private List<Long> idOptionAnswers;
+    private String openAnswer;
+//    private Long idPoll;
+    private String idPoll;
+    private TypeQuestionaryEnum type;
 
     @PropertyName("id_answer")
     public Long getIdAnswer() {
@@ -50,13 +52,23 @@ public class AnswerEntity extends AbstractEntity {
         this.openAnswer = openAnswer;
     }
 
+//    @PropertyName("id_poll")
+//    public Long getIdPoll() {
+//        return idPoll;
+//    }
+//
+//    @PropertyName("id_poll")
+//    public void setIdPoll(Long idPoll) {
+//        this.idPoll = idPoll;
+//    }
+
     @PropertyName("id_poll")
-    public Long getIdPoll() {
+    public String getIdPoll() {
         return idPoll;
     }
 
     @PropertyName("id_poll")
-    public void setIdPoll(Long idPoll) {
+    public void setIdPoll(String idPoll) {
         this.idPoll = idPoll;
     }
 

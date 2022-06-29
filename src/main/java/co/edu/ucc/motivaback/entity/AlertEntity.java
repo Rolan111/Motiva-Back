@@ -11,7 +11,8 @@ import com.google.cloud.spring.data.firestore.Document;
 @Document(collectionName = "alert")
 public class AlertEntity extends AbstractEntity {
     private int idAlert;
-    private int idPoll;
+//    private int idPoll;
+    private String idPoll;
     private int score;
 
     @PropertyName("id_alert")
@@ -24,13 +25,22 @@ public class AlertEntity extends AbstractEntity {
         this.idAlert = idAlert;
     }
 
-    @PropertyName("id_poll")
-    public int getIdPoll() {
+//    @PropertyName("id_poll")
+//    public int getIdPoll() {
+//        return idPoll;
+//    }
+//
+//    @PropertyName("id_poll")
+//    public void setIdPoll(int idPoll) {
+//        this.idPoll = idPoll;
+//    }
+
+
+    public String getIdPoll() {
         return idPoll;
     }
 
-    @PropertyName("id_poll")
-    public void setIdPoll(int idPoll) {
+    public void setIdPoll(String idPoll) {
         this.idPoll = idPoll;
     }
 

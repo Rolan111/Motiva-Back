@@ -5,6 +5,7 @@ import com.google.cloud.spring.data.firestore.Document;
 
 @Document(collectionName = "option_answer")
 public class OptionAnswerEntity extends AbstractEntity {
+
     private Long idOptionAnswer;
     private Long idQuestion;
     private String description;

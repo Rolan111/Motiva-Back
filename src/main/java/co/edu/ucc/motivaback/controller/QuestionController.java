@@ -3,6 +3,7 @@ package co.edu.ucc.motivaback.controller;
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.QuestionDto;
 import co.edu.ucc.motivaback.entity.QuestionEntityPrueba;
+import co.edu.ucc.motivaback.entity.QuestionEntityPrueba;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.QuestionService;
 import co.edu.ucc.motivaback.util.CommonsService;
@@ -53,6 +54,22 @@ public class QuestionController {
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping(value = "/questionsAdult")
+    public List<QuestionEntityPrueba> getAllQuestionsAdult() throws ExecutionException, InterruptedException {
+        List<QuestionEntityPrueba> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("question");
+        ApiFuture<QuerySnapshot> future = documentReference.whereEqualTo("type","ADULT").orderBy("id_question").get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents) {
+            QuestionEntityPrueba commentsDto = doc.toObject(QuestionEntityPrueba.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
     }
 
     @GetMapping(value = "/questionByIdQuestion/{id_question}")

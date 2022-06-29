@@ -10,7 +10,8 @@ import java.util.Date;
  * @class PollDto
  */
 public class PollDto extends AbstractDto {
-    private Integer idPoll;
+//    private Integer idPoll;
+    private String idPoll;
     private String approvalDoc;
     private Date date;
     private String evidence;
@@ -27,11 +28,20 @@ public class PollDto extends AbstractDto {
         this.idCity = idCity;
     }
 
-    public Integer getIdPoll() {
+//    public Integer getIdPoll() {
+//        return idPoll;
+//    }
+//
+//    public void setIdPoll(Integer idPoll) {
+//        this.idPoll = idPoll;
+//    }
+
+
+    public String getIdPoll() {
         return idPoll;
     }
 
-    public void setIdPoll(Integer idPoll) {
+    public void setIdPoll(String idPoll) {
         this.idPoll = idPoll;
     }
 
