@@ -65,6 +65,23 @@ public class AlertController {
         return commentsEntities;
     }
 
+    @DeleteMapping(value = "/alert-delete/{idPoll}")
+    public List<AlertEntity> deleteAlerts(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
+        List<AlertEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("alert_pruebas");
+        ApiFuture<QuerySnapshot> future = documentReference.whereEqualTo("id_poll",idPoll).get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents) {
+            AlertEntity commentsDto = doc.toObject(AlertEntity.class);
+            commentsEntities.add(commentsDto);
+            doc.getReference().delete();
+        }
+        return commentsEntities;
+    }
+
     //GET ALERTS de PRUEBA
     @GetMapping(value = "/alerts-pruebas")
     public List<AlertEntity> getAlertsPrueba() throws ExecutionException, InterruptedException {
@@ -109,22 +126,6 @@ public class AlertController {
         return "Hola mundo";
     }
 
-    @DeleteMapping(value = "/alert-delete/{idPoll}")
-    public List<AlertEntity> deleteAlerts(@PathVariable Integer idPoll) throws ExecutionException, InterruptedException {
-        List<AlertEntity> commentsEntities = new ArrayList<>();
-
-        Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("alert_pruebas");
-        ApiFuture<QuerySnapshot> future = documentReference.whereEqualTo("id_poll",idPoll).get();
-        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-
-        for (QueryDocumentSnapshot doc : documents) {
-            AlertEntity commentsDto = doc.toObject(AlertEntity.class);
-            commentsEntities.add(commentsDto);
-            doc.getReference().delete();
-        }
-        return commentsEntities;
-    }
     //********************
 
     //INACTIVE ALERTS

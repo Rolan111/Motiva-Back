@@ -12,6 +12,7 @@ import co.edu.ucc.motivaback.util.GeneralBodyResponse;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
+import com.google.firebase.database.DatabaseReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -143,7 +144,7 @@ public class CareSheetController {
     }
 
     @GetMapping(value = "/answer-psychosocial-ByIdPoll/{id}")
-    public List<CareSheetAnswerPsychosocialEntity> answerPsychosocialByIdPoll(@PathVariable Integer id) throws ExecutionException, InterruptedException {
+    public List<CareSheetAnswerPsychosocialEntity> answerPsychosocialByIdPoll(@PathVariable String id) throws ExecutionException, InterruptedException {
         List<CareSheetAnswerPsychosocialEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
@@ -181,6 +182,17 @@ public class CareSheetController {
         Firestore db = FirestoreClient.getFirestore();
         db.collection("answer_psychosocial").document().set(careSheetAnswerPsychosocialEntity);
     }
+
+    // Segunda forma -- Revisar como guardar una lista
+//    @PostMapping(value = "/care-sheet-answer-psychosocial-create2")
+//    public void saveComment(@RequestBody List<CareSheetAnswerPsychosocialEntity> careSheetAnswerPsychosocialEntity) {
+//        Firestore db = FirestoreClient.getFirestore();
+////        db.collection("answer_psychosocial").document().set(careSheetAnswerPsychosocialEntity);
+////        DatabaseReference usersRef = ref.child("users");
+//        CollectionReference usersRef = db.collection("answer_psychosocial");
+//        CollectionReference newPostRef = usersRef.push();
+//        newPostRef.setValueAsync();
+//    }
 
     private ResponseEntity<?> hasAccess(AuthenticatedUser authenticatedUser) {
         if (!authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()) && !authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name())) {
