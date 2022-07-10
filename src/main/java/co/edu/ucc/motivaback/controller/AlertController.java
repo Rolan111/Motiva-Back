@@ -70,7 +70,7 @@ public class AlertController {
         List<AlertEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("alert_pruebas");
+        CollectionReference documentReference = db.collection("alert");
         ApiFuture<QuerySnapshot> future = documentReference.whereEqualTo("id_poll",idPoll).get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
@@ -129,7 +129,7 @@ public class AlertController {
     //********************
 
     //INACTIVE ALERTS
-    @GetMapping(value = "/inactive-alert")
+    @GetMapping(value = "/inactive-alerts")
     public List<InactiveAlertEntity> getInactiveAlerts() throws ExecutionException, InterruptedException {
         List<InactiveAlertEntity> commentsEntities = new ArrayList<>();
 

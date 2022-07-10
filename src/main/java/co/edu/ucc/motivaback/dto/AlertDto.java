@@ -1,5 +1,7 @@
 package co.edu.ucc.motivaback.dto;
 
+import com.google.cloud.firestore.annotation.PropertyName;
+
 /**
  * @author nagredo
  * @project motiva-back
@@ -26,7 +28,6 @@ public class AlertDto extends AbstractDto {
 //    public void setIdPoll(int idPoll) {
 //        this.idPoll = idPoll;
 //    }
-
 
     public String getIdPoll() {
         return idPoll;

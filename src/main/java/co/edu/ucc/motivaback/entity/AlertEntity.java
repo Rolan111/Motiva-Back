@@ -35,11 +35,12 @@ public class AlertEntity extends AbstractEntity {
 //        this.idPoll = idPoll;
 //    }
 
-
+    @PropertyName("id_poll")
     public String getIdPoll() {
         return idPoll;
     }
 
+    @PropertyName("id_poll")
     public void setIdPoll(String idPoll) {
         this.idPoll = idPoll;
     }
