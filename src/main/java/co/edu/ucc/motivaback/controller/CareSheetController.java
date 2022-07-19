@@ -184,15 +184,21 @@ public class CareSheetController {
     }
 
     // Segunda forma -- Revisar como guardar una lista
-//    @PostMapping(value = "/care-sheet-answer-psychosocial-create2")
-//    public void saveComment(@RequestBody List<CareSheetAnswerPsychosocialEntity> careSheetAnswerPsychosocialEntity) {
-//        Firestore db = FirestoreClient.getFirestore();
-////        db.collection("answer_psychosocial").document().set(careSheetAnswerPsychosocialEntity);
-////        DatabaseReference usersRef = ref.child("users");
+    @PostMapping(value = "/care-sheet-answer-psychosocial-create2")
+    public void saveComment(@RequestBody List<CareSheetAnswerPsychosocialEntity> careSheetAnswerPsychosocialEntity) {
+        Firestore db = FirestoreClient.getFirestore();
+        
+//        db.collection("answer_psychosocial").document().set(careSheetAnswerPsychosocialEntity);
+//        DatabaseReference usersRef = ref.child("users");
+
+        for (CareSheetAnswerPsychosocialEntity doc: careSheetAnswerPsychosocialEntity){
+            db.collection("answer_psychosocial").document().set(doc);
+        }
+        
 //        CollectionReference usersRef = db.collection("answer_psychosocial");
 //        CollectionReference newPostRef = usersRef.push();
 //        newPostRef.setValueAsync();
-//    }
+    }
 
     private ResponseEntity<?> hasAccess(AuthenticatedUser authenticatedUser) {
         if (!authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()) && !authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name())) {
