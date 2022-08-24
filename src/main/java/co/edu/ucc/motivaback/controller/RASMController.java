@@ -1,6 +1,7 @@
 package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.entity.RASMEntity;
+import co.edu.ucc.motivaback.entity.TypeRasmiEntity;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.Firestore;
@@ -33,7 +34,22 @@ public class RASMController {
         return commentsEntities;
     }
 
+    // Para la tabla Type_rasmi
+    @GetMapping(value = "/type-rasmi")
+    public List<TypeRasmiEntity> getTypeRasmi() throws ExecutionException, InterruptedException {
+        List<TypeRasmiEntity> commentsEntities = new ArrayList<>();
 
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("type_rasmi");
+        ApiFuture<QuerySnapshot> future = documentReference.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents) {
+            TypeRasmiEntity commentsDto = doc.toObject(TypeRasmiEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+    }
 
     @PostMapping(value = "/rasm-create")
     public String saveRASM(@RequestBody RASMEntity rasmEntity) {
