@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "motiva-db",
+  "private_key_id": "5c3caa5f8db0d0c405da2b5d756c0b6f4470d926",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDvGKtXl3mjr7sz\neMdQpHNxX5nC4bqpnJ8+4WWPFERHJetLw/M6szvSPyeTZWPbpC7NrdVrjqNMUG7H\n5qQZuMFV3NiEqHIJY9MVJjfemhQ7Uw+Vc97d+Fm5kYCbPCT/pItluTCbrRw043AG\n5qB+x963MzPI7YZs7hZcZ9xHq706/XOfynnlGiYS1A7zmTDZ8wV25TuiA/gvoqYP\nC+9zUgYWSgAsdCPR/kjECeed76avnaWhYWXYJhu95NPBYImfqSrx96Gah6Uq0tNl\nJFQTN6Mey4aopYkhp2TNBQJBKTlhbe5k7RfqFap22lEAtBYIST/1welwA64I0oH2\n28O+EmBxAgMBAAECggEAAUjKmSpQGJYKiAQK3bb9GUOZk84gBpuiey/yr8DyEx1D\n/S3+E0dwR533+xRWeTEHC4BhbFCxoHNxUuYn5RekrzlurtC+UxNWkw9NCcdeBYm5\nzymruEQbzEcY2ndJXheuztg0B663f0e7pnKBnnNkUdYxiHo70yo4vnHpi/eDKSso\nde9AsBCQI7bcr+9iBoaGFlwUrc53s9IIiMvFWpLRzeCoGn0aXVE+f0g44OoAUM7O\nzFI7ERWWOavP4acyTboo/LHJ7/dZtYVwh0tty0NVrhLj7NTbVuU202c6FsXcR9pB\nEKs8PCarY6ndtTYmg/iewuwfs2NmXVqI6z20WS3ImQKBgQD4vwQSaMgo64iroLn/\nCqzz4BjomTraBDrl2IK/sNlLN25ENTaauMoxac886SFHM2vqUGEu8E/adtlrnGRm\nqz+FpGTEr7FpJrEV1nxEfcwOhkIzdVX/eBbDdN8OCVxoSSqvEBrjKz04OEzjByQp\nC2bkhUFAc9WQ84sZajAT7YUouQKBgQD2EZ0y7Xz03KKxEW9ETF/khxJZPJzAwk6O\nbxhVWmsfn9VqWsaBP4tOgjdmGaOinbThrC5hpCCRBRX5LtYNIk/6TswQNevz76mY\n6Apg8xp64KiYRft0Je99DRaoj3Z8KXpM/eK6gmBuXcHKJmMhKnojx10XBhsVWq1Z\ngI1ShECpeQKBgQDx2n/yClE7gC9FeKP/t3iMMoLlfT78hYpiuo3+JcxQ1tdumDK8\nYxmsy81E0wOZQAUYMQkc42kw58fkWo5ASRcdMMcNeipMK+OYcRAoZAvIv3+Umux/\n1VqEtpi+BBoGB8XpqwYJhJwkkpEnWGUvRzfGz02vhjDLnBDOKDIQ3itPeQKBgAUN\nw47CNejJh0Xft8tNTkLhS00t44JJ+1cNjRBjtQOHQtjWWHFbHr9UCVM9f5DdcFOa\nN7Glr02LLzJY9eh7Je1cJPDISrpN18veKChplcekSZInDc0K4mpNFIQNvj86ktp1\n9GwkNVrO7iX6t9p8htmpRI4uf+vmWt0VuNFTCgjxAoGBAMLIp2wCaqmAornULLr8\ndKdSF01gU08rz3n29REedLXR2RPotKcg0ZUXndUeVY4/mdE4QWzIU/ywTTwpeeZL\nojxcPgBS/XyBiQMvzYaOq25wMel9sxtMNa4WRE43NAdTqMoZmnZxrRsAa/BN3FvX\n8d+ysWtTEqYZSvl3b9YG1Hgv\n-----END PRIVATE KEY-----\n",
+  "client_email": "motiva-env-users@motiva-db.iam.gserviceaccount.com",
+  "client_id": "106061038086441219199",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/motiva-env-users%40motiva-db.iam.gserviceaccount.com"
+}
