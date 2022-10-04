@@ -40,7 +40,7 @@ public class RepComAgentController {
     @GetMapping(value = "/rep-com-agents")
     public ResponseEntity<GeneralBodyResponse<List<RepComAgentDto>>> getAll(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()) && !authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()))
+        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()) && !authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()) && !authenticatedUser.getRol().equals(UserRolEnum.USER.name()) && !authenticatedUser.getRol().equals(UserRolEnum.AGENTE.name()))
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
 
         try {

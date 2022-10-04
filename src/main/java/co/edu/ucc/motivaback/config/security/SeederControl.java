@@ -21,8 +21,7 @@
 //import java.util.HashMap;
 //import java.util.Map;
 //
-//import static co.edu.ucc.motivaback.enums.UserRolEnum.P_CAMPO;
-//import static co.edu.ucc.motivaback.enums.UserRolEnum.SUPERVISOR;
+//import static co.edu.ucc.motivaback.enums.UserRolEnum.*;
 //
 //@Component
 //public class SeederControl {
@@ -47,15 +46,19 @@
 //
 //    protected void userSeed() {
 //
-////        Map<String, Object> docData1 = getDocData(addUserPCampo(1L,"Chanchi", "Kelly Daniela", "1061801108", "Ck1061801108", P_CAMPO));
-////        Map<String, Object> docData2 = getDocData(addUserPCampo(2L,"Campo", "Daniel", "1020604689", "Cd1020604689", SUPERVISOR));
-//        Map<String, Object> docData1 = getDocData(addUserPCampo(3L,"Cajas", "Maria Alejandra", "1061801109", "Ck1061801108", P_CAMPO));
-//        Map<String, Object> docData2 = getDocData(addUserPCampo(4L,"Daza", "Armando", "1061801109", "Ck1061801108", P_CAMPO));
+//        Map<String, Object> docData1 = getDocData(addUserPCampo(1L,"Chanchi", "Kelly Daniela", "1061801108", "Ck1061801108", P_CAMPO));
+//        Map<String, Object> docData2 = getDocData(addUserPCampo(2L,"Campo", "Daniel", "1020604689", "Cd1020604689", SUPERVISOR));
+//        Map<String, Object> docData3 = getDocData(addUserPCampo(3L,"Cajas", "Maria Alejandra", "1061801109", "Cm1061801109", AGENTE));
+//        Map<String, Object> docData4 = getDocData(addUserPCampo(4L,"Daza", "Armando", "1061801100", "Da1061801100", P_CAMPO));
+//        Map<String, Object> docData5 = getDocData(addUserPCampo(5L,"Paz", "Einer", "1061801200", "Pe1061801200", USER));
 //
 //
 //        ArrayList<Map<String, Object>> listDocData = new ArrayList<>();
 //        listDocData.add(docData1);
 //        listDocData.add(docData2);
+//        listDocData.add(docData3);
+//        listDocData.add(docData4);
+//        listDocData.add(docData5);
 //
 //
 //        for (Map<String, Object> docDataI : listDocData) {
