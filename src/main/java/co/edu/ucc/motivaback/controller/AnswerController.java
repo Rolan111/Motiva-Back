@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -140,12 +141,46 @@ public class AnswerController {
     }
 
     @GetMapping(value = "/answerByIdPoll/{idPoll}")
-    public List<AnswerEntity> answerByIdPoll(@PathVariable Integer idPoll) throws ExecutionException, InterruptedException {
+    public List<AnswerEntity> answerByIdPoll(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
         List<AnswerEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("answer");
         Query query = documentReference.whereEqualTo("id_poll", idPoll);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            AnswerEntity commentsDto = doc.toObject(AnswerEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+    }
+
+    @GetMapping(value = "/answerByIdQuestion/{idQuestion}")
+    public List<AnswerEntity> answerByIdQuestion(@PathVariable Integer idQuestion) throws ExecutionException, InterruptedException {
+        List<AnswerEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("answer");
+        Query query = documentReference.whereEqualTo("id_question", idQuestion);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            AnswerEntity commentsDto = doc.toObject(AnswerEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+    }
+
+    @GetMapping(value = "/answerMultipleByIdPoll/{idPoll}")
+    public List<AnswerEntity> answerMultipleConsultas(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
+        List<AnswerEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("answer");
+        Query query = documentReference.whereEqualTo("id_poll", idPoll).whereIn("id_question", Arrays.asList(2,6,1,5));
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
