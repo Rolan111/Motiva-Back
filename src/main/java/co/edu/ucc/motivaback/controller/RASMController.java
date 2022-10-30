@@ -3,10 +3,7 @@ package co.edu.ucc.motivaback.controller;
 import co.edu.ucc.motivaback.entity.RASMEntity;
 import co.edu.ucc.motivaback.entity.TypeRasmiEntity;
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +22,23 @@ public class RASMController {
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("rasm");
         ApiFuture<QuerySnapshot> future = documentReference.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents) {
+            RASMEntity commentsDto = doc.toObject(RASMEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+    }
+
+    @GetMapping(value = "/rasmByIdPoll/{idPoll}")
+    public List<RASMEntity> getRASMByIdPoll(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
+        List<RASMEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("rasm");
+        Query query = documentReference.whereEqualTo("id_poll", idPoll);
+        ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
         for (QueryDocumentSnapshot doc : documents) {
