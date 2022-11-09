@@ -26,6 +26,8 @@ public class AlertServiceImpl implements AlertService {
 
     @Override
     public AlertDto create(AlertDto alertDto) {
+        System.out.println(alertDto);
+        System.out.println(AlertEntity.class);
         AlertEntity alertEntity = ObjectMapperUtils.map(alertDto, AlertEntity.class);
 
         alertEntity.setCreatedAt(new Date());
