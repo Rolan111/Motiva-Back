@@ -19,13 +19,13 @@ public class AlertDto extends AbstractDto {
     private String typeIdentification;
     private String municipality;
     private String date;
-    private int cellphone;
+    private long cellphone;
 
-    public int getCellphone() {
+    public long getCellphone() {
         return cellphone;
     }
 
-    public void setCellphone(int cellphone) {
+    public void setCellphone(long cellphone) {
         this.cellphone = cellphone;
     }
 

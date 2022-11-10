@@ -1,15 +1,11 @@
-package co.edu.ucc.motivaback.entity;
-
-import com.google.cloud.firestore.annotation.PropertyName;
-import com.google.cloud.spring.data.firestore.Document;
+package co.edu.ucc.motivaback.dto;
 
 /**
  * @author nagredo
  * @project motiva-back
- * @class AlertEntity
+ * @class AlertDto
  */
-@Document(collectionName = "alert")
-public class AlertEntity extends AbstractEntity {
+public class RASMDto extends AbstractDto {
     private int idAlert;
 //    private int idPoll;
     private String idPoll;
@@ -31,13 +27,22 @@ public class AlertEntity extends AbstractEntity {
         this.cellphone = cellphone;
     }
 
-    public String getProfessional() {
+    public String getLastNameBeneficiary() {
+        return lastNameBeneficiary;
+    }
+
+    public void setLastNameBeneficiary(String lastNameBeneficiary) {
+        this.lastNameBeneficiary = lastNameBeneficiary;
+    }
+
+    public String getNameProfessional() {
         return professional;
     }
 
-    public void setProfessional(String professional) {
-        this.professional = professional;
+    public void setNameProfessional(String nameProfessional) {
+        this.professional = nameProfessional;
     }
+
 
     public String getNameBeneficiary() {
         return nameBeneficiary;
@@ -47,13 +52,6 @@ public class AlertEntity extends AbstractEntity {
         this.nameBeneficiary = nameBeneficiary;
     }
 
-    public String getLastNameBeneficiary() {
-        return lastNameBeneficiary;
-    }
-
-    public void setLastNameBeneficiary(String lastNameBeneficiary) {
-        this.lastNameBeneficiary = lastNameBeneficiary;
-    }
 
     public long getIdentification() {
         return identification;
@@ -87,32 +85,26 @@ public class AlertEntity extends AbstractEntity {
         this.date = date;
     }
 
-    @PropertyName("id_alert")
     public int getIdAlert() {
         return idAlert;
     }
 
-    @PropertyName("id_alert")
     public void setIdAlert(int idAlert) {
         this.idAlert = idAlert;
     }
 
-//    @PropertyName("id_poll")
 //    public int getIdPoll() {
 //        return idPoll;
 //    }
 //
-//    @PropertyName("id_poll")
 //    public void setIdPoll(int idPoll) {
 //        this.idPoll = idPoll;
 //    }
 
-    @PropertyName("id_poll")
     public String getIdPoll() {
         return idPoll;
     }
 
-    @PropertyName("id_poll")
     public void setIdPoll(String idPoll) {
         this.idPoll = idPoll;
     }
