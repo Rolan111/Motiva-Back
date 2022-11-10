@@ -18,6 +18,7 @@ public class AlertDto extends AbstractDto {
     private long identification;
     private String typeIdentification;
     private String municipality;
+    private String questionnaireType;
     private String date;
     private long cellphone;
 
@@ -28,11 +29,11 @@ public class AlertDto extends AbstractDto {
     public void setCellphone(long cellphone) {
         this.cellphone = cellphone;
     }
-
+    @PropertyName("last_name_beneficiary")
     public String getLastNameBeneficiary() {
         return lastNameBeneficiary;
     }
-
+    @PropertyName("last_name_beneficiary")
     public void setLastNameBeneficiary(String lastNameBeneficiary) {
         this.lastNameBeneficiary = lastNameBeneficiary;
     }
@@ -45,11 +46,11 @@ public class AlertDto extends AbstractDto {
         this.professional = nameProfessional;
     }
 
-
+    @PropertyName("name_beneficiary")
     public String getNameBeneficiary() {
         return nameBeneficiary;
     }
-
+    @PropertyName("name_beneficiary")
     public void setNameBeneficiary(String nameBeneficiary) {
         this.nameBeneficiary = nameBeneficiary;
     }
@@ -62,11 +63,11 @@ public class AlertDto extends AbstractDto {
     public void setIdentification(long identification) {
         this.identification = identification;
     }
-
+    @PropertyName("type_identification")
     public String getTypeIdentification() {
         return typeIdentification;
     }
-
+    @PropertyName("type_identification")
     public void setTypeIdentification(String typeIdentification) {
         this.typeIdentification = typeIdentification;
     }
@@ -86,11 +87,11 @@ public class AlertDto extends AbstractDto {
     public void setDate(String date) {
         this.date = date;
     }
-
+    @PropertyName("id_alert")
     public int getIdAlert() {
         return idAlert;
     }
-
+    @PropertyName("id_alert")
     public void setIdAlert(int idAlert) {
         this.idAlert = idAlert;
     }
@@ -103,10 +104,11 @@ public class AlertDto extends AbstractDto {
 //        this.idPoll = idPoll;
 //    }
 
+    @PropertyName("id_poll")
     public String getIdPoll() {
         return idPoll;
     }
-
+    @PropertyName("id_poll")
     public void setIdPoll(String idPoll) {
         this.idPoll = idPoll;
     }
@@ -117,5 +119,21 @@ public class AlertDto extends AbstractDto {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public String getProfessional() {
+        return professional;
+    }
+
+    public void setProfessional(String professional) {
+        this.professional = professional;
+    }
+    @PropertyName("questionnaire_type")
+    public String getQuestionnaireType() {
+        return questionnaireType;
+    }
+    @PropertyName("questionnaire_type")
+    public void setQuestionnaireType(String questionnaireType) {
+        this.questionnaireType = questionnaireType;
     }
 }
