@@ -14,29 +14,20 @@ public class AlertEntity extends AbstractEntity {
 //    private int idPoll;
     private String idPoll;
     private int score;
-    private String nameProfessional;
-    private String lastNameProfessional;
-    private String nameBeneficiary;
+
+    private String nameBeneficiary; private String professional;
     private String lastNameBeneficiary;
-    private int identification;
+    private long identification;
     private String typeIdentification;
     private String municipality;
     private String date;
 
-    public String getNameProfessional() {
-        return nameProfessional;
+    public String getProfessional() {
+        return professional;
     }
 
-    public void setNameProfessional(String nameProfessional) {
-        this.nameProfessional = nameProfessional;
-    }
-
-    public String getLastNameProfessional() {
-        return lastNameProfessional;
-    }
-
-    public void setLastNameProfessional(String lastNameProfessional) {
-        this.lastNameProfessional = lastNameProfessional;
+    public void setProfessional(String professional) {
+        this.professional = professional;
     }
 
     public String getNameBeneficiary() {
@@ -55,11 +46,11 @@ public class AlertEntity extends AbstractEntity {
         this.lastNameBeneficiary = lastNameBeneficiary;
     }
 
-    public int getIdentification() {
+    public long getIdentification() {
         return identification;
     }
 
-    public void setIdentification(int identification) {
+    public void setIdentification(long identification) {
         this.identification = identification;
     }
 

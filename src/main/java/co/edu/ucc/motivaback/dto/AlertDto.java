@@ -12,11 +12,10 @@ public class AlertDto extends AbstractDto {
 //    private int idPoll;
     private String idPoll;
     private int score;
-    private String nameProfessional;
-    private String lastNameProfessional;
+    private String professional;
     private String nameBeneficiary;
     private String lastNameBeneficiary;
-    private int identification;
+    private long identification;
     private String typeIdentification;
     private String municipality;
     private String date;
@@ -30,20 +29,13 @@ public class AlertDto extends AbstractDto {
     }
 
     public String getNameProfessional() {
-        return nameProfessional;
+        return professional;
     }
 
     public void setNameProfessional(String nameProfessional) {
-        this.nameProfessional = nameProfessional;
+        this.professional = nameProfessional;
     }
 
-    public String getLastNameProfessional() {
-        return lastNameProfessional;
-    }
-
-    public void setLastNameProfessional(String lastNameProfessional) {
-        this.lastNameProfessional = lastNameProfessional;
-    }
 
     public String getNameBeneficiary() {
         return nameBeneficiary;
@@ -54,11 +46,11 @@ public class AlertDto extends AbstractDto {
     }
 
 
-    public int getIdentification() {
+    public long getIdentification() {
         return identification;
     }
 
-    public void setIdentification(int identification) {
+    public void setIdentification(long identification) {
         this.identification = identification;
     }
 
