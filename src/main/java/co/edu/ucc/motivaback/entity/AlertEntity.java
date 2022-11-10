@@ -14,13 +14,22 @@ public class AlertEntity extends AbstractEntity {
 //    private int idPoll;
     private String idPoll;
     private int score;
-
-    private String nameBeneficiary; private String professional;
+    private String professional;
+    private String nameBeneficiary;
     private String lastNameBeneficiary;
     private long identification;
     private String typeIdentification;
     private String municipality;
     private String date;
+    private int cellphone;
+
+    public int getCellphone() {
+        return cellphone;
+    }
+
+    public void setCellphone(int cellphone) {
+        this.cellphone = cellphone;
+    }
 
     public String getProfessional() {
         return professional;

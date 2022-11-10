@@ -19,6 +19,15 @@ public class AlertDto extends AbstractDto {
     private String typeIdentification;
     private String municipality;
     private String date;
+    private int cellphone;
+
+    public int getCellphone() {
+        return cellphone;
+    }
+
+    public void setCellphone(int cellphone) {
+        this.cellphone = cellphone;
+    }
 
     public String getLastNameBeneficiary() {
         return lastNameBeneficiary;
