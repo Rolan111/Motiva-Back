@@ -3,16 +3,14 @@ package co.edu.ucc.motivaback.controller;
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.AlertDto;
 import co.edu.ucc.motivaback.entity.AlertEntity;
+import co.edu.ucc.motivaback.entity.CareSheetOptionAnwerEntity;
 import co.edu.ucc.motivaback.entity.InactiveAlertEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.AlertService;
 import co.edu.ucc.motivaback.util.CommonsService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +36,24 @@ public class AlertController {
     }
 
     int tamanioLista;
+
+    @GetMapping(value = "/alertByIdPoll/{idPoll}")
+    public List<AlertEntity> alertByIdPoll(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
+        List<AlertEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("alert");
+        Query query = documentReference.whereEqualTo("id_poll", idPoll);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            AlertEntity commentsDto = doc.toObject(AlertEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+
+    }
 
     @GetMapping(value = "/alerts-size") //Consultamos la cantidad de registros
     public int alertsSize() throws ExecutionException, InterruptedException {
