@@ -18,7 +18,7 @@ public class AlertDto extends AbstractDto {
     private long identification;
     private String typeIdentification;
     private String municipality;
-    private String questionnaireType;
+    private String typeQuestionnaire;
     private String date;
     private long cellphone;
 
@@ -96,13 +96,6 @@ public class AlertDto extends AbstractDto {
         this.idAlert = idAlert;
     }
 
-//    public int getIdPoll() {
-//        return idPoll;
-//    }
-//
-//    public void setIdPoll(int idPoll) {
-//        this.idPoll = idPoll;
-//    }
 
     @PropertyName("id_poll")
     public String getIdPoll() {
@@ -128,12 +121,13 @@ public class AlertDto extends AbstractDto {
     public void setProfessional(String professional) {
         this.professional = professional;
     }
-    @PropertyName("questionnaire_type")
-    public String getQuestionnaireType() {
-        return questionnaireType;
+
+    @PropertyName("type_questionnaire")
+    public String getTypeQuestionnaire() {
+        return typeQuestionnaire;
     }
-    @PropertyName("questionnaire_type")
-    public void setQuestionnaireType(String questionnaireType) {
-        this.questionnaireType = questionnaireType;
+    @PropertyName("type_questionnaire")
+    public void setTypeQuestionnaire(String typeQuestionnaire) {
+        this.typeQuestionnaire = typeQuestionnaire;
     }
 }

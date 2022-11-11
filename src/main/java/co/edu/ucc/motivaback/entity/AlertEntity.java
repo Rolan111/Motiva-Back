@@ -20,7 +20,7 @@ public class AlertEntity extends AbstractEntity {
     private long identification;
     private String typeIdentification;
     private String municipality;
-    private String questionnaireType;
+    private String typeQuestionnaire;
     private String date;
     private long cellphone;
 
@@ -129,12 +129,12 @@ public class AlertEntity extends AbstractEntity {
         this.score = score;
     }
 
-    @PropertyName("questionnaire_type")
-    public String getQuestionnaireType() {
-        return questionnaireType;
+    @PropertyName("type_questionnaire")
+    public String getTypeQuestionnaire() {
+        return typeQuestionnaire;
     }
-    @PropertyName("questionnaire_type")
-    public void setQuestionnaireType(String questionnaireType) {
-        this.questionnaireType = questionnaireType;
+    @PropertyName("type_questionnaire")
+    public void setTypeQuestionnaire(String typeQuestionnaire) {
+        this.typeQuestionnaire = typeQuestionnaire;
     }
 }
