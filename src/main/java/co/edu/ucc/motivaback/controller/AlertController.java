@@ -52,7 +52,6 @@ public class AlertController {
             commentsEntities.add(commentsDto);
         }
         return commentsEntities;
-
     }
 
     @GetMapping(value = "/alerts-size") //Consultamos la cantidad de registros
