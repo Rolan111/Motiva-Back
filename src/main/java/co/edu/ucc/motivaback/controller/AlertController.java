@@ -87,7 +87,7 @@ public class AlertController {
         return commentsEntities;
     }
 
-    @PostMapping(value = "/alert-create")
+    @PostMapping(value = "/alert-create2")
     public ResponseEntity<GeneralBodyResponse<AlertDto>> save(@Valid @RequestBody AlertDto alertDto,
                                                               @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()) && !authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()))
