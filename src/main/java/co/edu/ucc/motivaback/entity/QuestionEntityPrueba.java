@@ -3,26 +3,17 @@ package co.edu.ucc.motivaback.entity;
 import com.google.cloud.firestore.annotation.PropertyName;
 
 public class QuestionEntityPrueba extends AbstractEntity {
-    private int idQuestion;
+    private int idQuetion;
     private String description;
-    private String type;
 
-    public String getType() {
-        return type;
+    @PropertyName("id_quetion")
+    public int getIdQuetion() {
+        return idQuetion;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @PropertyName("id_question")
-    public int getIdQuestion() {
-        return idQuestion;
-    }
-
-    @PropertyName("id_question")
-    public void setIdQuestion(int idQuestion) {
-        this.idQuestion = idQuestion;
+    @PropertyName("id_quetion")
+    public void setIdQuetion(int idQuetion) {
+        this.idQuetion = idQuetion;
     }
 
     public String getDescription() {
