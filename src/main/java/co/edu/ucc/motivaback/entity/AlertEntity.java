@@ -11,7 +11,6 @@ import com.google.cloud.spring.data.firestore.Document;
 @Document(collectionName = "alert")
 public class AlertEntity extends AbstractEntity {
     private int idAlert;
-//    private int idPoll;
     private String idPoll;
     private int score;
     private String professional;
