@@ -35,10 +35,10 @@ public class AlertController {
         this.alertEntity = alertEntity;
     }
 
-    //cambios nuevos
     int tamanioLista;
 
-    //Persistir commit, en master también 2
+    //Persistir commit
+    //Cambio nuevo desde alert DEV
 
     @GetMapping(value = "/alertByIdPoll/{idPoll}")
     public List<AlertEntity> alertByIdPoll(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
