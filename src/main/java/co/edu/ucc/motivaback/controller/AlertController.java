@@ -35,6 +35,7 @@ public class AlertController {
         this.alertEntity = alertEntity;
     }
 
+    //cambios nuevos
     int tamanioLista;
 
     @GetMapping(value = "/alertByIdPoll/{idPoll}")
