@@ -9,7 +9,7 @@ import com.google.cloud.firestore.annotation.PropertyName;
  */
 public class AlertDto extends AbstractDto {
     private int idAlert;
-//    private int idPoll;
+//    private int idPoll;//
     private String idPoll;
     private int score;
     private String professional;

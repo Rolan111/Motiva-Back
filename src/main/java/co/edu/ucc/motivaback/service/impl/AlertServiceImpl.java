@@ -9,6 +9,7 @@ import co.edu.ucc.motivaback.util.ObjectMapperUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author nagredo
@@ -25,9 +26,12 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
+    public List<AlertDto> findAll() {
+        return null;
+    }
+
+    @Override
     public AlertDto create(AlertDto alertDto) {
-        System.out.println(alertDto);
-        System.out.println(AlertEntity.class);
         AlertEntity alertEntity = ObjectMapperUtils.map(alertDto, AlertEntity.class);
 
         alertEntity.setCreatedAt(new Date());
