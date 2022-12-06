@@ -37,9 +37,6 @@ public class AlertController {
 
     int tamanioLista;
 
-    //Persistir commit
-    //Cambio nuevo
-
     @GetMapping(value = "/alertByIdPoll/{idPoll}")
     public List<AlertEntity> alertByIdPoll(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
         List<AlertEntity> commentsEntities = new ArrayList<>();
