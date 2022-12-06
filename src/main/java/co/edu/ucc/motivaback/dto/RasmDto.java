@@ -1,8 +1,13 @@
-package co.edu.ucc.motivaback.entity;
+package co.edu.ucc.motivaback.dto;
 
 import com.google.cloud.firestore.annotation.PropertyName;
 
-public class RASMEntity extends AbstractEntity {
+/**
+ * @author nagredo
+ * @project motiva-back
+ * @class AlertDto
+ */
+public class RasmDto extends AbstractDto {
     private String idPoll;
     private String typeRasm;
     private int score;

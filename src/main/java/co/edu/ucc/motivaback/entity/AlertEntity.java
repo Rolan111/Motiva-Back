@@ -101,16 +101,6 @@ public class AlertEntity extends AbstractEntity {
         this.idAlert = idAlert;
     }
 
-//    @PropertyName("id_poll")
-//    public int getIdPoll() {
-//        return idPoll;
-//    }
-//
-//    @PropertyName("id_poll")
-//    public void setIdPoll(int idPoll) {
-//        this.idPoll = idPoll;
-//    }
-
     @PropertyName("id_poll")
     public String getIdPoll() {
         return idPoll;
@@ -137,4 +127,6 @@ public class AlertEntity extends AbstractEntity {
     public void setTypeQuestionnaire(String typeQuestionnaire) {
         this.typeQuestionnaire = typeQuestionnaire;
     }
+
+
 }

@@ -1,7 +1,7 @@
 package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
-import co.edu.ucc.motivaback.dto.RASMDto;
+import co.edu.ucc.motivaback.dto.RasmDto;
 import co.edu.ucc.motivaback.entity.RASMEntity;
 import co.edu.ucc.motivaback.entity.TypeRasmiEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
@@ -26,21 +26,21 @@ import static co.edu.ucc.motivaback.util.CommonsService.CREATED_OK;
 
 @RestController
 @RequestMapping("/api")
-public class RASMController {
+public class RasmController {
 
     private final RASMService rasmService;
 
-    public RASMController(RASMService rasmService) {
+    public RasmController(RASMService rasmService) {
         this.rasmService = rasmService;
     }
 
 
-    @GetMapping(value = "/rasm")
-    public List<RASMEntity> getRASM() throws ExecutionException, InterruptedException {
+    @GetMapping(value = "/getAllRasm")
+    public List<RASMEntity> getRasm() throws ExecutionException, InterruptedException {
         List<RASMEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("rasm");
+        CollectionReference documentReference = db.collection("rASMEntity");
         ApiFuture<QuerySnapshot> future = documentReference.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
@@ -56,7 +56,7 @@ public class RASMController {
         List<RASMEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("rasm");
+        CollectionReference documentReference = db.collection("rASMEntity");
         Query query = documentReference.whereEqualTo("id_poll", idPoll);
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
@@ -85,16 +85,9 @@ public class RASMController {
         return commentsEntities;
     }
 
-    /*@PostMapping(value = "/rasm-create")
-    public String saveRASM(@RequestBody RASMEntity rasmEntity) {
-        Firestore db = FirestoreClient.getFirestore();
-        db.collection("rasm").document().set(rasmEntity);
-        return "Hola mundo";
-    }*/
-
     @PostMapping(value = "/rasm-create")
-    public ResponseEntity<GeneralBodyResponse<RASMDto>> save(@Valid @RequestBody RASMDto rasmDto,
-                                                              @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+    public ResponseEntity<GeneralBodyResponse<RasmDto>> save(@Valid @RequestBody RasmDto rasmDto,
+                                                             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()) && !authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()))
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
 
@@ -104,7 +97,6 @@ public class RASMController {
             var save = this.rasmService.create(rasmDto);
 
             if (save != null){
-                System.out.println("Se creo ");
                 return new ResponseEntity<>(new GeneralBodyResponse<>(save, CREATED_OK, null), HttpStatus.OK);
 
                 }else

@@ -1,7 +1,7 @@
 package co.edu.ucc.motivaback.service;
 
 
-import co.edu.ucc.motivaback.dto.RASMDto;
+import co.edu.ucc.motivaback.dto.RasmDto;
 
 /**
  * @author nagredo
@@ -9,5 +9,5 @@ import co.edu.ucc.motivaback.dto.RASMDto;
  * @class AlertService
  */
 public interface RASMService {
-    RASMDto create(RASMDto rasmDto);
+    RasmDto create(RasmDto rasmDto);
 }
