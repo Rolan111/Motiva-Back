@@ -4,7 +4,6 @@ import java.util.Map;
 
 public class TrackingSheetDto extends AbstractDto {
 
-    //@DocumentId
     private String id;
 
     private int idTrackingSheet;

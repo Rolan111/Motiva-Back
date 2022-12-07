@@ -187,17 +187,11 @@ public class CareSheetController {
     @PostMapping(value = "/care-sheet-answer-psychosocial-create2")
     public void saveComment(@RequestBody List<CareSheetAnswerPsychosocialEntity> careSheetAnswerPsychosocialEntity) {
         Firestore db = FirestoreClient.getFirestore();
-        
-//        db.collection("answer_psychosocial").document().set(careSheetAnswerPsychosocialEntity);
-//        DatabaseReference usersRef = ref.child("users");
 
         for (CareSheetAnswerPsychosocialEntity doc: careSheetAnswerPsychosocialEntity){
             db.collection("answer_psychosocial").document().set(doc);
         }
-        
-//        CollectionReference usersRef = db.collection("answer_psychosocial");
-//        CollectionReference newPostRef = usersRef.push();
-//        newPostRef.setValueAsync();
+
     }
 
     private ResponseEntity<?> hasAccess(AuthenticatedUser authenticatedUser) {

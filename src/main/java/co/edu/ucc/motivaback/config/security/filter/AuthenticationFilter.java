@@ -67,7 +67,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) {
         try {
             var userDto = (UserEntity) auth.getPrincipal();
-            var expiration = new Date(System.currentTimeMillis() + 7200000);
+            var expiration = new Date(System.currentTimeMillis() + 7200000); //7200000 ms => 2 Horas
             var subject = UUID.randomUUID().toString();
             var token = Jwts.builder()
                     .setIssuer("key_maker")

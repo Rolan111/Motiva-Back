@@ -29,8 +29,6 @@ import static co.edu.ucc.motivaback.util.CommonsService.*;
 public class TrackingSheetController {
 
     private final TrackingSheetService trackingSheetService;
-
-    //Adicional
     private final TrackingSheetRepository trackingSheetRepository;
     private final FirestoreTemplate firestoreTemplate;
     FirestoreReactiveOperations firestoreTemplate2;

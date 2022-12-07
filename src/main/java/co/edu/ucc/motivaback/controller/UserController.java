@@ -7,6 +7,7 @@ import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.UserService;
 import co.edu.ucc.motivaback.util.CommonsService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
+import com.google.api.client.json.Json;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
@@ -16,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -31,7 +33,8 @@ import static co.edu.ucc.motivaback.util.CommonsService.*;
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
-
+    ArrayList<String> prueba= new ArrayList<>();
+//    prueba (0,"La sesión aún está activa");
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -106,5 +109,11 @@ public class UserController {
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    /** Verificamos si es posible consultar esta sesión, de ser así es porque existen credenciales válidas */
+    @GetMapping(value = "/verificando-sesion")
+    public int verificandoSesion() {
+        return 1;
     }
 }
