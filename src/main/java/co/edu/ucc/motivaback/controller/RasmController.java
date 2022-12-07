@@ -1,7 +1,7 @@
 package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
-import co.edu.ucc.motivaback.dto.RASMDto;
+import co.edu.ucc.motivaback.dto.RasmDto;
 import co.edu.ucc.motivaback.entity.RASMEntity;
 import co.edu.ucc.motivaback.entity.TypeRasmiEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
@@ -26,11 +26,11 @@ import static co.edu.ucc.motivaback.util.CommonsService.CREATED_OK;
 
 @RestController
 @RequestMapping("/api")
-public class RASMController {
+public class RasmController {
 
     private final RASMService rasmService;
 
-    public RASMController(RASMService rasmService) {
+    public RasmController(RASMService rasmService) {
         this.rasmService = rasmService;
     }
 
@@ -93,7 +93,7 @@ public class RASMController {
     }*/
 
     @PostMapping(value = "/rasm-create")
-    public ResponseEntity<GeneralBodyResponse<RASMDto>> save(@Valid @RequestBody RASMDto rasmDto,
+    public ResponseEntity<GeneralBodyResponse<RasmDto>> save(@Valid @RequestBody RasmDto rasmDto,
                                                               @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()) && !authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()))
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
