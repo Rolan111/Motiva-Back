@@ -72,6 +72,22 @@ public class QuestionController {
         return commentsEntities;
     }
 
+    @GetMapping(value = "/questionsChildren")
+    public List<QuestionEntityPrueba> getAllQuestionsChildren() throws ExecutionException, InterruptedException {
+        List<QuestionEntityPrueba> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("question");
+        ApiFuture<QuerySnapshot> future = documentReference.whereEqualTo("type","CHILDREN").orderBy("id_question").get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents) {
+            QuestionEntityPrueba commentsDto = doc.toObject(QuestionEntityPrueba.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+    }
+
     @GetMapping(value = "/questionByIdQuestion/{id_question}")
     public List<QuestionEntityPrueba> answerPsychosocialByIdPoll(@PathVariable("id_question") Integer idQuestion) throws ExecutionException, InterruptedException {
         List<QuestionEntityPrueba> commentsEntities = new ArrayList<>();

@@ -97,13 +97,13 @@ public class PollController {
         }
     }
 
-    @GetMapping(value = "/pollById/{id}")
-    public List<PollEntity> pollById(@PathVariable String id) throws ExecutionException, InterruptedException {
+    @GetMapping(value = "/pollByIdPoll/{idPoll}")
+    public List<PollEntity> pollById(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
         List<PollEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("poll");
-        Query query = documentReference.whereEqualTo("id_poll", id);
+        Query query = documentReference.whereEqualTo("id_poll", idPoll);
         ApiFuture<QuerySnapshot> future = query.get();
 
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
