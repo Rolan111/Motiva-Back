@@ -51,6 +51,22 @@ public class RasmController {
         return commentsEntities;
     }
 
+    @GetMapping(value = "/getAllRasm")
+    public List<RASMEntity> getRasm() throws ExecutionException, InterruptedException {
+        List<RASMEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("rASMEntity");
+        ApiFuture<QuerySnapshot> future = documentReference.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents) {
+            RASMEntity commentsDto = doc.toObject(RASMEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+    }
+
     @GetMapping(value = "/rasmByIdPoll/{idPoll}")
     public List<RASMEntity> getRASMByIdPoll(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
         List<RASMEntity> commentsEntities = new ArrayList<>();
