@@ -95,6 +95,23 @@ public class AnswerController {
         return commentsEntities;
     }
 
+    @GetMapping(value = "/answerByIdQuestionAndOpenAnswer/{idQuestion}/{openAnswer}")
+    public List<AnswerEntity> answerByIdQuestionAndOpenAnswer(@PathVariable Integer idQuestion, @PathVariable String openAnswer) throws ExecutionException, InterruptedException {
+        List<AnswerEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("answer");
+        Query query = documentReference.whereEqualTo("id_question", idQuestion).whereEqualTo("open_answer", openAnswer);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            AnswerEntity commentsDto = doc.toObject(AnswerEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+    }
+
     //COLECCIÓN DE PRUEBA
     @PostMapping(value = "/answers-pruebas")
     public String saveComment(@RequestBody CareSheetAnswerEntity commentsEntity) {
