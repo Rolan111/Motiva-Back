@@ -72,7 +72,7 @@ public class RasmController {
         List<RASMEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("rasm");
+        CollectionReference documentReference = db.collection("rASMEntity"); // CAMBIAR AQUI a rasm
         Query query = documentReference.whereEqualTo("id_poll", idPoll);
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
@@ -100,6 +100,7 @@ public class RasmController {
         }
         return commentsEntities;
     }
+
 
     /*@PostMapping(value = "/rasm-create")
     public String saveRASM(@RequestBody RASMEntity rasmEntity) {
@@ -129,4 +130,25 @@ public class RasmController {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @DeleteMapping(value = "/rasm-delete/{idPoll}")
+    public List<RASMEntity> deleteAlerts(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
+        List<RASMEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("rASMEntity"); //CAMBIAR A rasm
+        ApiFuture<QuerySnapshot> future = documentReference.whereEqualTo("id_poll",idPoll).get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents) {
+            RASMEntity commentsDto = doc.toObject(RASMEntity.class);
+            commentsEntities.add(commentsDto);
+            doc.getReference().delete();
+        }
+        return commentsEntities;
+    }
+
+
+
+
 }

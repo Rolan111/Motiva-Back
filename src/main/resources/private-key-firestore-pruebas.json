@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "motiva-pruebas-db",
+  "private_key_id": "da7a963b3e4982c2059a5e4e04cfb3bc4ace8b52",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCIVk8qXdxEAxuj\nHZsqnvhYkZBJM5I1gbezWj9RDXDc/YHgRX6RDgoyNJCzVvHGcakzXtUPQvyMzfez\nlAGX/jJbInP1WsxQP2/E2vD7dbrC6O7WN/ysdJRCTfDcknBVxkmexdaJaMnqvWvo\nXh2TnSqV2Ed+47KYjEbrq4wQ4fbvVLRjjZ5Cb7g9TFAXI1+GhPxonBqz6kNcy5m4\nhz7H5mX39VffHWcno9onF3bNc0Q4Ub9y2ieiNG1l9km3mSlc9ekkvMD6CE0A5wqV\n2jVv8+I3+PKFG1suanEz8F4EMxAAXO6EZTi72Qj69+Dr4NDSwvBin+R35tSgxbXF\n+6sSobrJAgMBAAECggEABZSWz/Kgke4YowASuldgbeujXsOsH+GL3dz7S3uD25/K\nwZ3GlPRgqXZqV9Tet5MubEpc6S+CO9cwZNrRh+GhOQa7fVb2lvBJyGJ3y6shdlnn\ncMBA6OQqr14WVkjuLSydFdEeO2idHy0arhuwFTsxI4oDPyfdxw2y13GhnY1KOLiN\nD12bq7Ps/m317qZPuNo25U2WowChIwhyuT9t0XylgOiYuYkzA0615Xi7CrcbMhIn\n35Gm6BOVYjSFDzEg5pNEmjgm56VoU449fME9D9DvZObyKY3ni1nUSu/pLKb0WBAm\nx1eBCsDnh1uXHZscI5VelMpAiO9fV+klYpWAdzmLKwKBgQC/Out16kiEnMiOTO8p\nsHmzI4xGhvvJBtXZYdew814G2o/ktcAemqFR8jXKkLgZQq9tCoDVhGiuUll5reZd\n3VR/OeF3e/pjFaG223/oGlTFsI8LkNklkoJny0aeKABd4J3AalGYijJCnGJLOGbu\nfBb3bqNsLhtBfyd0Q6WmKyWjowKBgQC2g8GZc3AYD4INaQePSgyldOxVVf1+zj7g\nYrIf2e2UXIQSPIGLHW1Ncy/5fuZoWp3juy7Cg9zhZ7LVH5UbNrQN007YU+QFaEg7\n0oYHL4s9wVtj4Fq582IVEvHKfrVwm3oBiP2v6naaEDjfsOC86QSdRiuVPAORSoMs\nHC91luPuowKBgHx0/1vd39aXJ5wdjCYo2fvx7dDU9zfNgA6btEJREegKBU6Hz4Lb\nhpSLu+CbMYYXNY8VH+ZW575UkDE2MdDzRJQM+qXGBZ7JLFeTIfrQcE29bEvNuNXQ\nNZkR3mL+i8aNcn4RdAuAHdfmab6k9bDPCC9/TVMR6uFEvUvY3w131WZbAoGAYR+u\nF3WZsgQWpgI9NqAmKKoW1baDxkYEqa17sn1q8ydkVLwEB76qGqvwXKmN/Pwzxysl\nz/cRxJVFUiqTUz8CA9VtwKqrzcDXp5X5IrvHMh7B/l02inuctzA0oRhaf0kNXOHE\ndiej44o8abUbcwvhG7xqluiv0VJAiWmaS833D1cCgYBpww9lXOENKN/QiOwKpT39\nO/GduTD//eZZ6xoCi7vOWZaREamDKjaKjwBwUWhgMdpfEXZVWQlx4p1eLqULivbH\n4f628KXcFL9MSFs8bI3oE+Fi4sRwGdjGi1md52JIL2Hm7UG0splqPYkkcSPvCnuw\nlAcJWHQc57610+s8VjCCiQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-m5e5g@motiva-pruebas-db.iam.gserviceaccount.com",
+  "client_id": "115968663793798875662",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-m5e5g%40motiva-pruebas-db.iam.gserviceaccount.com"
+}

@@ -5,10 +5,10 @@ import com.google.cloud.spring.data.firestore.Document;
 
 import java.util.Map;
 
-@Document(collectionName = "tracking_sheet")
+@Document(collectionName = "tracking_sheet_follow_user")
 public class TrackingSheetEntity extends AbstractEntity {
 
-    private String idTrackingSheet;
+    private String idPoll;
 
     private String names;
     private String lastnames;
@@ -18,22 +18,13 @@ public class TrackingSheetEntity extends AbstractEntity {
     private String referredEntity;
     private String attentionStatus;
     private String recommendations;
-    private Map<String, String> comments;
 
-    public Map<String, String> getComments() {
-        return comments;
+    public String getIdPoll() {
+        return idPoll;
     }
 
-    public void setComments(Map<String, String> comments) {
-        this.comments = comments;
-    }
-
-    public String getIdTrackingSheet() {
-        return idTrackingSheet;
-    }
-
-    public void setIdTrackingSheet(String idTrackingSheet) {
-        this.idTrackingSheet = idTrackingSheet;
+    public void setIdPoll(String idPoll) {
+        this.idPoll = idPoll;
     }
 
     public String getNames() {
