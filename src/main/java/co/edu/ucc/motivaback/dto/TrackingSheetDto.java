@@ -4,9 +4,9 @@ import java.util.Map;
 
 public class TrackingSheetDto extends AbstractDto {
 
-    private String id;
+    private String idPoll;
 
-    private int idTrackingSheet;
+    //private int idTrackingSheet;
 
     private String names;
     private String lastnames;
@@ -26,22 +26,12 @@ public class TrackingSheetDto extends AbstractDto {
         this.comments = comments;
     }
 
-    @Override
-    public String getId() {
-        return id;
+    public String getIdPoll() {
+        return idPoll;
     }
 
-    @Override
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public int getIdTrackingSheet() {
-        return idTrackingSheet;
-    }
-
-    public void setIdTrackingSheet(int idTrackingSheet) {
-        this.idTrackingSheet = idTrackingSheet;
+    public void setIdPoll(String idPoll) {
+        this.idPoll = idPoll;
     }
 
     public String getNames() {
@@ -58,6 +48,14 @@ public class TrackingSheetDto extends AbstractDto {
 
     public void setLastnames(String lastnames) {
         this.lastnames = lastnames;
+    }
+
+    public String getIdentificationType() {
+        return identificationType;
+    }
+
+    public void setIdentificationType(String identificationType) {
+        this.identificationType = identificationType;
     }
 
     public String getIdentification() {
@@ -98,13 +96,5 @@ public class TrackingSheetDto extends AbstractDto {
 
     public void setRecommendations(String recommendations) {
         this.recommendations = recommendations;
-    }
-
-    public String getIdentificationType() {
-        return identificationType;
-    }
-
-    public void setIdentificationType(String identificationType) {
-        this.identificationType = identificationType;
     }
 }

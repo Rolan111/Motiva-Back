@@ -39,8 +39,6 @@ public class TrackingSheetController {
 
     }
 
-
-
     @GetMapping(value = "/tracking-sheets")
     public ResponseEntity<GeneralBodyResponse<List<TrackingSheetDto>>> getAll(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
