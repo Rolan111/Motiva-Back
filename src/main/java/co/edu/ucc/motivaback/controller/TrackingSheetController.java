@@ -9,7 +9,11 @@ import co.edu.ucc.motivaback.repository.TrackingSheetRepository;
 import co.edu.ucc.motivaback.service.TrackingSheetService;
 import co.edu.ucc.motivaback.util.CommonsService;
 import co.edu.ucc.motivaback.util.GeneralBodyResponse;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.spring.data.firestore.FirestoreReactiveOperations;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.http.HttpStatus;
@@ -19,7 +23,9 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static co.edu.ucc.motivaback.util.CommonsService.*;
 
@@ -39,22 +45,38 @@ public class TrackingSheetController {
 
     }
 
+//    @GetMapping(value = "/tracking-sheets")
+//    public ResponseEntity<GeneralBodyResponse<List<TrackingSheetDto>>> getAll(
+//            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+//        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()) && !authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()))
+//            return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
+//
+//        try {
+//            var trackingSheetDtoList = this.trackingSheetService.getAll();
+//
+//            if (!trackingSheetDtoList.isEmpty())
+//                return new ResponseEntity<>(new GeneralBodyResponse<>(trackingSheetDtoList, LIST_OK, null), HttpStatus.OK);
+//            else
+//                return new ResponseEntity<>(new GeneralBodyResponse<>(null, EMPTY_LIST, null), HttpStatus.BAD_REQUEST);
+//        } catch (Exception ex) {
+//            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+//        }
+//    }
+
     @GetMapping(value = "/tracking-sheets")
-    public ResponseEntity<GeneralBodyResponse<List<TrackingSheetDto>>> getAll(
-            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()) && !authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()))
-            return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
+    public List<TrackingSheetEntity> getAllTrackingSheetFollowUser() throws ExecutionException, InterruptedException {
+        List<TrackingSheetEntity> commentsEntities = new ArrayList<>();
 
-        try {
-            var trackingSheetDtoList = this.trackingSheetService.getAll();
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("tracking_sheet_follow_user");
+        ApiFuture<QuerySnapshot> future = documentReference.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
-            if (!trackingSheetDtoList.isEmpty())
-                return new ResponseEntity<>(new GeneralBodyResponse<>(trackingSheetDtoList, LIST_OK, null), HttpStatus.OK);
-            else
-                return new ResponseEntity<>(new GeneralBodyResponse<>(null, EMPTY_LIST, null), HttpStatus.BAD_REQUEST);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+        for (QueryDocumentSnapshot doc : documents) {
+            TrackingSheetEntity commentsDto = doc.toObject(TrackingSheetEntity.class);
+            commentsEntities.add(commentsDto);
         }
+        return commentsEntities;
     }
 
     @GetMapping(value = "/tracking-sheets2")
@@ -71,24 +93,6 @@ public class TrackingSheetController {
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
-    }
-
-
-
-
-    @GetMapping(value = "/tracking-sheets3")
-    public Flux<TrackingSheetEntity> getAllUsers() {
-        return trackingSheetRepository.findAll();
-    }
-
-    @GetMapping("/tracking-sheet/{id}")
-    public Mono<TrackingSheetEntity> getTrackingById(@PathVariable String id) {
-        return trackingSheetRepository.findById(id);
-    }
-
-    @GetMapping("/tracking-sheets3/{typeRoute}")
-    public Flux<TrackingSheetEntity> getUsersByAge(@PathVariable String typeRoute) {
-        return trackingSheetRepository.findByTypeRoute(typeRoute);
     }
 
     @PostMapping(value = "/tracking-sheet-create")
