@@ -34,23 +34,6 @@ public class RasmController {
         this.rasmService = rasmService;
     }
 
-
-    @GetMapping(value = "/rasm")
-    public List<RASMEntity> getRASM() throws ExecutionException, InterruptedException {
-        List<RASMEntity> commentsEntities = new ArrayList<>();
-
-        Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("rasm");
-        ApiFuture<QuerySnapshot> future = documentReference.get();
-        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-
-        for (QueryDocumentSnapshot doc : documents) {
-            RASMEntity commentsDto = doc.toObject(RASMEntity.class);
-            commentsEntities.add(commentsDto);
-        }
-        return commentsEntities;
-    }
-
     @GetMapping(value = "/getAllRasm")
     public List<RASMEntity> getRasm() throws ExecutionException, InterruptedException {
         List<RASMEntity> commentsEntities = new ArrayList<>();
@@ -72,7 +55,7 @@ public class RasmController {
         List<RASMEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("rASMEntity"); // CAMBIAR AQUI a rasm
+        CollectionReference documentReference = db.collection("rasm"); // CAMBIAR AQUI a rasm
         Query query = documentReference.whereEqualTo("id_poll", idPoll);
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
