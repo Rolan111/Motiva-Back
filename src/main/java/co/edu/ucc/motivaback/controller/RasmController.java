@@ -56,7 +56,7 @@ public class RasmController {
         List<RASMEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("rASMEntity");
+        CollectionReference documentReference = db.collection("rasm");
         ApiFuture<QuerySnapshot> future = documentReference.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
