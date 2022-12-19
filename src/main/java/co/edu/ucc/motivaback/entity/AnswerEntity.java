@@ -52,16 +52,6 @@ public class AnswerEntity extends AbstractEntity {
         this.openAnswer = openAnswer;
     }
 
-//    @PropertyName("id_poll")
-//    public Long getIdPoll() {
-//        return idPoll;
-//    }
-//
-//    @PropertyName("id_poll")
-//    public void setIdPoll(Long idPoll) {
-//        this.idPoll = idPoll;
-//    }
-
     @PropertyName("id_poll")
     public String getIdPoll() {
         return idPoll;

@@ -102,41 +102,41 @@ public class RasmController {
     }
 
 
-    /*@PostMapping(value = "/rasm-create")
+    @PostMapping(value = "/rasm-create")
     public String saveRASM(@RequestBody RASMEntity rasmEntity) {
         Firestore db = FirestoreClient.getFirestore();
         db.collection("rasm").document().set(rasmEntity);
         return "Hola mundo";
-    }*/
-
-    @PostMapping(value = "/rasm-create")
-    public ResponseEntity<GeneralBodyResponse<RasmDto>> save(@Valid @RequestBody RasmDto rasmDto,
-                                                              @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()) && !authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()))
-            return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
-
-        try {
-            rasmDto.setCreatedBy(authenticatedUser.getId().longValue());
-
-            var save = this.rasmService.create(rasmDto);
-
-            if (save != null){
-                System.out.println("Se creo ");
-                return new ResponseEntity<>(new GeneralBodyResponse<>(save, CREATED_OK, null), HttpStatus.OK);
-
-                }else
-                return new ResponseEntity<>(new GeneralBodyResponse<>(null, CREATED_FAIL, null), HttpStatus.BAD_REQUEST);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
-        }
     }
+
+//    @PostMapping(value = "/rasm-create")
+//    public ResponseEntity<GeneralBodyResponse<RasmDto>> save(@Valid @RequestBody RasmDto rasmDto,
+//                                                              @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+//        if (!authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name()) && !authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()))
+//            return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);
+//
+//        try {
+//            rasmDto.setCreatedBy(authenticatedUser.getId().longValue());
+//
+//            var save = this.rasmService.create(rasmDto);
+//
+//            if (save != null){
+//                System.out.println("Se creo ");
+//                return new ResponseEntity<>(new GeneralBodyResponse<>(save, CREATED_OK, null), HttpStatus.OK);
+//
+//                }else
+//                return new ResponseEntity<>(new GeneralBodyResponse<>(null, CREATED_FAIL, null), HttpStatus.BAD_REQUEST);
+//        } catch (Exception ex) {
+//            return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
+//        }
+//    }
 
     @DeleteMapping(value = "/rasm-delete/{idPoll}")
     public List<RASMEntity> deleteAlerts(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
         List<RASMEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("rASMEntity"); //CAMBIAR A rasm
+        CollectionReference documentReference = db.collection("rasm");
         ApiFuture<QuerySnapshot> future = documentReference.whereEqualTo("id_poll",idPoll).get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
