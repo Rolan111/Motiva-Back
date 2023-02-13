@@ -6,11 +6,6 @@ import com.google.cloud.spring.data.firestore.Document;
 
 import java.util.List;
 
-/**
- * @author nagredo
- * @project motiva-back
- * @class AnswerEntity
- */
 @Document(collectionName = "answer")
 public class AnswerEntity extends AbstractEntity {
 

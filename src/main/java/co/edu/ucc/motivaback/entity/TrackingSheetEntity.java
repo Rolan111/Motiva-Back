@@ -9,7 +9,7 @@ import java.util.Map;
 public class TrackingSheetEntity extends AbstractEntity {
 
     private String idPoll;
-
+    private String dateTracking;
     private String names;
     private String lastnames;
     private String identificationType;
@@ -25,6 +25,16 @@ public class TrackingSheetEntity extends AbstractEntity {
 
     public void setIdPoll(String idPoll) {
         this.idPoll = idPoll;
+    }
+
+    @PropertyName("date_tracking")
+    public String getDateTracking() {
+        return dateTracking;
+    }
+
+    @PropertyName("date_tracking")
+    public void setDateTracking(String dateTracking) {
+        this.dateTracking = dateTracking;
     }
 
     public String getNames() {

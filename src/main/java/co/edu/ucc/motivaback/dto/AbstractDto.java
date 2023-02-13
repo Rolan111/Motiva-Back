@@ -12,6 +12,12 @@ public abstract class AbstractDto {
     private Date updatedAt;
     private RegisterStatusEnum status;
 
+    protected AbstractDto() {
+        setCreatedAt(new Date());
+        setCreatedBy(1L);
+        setStatus(RegisterStatusEnum.ACTIVE);
+    }
+
     public String getId() {
         return id;
     }

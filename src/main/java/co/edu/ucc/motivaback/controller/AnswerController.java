@@ -5,6 +5,7 @@ import co.edu.ucc.motivaback.dto.AnswerDto;
 import co.edu.ucc.motivaback.dto.SequenceDto;
 import co.edu.ucc.motivaback.entity.AnswerEntity;
 import co.edu.ucc.motivaback.entity.CareSheetAnswerEntity;
+import co.edu.ucc.motivaback.entity.EmptyPruebaEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.AnswerService;
 import co.edu.ucc.motivaback.util.CommonsService;
@@ -203,6 +204,24 @@ public class AnswerController {
 
         for (QueryDocumentSnapshot doc : documents){
             AnswerEntity commentsDto = doc.toObject(AnswerEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+    }
+
+    //Consulta para los usuarios sin idpoll
+    @GetMapping(value = "/answerEmpty/{idQuestion}")
+    public List<EmptyPruebaEntity> answerEmpty(@PathVariable Integer idQuestion) throws ExecutionException, InterruptedException {
+        List<EmptyPruebaEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("answer");
+        Query query = documentReference.whereEqualTo("id_question", idQuestion).whereEqualTo("id_poll", null);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            EmptyPruebaEntity commentsDto = doc.toObject(EmptyPruebaEntity.class);
             commentsEntities.add(commentsDto);
         }
         return commentsEntities;
