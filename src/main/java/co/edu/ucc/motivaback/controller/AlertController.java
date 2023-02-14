@@ -172,7 +172,8 @@ public class AlertController {
     public String saveComment(@RequestBody InactiveAlertEntity inactiveAlertEntity) {
         Firestore db = FirestoreClient.getFirestore();
         db.collection("inactive_alert").document().set(inactiveAlertEntity);
-        return "Hola mundo";
+        return "{\"success\":1}";
+//        return "Hola mundo";
     }
 
 }
