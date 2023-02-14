@@ -3,7 +3,6 @@ package co.edu.ucc.motivaback.controller;
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.AlertDto;
 import co.edu.ucc.motivaback.entity.AlertEntity;
-import co.edu.ucc.motivaback.entity.CareSheetOptionAnwerEntity;
 import co.edu.ucc.motivaback.entity.InactiveAlertEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.AlertService;
@@ -35,7 +34,7 @@ public class AlertController {
         this.alertEntity = alertEntity;
     }
 
-    int tamanioLista;
+    private int sizeList;
 
     @GetMapping(value = "/alertByIdPoll/{idPoll}")
     public List<AlertEntity> alertByIdPoll(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
@@ -60,8 +59,8 @@ public class AlertController {
         CollectionReference documentReference = db.collection("alert");
         ApiFuture<QuerySnapshot> future = documentReference.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-        tamanioLista = documents.size();
-        return tamanioLista;
+        sizeList = documents.size();
+        return sizeList;
     }
 
     @GetMapping(value = "/alerts")
@@ -141,9 +140,18 @@ public class AlertController {
         return "Hola mundo";
     }
 
-    //********************
 
-    //INACTIVE ALERTS
+    /**ALERTAS INACTIVAS*/
+
+    @GetMapping(value = "/inactive-alerts-size") //Consultamos la cantidad de registros
+    public int inactiveAlertsSize() throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("inactive_alert");
+        ApiFuture<QuerySnapshot> future = documentReference.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        sizeList = documents.size();
+        return sizeList;
+    }
     @GetMapping(value = "/inactive-alerts")
     public List<InactiveAlertEntity> getInactiveAlerts() throws ExecutionException, InterruptedException {
         List<InactiveAlertEntity> commentsEntities = new ArrayList<>();
