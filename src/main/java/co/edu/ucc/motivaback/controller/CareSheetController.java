@@ -127,7 +127,7 @@ public class CareSheetController {
     }
 
     @GetMapping(value = "/answer-psychosocial-all")
-    public List<CareSheetAnswerPsychosocialEntity> answerPsychosocialByIdPoll() throws ExecutionException, InterruptedException {
+    public List<CareSheetAnswerPsychosocialEntity> answerPsychosocialAll() throws ExecutionException, InterruptedException {
         List<CareSheetAnswerPsychosocialEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();

@@ -4,11 +4,12 @@ import com.google.cloud.firestore.annotation.PropertyName;
 
 public class CareSheetAnswerPsychosocialEntity extends AbstractEntity {
 
+    private String id_poll;
     private Integer id_question;
     private Integer id_option_answer;
     private String open_answer;
 //    private Integer id_poll;
-    private String id_poll;
+
 
     public Integer getId_question() {
         return id_question;
