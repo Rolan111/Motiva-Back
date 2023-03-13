@@ -22,16 +22,6 @@ public class PollEntity extends AbstractEntity {
     private TypeQuestionaryEnum type;
     private Integer idCity;
 
-//    @PropertyName("id_poll")
-//    public Integer getIdPoll() {
-//        return idPoll;
-//    }
-//
-//    @PropertyName("id_poll")
-//    public void setIdPoll(Integer idPoll) {
-//        this.idPoll = idPoll;
-//    }
-
     @PropertyName("id_poll")
     public String getIdPoll() {
         return idPoll;

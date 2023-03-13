@@ -1,5 +1,7 @@
 package co.edu.ucc.motivaback.controller;
 
+import co.edu.ucc.motivaback.entity.CareSheetAnswerPsychosocialEntity;
+import co.edu.ucc.motivaback.entity.PollEntity;
 import co.edu.ucc.motivaback.entity.PruebasEntity2;
 import co.edu.ucc.motivaback.entity.PruebasEntityAnswerPsychosocial;
 import co.edu.ucc.motivaback.service.AnswerService;
@@ -23,53 +25,7 @@ public class PruebasController {
         this.answerService = answerService;
     }
 
-    // ############ ELIMADO SIMPLE ###################3
-    @DeleteMapping(value = "/eliminarDocumentoSimple/{idDocumento}")
-    public void eliminarDocumentoSimple(@PathVariable String idDocumento){
-        Firestore db = FirestoreClient.getFirestore();
-        db.collection("answer").document(idDocumento).delete();
-    }
-
-    //**********************  ELIMINAR DUPLICADOS ************************
-    @GetMapping(value = "/elimarDuplicados/{idPoll}")
-    public List<PruebasEntity2> eliminacionDuplicados(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
-
-        List<PruebasEntity2> pruebasEntities = new ArrayList<>(); //original
-        //Se REPRITE por mientras haya idPolls que traer dentro del array.
-        for (int i=0;i<arrayIdPollsDuplicados().size();i++){
-
-            Firestore db = FirestoreClient.getFirestore();
-            CollectionReference documentReference = db.collection("answer");
-            Query query = documentReference.whereEqualTo("id_poll", arrayIdPollsDuplicados().get(i)).orderBy("id_question");
-            ApiFuture<QuerySnapshot> future = query.get();
-            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-            int cantidadDocumentos=documents.size();
-            int intervalos=cantidadDocumentos/28;
-            int contador=0;
-            System.out.println("La cantidad de intervalos para este caso es: "+intervalos);
-            for (QueryDocumentSnapshot doc : documents){
-                contador=contador+1;
-                PruebasEntity2 pruebasEntity = doc.toObject(PruebasEntity2.class);
-                pruebasEntities.add(pruebasEntity);
-                pruebasEntity.setCreatedAt(doc.getCreateTime().toString());
-
-                System.out.println("El id de este documento es: "+doc.getId());
-                if(contador%intervalos!=0){
-                    System.out.println("Este hay que eliminar: "+doc.getId());
-                    db.collection("answer").document(doc.getId()).delete(); /** LINEA QUE ELIMINA */
-                }
-            }
-        }//FIN FOR hechizo
-
-        return null;
-    }
-
-    public static List<String> arrayIdPollsDuplicados(){
-        List<String> listaPolls = new ArrayList<>();
-        return listaPolls;
-    }
-
-    //########################### PARA ORDENAR DATOS SIN IDPOLL ANSWER #################################
+    //########################### ANSWER -- captura de datos SIN IDPOLL y asignación #################################
     @GetMapping(value = "/pruebasByTime/{idPoll}")
     public List<PruebasEntity2> alertByIdPoll(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
 
@@ -109,15 +65,120 @@ public class PruebasController {
     }
 
 
-    //###################   Gestión de DUPLICADOS -- ANSWER --- también para Cedulas #################
-    @GetMapping(value = "/duplicados/{idPoll}")
-    public List<PruebasEntity2> duplicados(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
+    //****************** ANSWER PSYCHOSOCIAL - captura de información y asignación de idPoll **********************
+    @GetMapping(value = "/pruebasPsychosocial/{idPoll}")
+    public List<PruebasEntityAnswerPsychosocial> pruebasPsychosocial(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
 
+        List<PruebasEntityAnswerPsychosocial> pruebasEntities = new ArrayList<>();
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("answer_psychosocial");
+        Query query = documentReference.whereEqualTo("id_poll", null);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        System.out.println("El numero de psychosocial es: "+documents.size());
+        for (QueryDocumentSnapshot doc : documents){
+            PruebasEntityAnswerPsychosocial pruebasEntity = doc.toObject(PruebasEntityAnswerPsychosocial.class);
+            pruebasEntities.add(pruebasEntity);
+            pruebasEntity.setCreatedAt2(doc.getCreateTime().toString());
+        }
+
+        pruebasEntities.sort(Comparator.comparing(PruebasEntityAnswerPsychosocial::getCreatedAt2)); //Ordenamos los datos por fecha
+        /** Codigo extractor */
+        String fechaDespegue = "2022-11-16T21:25:45.430913Z"; //COMIENZO -- puede ser falso, pero mejor verdadero para que no altere los contadores
+        Instant capturandoFechasInstant = Instant.parse(fechaDespegue); //COMIENZO
+//        String claveAleatoria = codigoAletario();
+        long diferenciaEntreFechas = 0;
+        int contador=-1;//-1 ya que el sistema empieza con un dato falso para que la condicón se cumpla y despegue en 0
+        ListasPsychosocial listasPsychosocial = new ListasPsychosocial(); //La utilizaremos un poco mas abajo
+        for (PruebasEntityAnswerPsychosocial recorriendoPruebas : pruebasEntities) { //no es conveniente hacer forEach para este caso
+
+            Instant auxFecha = Instant.parse(recorriendoPruebas.getCreatedAt2());
+
+            /** condición en base a los milisegundos de envío de información */
+            diferenciaEntreFechas = ChronoUnit.MICROS.between(capturandoFechasInstant, auxFecha);
+            if(diferenciaEntreFechas < 10000000 ){ //10 segundos. SI esto se cumple es porque pertenece al mismo cuestionario
+                try {
+                    recorriendoPruebas.setId_poll(listasPsychosocial.listaPollParaPsychosocial().get(contador));
+                }catch (Exception e){
+
+                }
+
+            }else{
+                capturandoFechasInstant = auxFecha;
+                System.out.println("Las fechas son: "+ capturandoFechasInstant);
+                contador=contador+1;
+                try {
+                    recorriendoPruebas.setId_poll(listasPsychosocial.listaPollParaPsychosocial().get(contador));
+                }catch (Exception e){
+
+                }
+            }
+
+        }
+
+        return pruebasEntities;
+    }
+
+    // *********** ENVIO de info a ANSWER PSYCHOSOCIAL -- solo prueba ***********
+    @PostMapping(value = "/care-sheet-answer-psychosocial-create-limpieza")
+    public void saveComment(@RequestBody List<PruebasEntityAnswerPsychosocial> careSheetAnswerPsychosocialEntity) {
+        Firestore db = FirestoreClient.getFirestore();
+
+        for (PruebasEntityAnswerPsychosocial doc: careSheetAnswerPsychosocialEntity){
+            db.collection("answer_psychosocial").document().set(doc);
+        }
+    }
+
+
+    //########################### POLL -- captura de información y asignación de IDPOLL ###############################
+    @GetMapping(value = "/pruebasColeccionPoll/{idPoll}")
+    public List<PollEntity> pollSinIdPoll(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
+
+        List<PollEntity> pruebasEntities = new ArrayList<>();
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("poll");
+        Query query = documentReference.whereEqualTo("id_poll", null);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        System.out.println("La cantidad de POLLS es: "+documents.size());
+
+        for (QueryDocumentSnapshot doc : documents){
+            PollEntity pruebasEntity = doc.toObject(PollEntity.class);
+            pruebasEntities.add(pruebasEntity);
+            pruebasEntity.setCreatedAt(doc.getCreateTime().toDate());
+        }
+
+        pruebasEntities.sort(Comparator.comparing(PollEntity::getCreatedAt));//se ordena por fecha
+
+        ListasAnswer listasAnswer = new ListasAnswer();
+        int contador=0;
+        for (PollEntity recorriendoNuevamente : pruebasEntities) { //no es conveniente hacer forEach para este caso
+            recorriendoNuevamente.setIdPoll(listasAnswer.listaPollsParaAnswer().get(contador));
+            contador++;
+        }
+
+        return pruebasEntities;
+    }
+
+
+
+
+
+
+
+    //###################   Gestión de DUPLICADOS idPoll -- Obtención Info -- ANSWER --- también para Cedulas #################
+    /** Conslta todos los cuestionarios y los ordena por fecha de identificación,
+     * ara luego obtener una lista de polls y revisar en excel cuales estan repetidos */
+    @GetMapping(value = "/duplicadosIdPolls/{idPoll}")
+    public List<PruebasEntity2> duplicados(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
+        //Se utiliza UNO de los dos depende de la necesidad
         List<String> listaPolls = new ArrayList<>();
+        List<String> listaCedulas = new ArrayList<>();
 
         List<PruebasEntity2> pruebasEntities = new ArrayList<>();
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("answer");
+        /** CAMBIA el orden de ORDENADO para obtener duplicados de IDPOLL o duplicados de CEDULA */
         Query query = documentReference.whereEqualTo("id_question", 205).orderBy("open_answer");
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
@@ -125,482 +186,87 @@ public class PruebasController {
         for (QueryDocumentSnapshot doc : documents){
             PruebasEntity2 pruebasEntity = doc.toObject(PruebasEntity2.class);
             pruebasEntities.add(pruebasEntity);
-            /** Empieza proceso */
-
-/*            for(int i=0;i<listaPolls.size();i++){
-                if (Objects.equals(pruebasEntity.getOpenAnswer(), listaPolls.get(i))){
-                    listaPollsDuplicados.add(pruebasEntity.getOpenAnswer());
-                }else{
-                    listaPolls.add(pruebasEntity.getOpenAnswer());
-                }
-                System.out.println("Los datos de lista son: "+listaPolls.get(i));
-                System.out.println("Aqui tenemos esta cantidad: "+listaPolls.size());
-            }*/
-            listaPolls.add(pruebasEntity.getOpenAnswer());
-//            System.out.println("Las cedulas son: "+pruebasEntity.getOpenAnswer());
-
+            listaPolls.add(pruebasEntity.getIdPoll());//Para revisar duplicados de POLLS    * Descomentar
+//            listaCedulas.add(pruebasEntity.getOpenAnswer());//Para revisar duplicados de CEDULAS    * Descomentar
         }
 
+        /** Esto se podría hacer arriba pero los logs de la consolan desordenan todo */
         //Recuperamos los datos
-        System.out.println("La cantidad de datos de lista son: "+listaPolls.size());
-        //Obtenemos los datos
-        for(int i=0;i<listaPolls.size();i++){
-//            System.out.println("Los ID POLLS son: "+listaPolls.get(i));
+        for(int i=0;i<listaPolls.size();i++){ //Para IDPOLLs
             System.out.println("listaPolls.add(\""+listaPolls.get(i)+"\");");
         }
 
-//        return pruebasEntities;
+//        for(int i=0;i<listaCedulas.size();i++){// Para CEDULAS
+//            System.out.println("listaCedulas.add(\""+listaCedulas.get(i)+"\");");
+//        }
         return null;
+    }
 
+
+    //**********************  ELIMINAR -- DUPLICADOS IdPolls -- Answer Y Answer psychosocial ************************
+    /** Para el proceso de eliminado de IdPOLL es mejor cada colección (ANSWER, ANSWER_PSYCHOSOCIAL, POLL)
+     * por SEPARADO */
+    @GetMapping(value = "/elimarDuplicados/{idPoll}")
+    public List<PruebasEntity2> eliminacionDuplicados(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
+
+        List<PruebasEntity2> pruebasEntities = new ArrayList<>(); //original
+        GestionDuplicados gestionDuplicados = new GestionDuplicados();
+        //Se REPITE por mientras haya idPolls que traer dentro del array.
+        for (int i=0;i<gestionDuplicados.metDuplicadosIdPolls().size();i++){
+
+            Firestore db = FirestoreClient.getFirestore();
+
+            CollectionReference documentReference = db.collection("answer"); //Cambiar aquí según la necesidad
+            Query query = documentReference.whereEqualTo("id_poll", gestionDuplicados.metDuplicadosIdPolls().get(i)).orderBy("id_question");
+            ApiFuture<QuerySnapshot> future = query.get();
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+            int intervalos=0; //Es la base de eliminación, es decir si de adulto hay 3 cuestionarios repetidos, es decir
+            //...171 documento, entonteces esto quiere decir que la base de eliminación es 3 por lo que 1 se conserva y
+            // ... dos se borran.
+            int cantidadDocumentos=documents.size();
+            if(documents.size()%57==0){//para ADULTOS
+                intervalos=cantidadDocumentos/57;
+            }else if (documents.size()%28 == 0) {//para NIÑOS
+                intervalos=cantidadDocumentos/28;
+            }else{
+                intervalos=1;//para que el modulador de 0 y no entre al Eliminado
+                System.out.println("Revisar este dato");
+            }
+
+            int contador=0;
+            System.out.println("La cantidad de intervalos para este caso es: "+intervalos);
+            for (QueryDocumentSnapshot doc : documents){
+                contador=contador+1;
+                PruebasEntity2 pruebasEntity = doc.toObject(PruebasEntity2.class);
+                pruebasEntities.add(pruebasEntity);
+                pruebasEntity.setCreatedAt(doc.getCreateTime().toString());
+
+                System.out.println("El id de este documento es: "+doc.getId());
+                if(contador%intervalos!=0){
+                    System.out.println("Este hay que eliminar: "+doc.getId());
+                    db.collection("answer").document(doc.getId()).delete(); /** LINEA QUE ELIMINA */
+                }
+            }
+        }//FIN FOR hechizo
+
+        return null;
     }
 
 
 
-
-    //###################   Gestión de DUPLICADOS -- CEDULAS #################
-    @GetMapping(value = "/duplicadosCedulas/{idPoll}")
+    //###################   ELIMINAR -- duplicados CEDULAS  #################
+    /** Elimina los dotos duplicados de CEDULAS de las colecciones ANSWER, ANSWER_PSYCHOSOCIAL, POLL simultánemente*/
+    @GetMapping(value = "/eliminarDuplicadosCedulas/{idPoll}")
     public List<PruebasEntity2> duplicadosCedulas(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
 
-        List<String> listaPollsCedulas = new ArrayList<>();
-        listaPollsCedulas.add("1002807185");
-        listaPollsCedulas.add("1002858042");
-        listaPollsCedulas.add("1002862111");
-        listaPollsCedulas.add("1002862651");
-        listaPollsCedulas.add("1002876620");
-        listaPollsCedulas.add("1002877007");
-        listaPollsCedulas.add("1002877262");
-        listaPollsCedulas.add("1002877314");
-        listaPollsCedulas.add("1002947342");
-        listaPollsCedulas.add("1002948013");
-        listaPollsCedulas.add("1002948507");
-        listaPollsCedulas.add("1002949072");
-        listaPollsCedulas.add("1002968926");
-        listaPollsCedulas.add("1003102816");
-//        listaPollsCedulas.add("1003104244");
-//        listaPollsCedulas.add("1005877460");
-//        listaPollsCedulas.add("10059240");
-//        listaPollsCedulas.add("1006037141");
-//        listaPollsCedulas.add("1006513420");
-//        listaPollsCedulas.add("1006550140");
-//        listaPollsCedulas.add("1006879150");
-//        listaPollsCedulas.add("1007209067");
-//        listaPollsCedulas.add("1007419315");
-//        listaPollsCedulas.add("1007616652");
-//        listaPollsCedulas.add("1010095335");
-//        listaPollsCedulas.add("1015444237");
-//        listaPollsCedulas.add("1023872275");
-//        listaPollsCedulas.add("1029604953");
-//        listaPollsCedulas.add("1029623790");
-//        listaPollsCedulas.add("10303634");
-//        listaPollsCedulas.add("1033775294");
-//        listaPollsCedulas.add("10389086");
-//        listaPollsCedulas.add("10483221");
-//        listaPollsCedulas.add("10490990");
-//        listaPollsCedulas.add("10491525");
-//        listaPollsCedulas.add("10495284");
-//        listaPollsCedulas.add("10526180");
-//        listaPollsCedulas.add("10534157");
-//        listaPollsCedulas.add("10543877");
-//        listaPollsCedulas.add("10551932");
-//        listaPollsCedulas.add("1058932334");
-//        listaPollsCedulas.add("1058935903");
-//        listaPollsCedulas.add("10589661");
-//        listaPollsCedulas.add("1058968238");
-//        listaPollsCedulas.add("105897055");
-//        listaPollsCedulas.add("1058971714");
-//        listaPollsCedulas.add("1058974674");
-//        listaPollsCedulas.add("1059047040");
-//        listaPollsCedulas.add("1059166657");
-//        listaPollsCedulas.add("1059236614");
-//        listaPollsCedulas.add("1059240003");
-//        listaPollsCedulas.add("105924392");
-//        listaPollsCedulas.add("1059360213");
-//        listaPollsCedulas.add("1059360859");
-//        listaPollsCedulas.add("1059363862");
-//        listaPollsCedulas.add("1059444666");
-//        listaPollsCedulas.add("1059445432");
-//        listaPollsCedulas.add("1059446402");
-//        listaPollsCedulas.add("1059447061");
-//        listaPollsCedulas.add("105944744");
-//        listaPollsCedulas.add("1059449162");
-//        listaPollsCedulas.add("1059449264");
-//        listaPollsCedulas.add("1059595490");
-//        listaPollsCedulas.add("1059597101");
-//        listaPollsCedulas.add("1059599451");
-//        listaPollsCedulas.add("1059601734");
-//        listaPollsCedulas.add("1059601877");
-//        listaPollsCedulas.add("1059602891");
-//        listaPollsCedulas.add("1059602906");
-//        listaPollsCedulas.add("1059604117");
-//        listaPollsCedulas.add("1059604439");
-//        listaPollsCedulas.add("1059605535");
-//        listaPollsCedulas.add("1059843889");
-//        listaPollsCedulas.add("1059844988");
-//        listaPollsCedulas.add("1059845804");
-//        listaPollsCedulas.add("105990072");
-//        listaPollsCedulas.add("1059901421");
-//        listaPollsCedulas.add("1059906299");
-//        listaPollsCedulas.add("105990736");
-//        listaPollsCedulas.add("1059912558");
-//        listaPollsCedulas.add("105991265");
-//        listaPollsCedulas.add("1059913053");
-//        listaPollsCedulas.add("105993798");
-//        listaPollsCedulas.add("1059986722");
-//        listaPollsCedulas.add("1060207660");
-//        listaPollsCedulas.add("1060208045");
-//        listaPollsCedulas.add("1060208549");
-//        listaPollsCedulas.add("1060236096");
-//        listaPollsCedulas.add("1060336544");
-//        listaPollsCedulas.add("1060363230");
-//        listaPollsCedulas.add("1060386498");
-//        listaPollsCedulas.add("1060467667");
-//        listaPollsCedulas.add("1060879812");
-//        listaPollsCedulas.add("1060988975");
-//        listaPollsCedulas.add("106107740");
-//        listaPollsCedulas.add("1061083377");
-//        listaPollsCedulas.add("1061198580");
-//        listaPollsCedulas.add("1061200886");
-//        listaPollsCedulas.add("1061210416");
-//        listaPollsCedulas.add("1061212148");
-//        listaPollsCedulas.add("1061215187");
-//        listaPollsCedulas.add("1061220985");
-//        listaPollsCedulas.add("106122191");
-//        listaPollsCedulas.add("1061222296");
-//        listaPollsCedulas.add("1061431524");
-//        listaPollsCedulas.add("1061432002");
-//        listaPollsCedulas.add("1061432788");
-//        listaPollsCedulas.add("1061434062");
-//        listaPollsCedulas.add("10614341129");
-//        listaPollsCedulas.add("1061434657");
-//        listaPollsCedulas.add("1061434773");
-//        listaPollsCedulas.add("1061436319");
-//        listaPollsCedulas.add("1061437615");
-//        listaPollsCedulas.add("1061440188");
-//        listaPollsCedulas.add("1061440263");
-//        listaPollsCedulas.add("1061440265");
-//        listaPollsCedulas.add("1061502799");
-//        listaPollsCedulas.add("1061503941");
-//        listaPollsCedulas.add("1061534824");
-//        listaPollsCedulas.add("1061538420");
-//        listaPollsCedulas.add("1061540762");
-//        listaPollsCedulas.add("1061541021");
-//        listaPollsCedulas.add("1061541108");
-//        listaPollsCedulas.add("1061542115");
-//        listaPollsCedulas.add("1061543046");
-//        listaPollsCedulas.add("1061543631");
-//        listaPollsCedulas.add("1061543750");
-//        listaPollsCedulas.add("1061543779");
-//        listaPollsCedulas.add("1061599464");
-//        listaPollsCedulas.add("1061600819");
-//        listaPollsCedulas.add("1061687962");
-//        listaPollsCedulas.add("1061689653");
-//        listaPollsCedulas.add("1061692452");
-//        listaPollsCedulas.add("1061696754");
-//        listaPollsCedulas.add("1061712555");
-//        listaPollsCedulas.add("1061712941");
-//        listaPollsCedulas.add("1061717338");
-//        listaPollsCedulas.add("1061726472");
-//        listaPollsCedulas.add("1061748602");
-//        listaPollsCedulas.add("106174939");
-//        listaPollsCedulas.add("1061749687");
-//        listaPollsCedulas.add("1061750417");
-//        listaPollsCedulas.add("1061757008");
-//        listaPollsCedulas.add("106176165");
-//        listaPollsCedulas.add("1061787029");
-//        listaPollsCedulas.add("1061790582");
-//        listaPollsCedulas.add("1061794482");
-//        listaPollsCedulas.add("10620078727");
-//        listaPollsCedulas.add("1062014170");
-//        listaPollsCedulas.add("1062074294");
-//        listaPollsCedulas.add("1062077228");
-//        listaPollsCedulas.add("1062078033");
-//        listaPollsCedulas.add("1062078183");
-//        listaPollsCedulas.add("1062078625");
-//        listaPollsCedulas.add("106207917");
-//        listaPollsCedulas.add("1062079304");
-//        listaPollsCedulas.add("1062079334");
-//        listaPollsCedulas.add("1062079870");
-//        listaPollsCedulas.add("1062080432");
-//        listaPollsCedulas.add("1062080997");
-//        listaPollsCedulas.add("1062081038");
-//        listaPollsCedulas.add("1062082537");
-//        listaPollsCedulas.add("1062083350");
-//        listaPollsCedulas.add("1062083419");
-//        listaPollsCedulas.add("1062083758");
-//        listaPollsCedulas.add("1062083822");
-//        listaPollsCedulas.add("1062084595");
-//        listaPollsCedulas.add("1062084686");
-//        listaPollsCedulas.add("1062085034");
-//        listaPollsCedulas.add("1062085217");
-//        listaPollsCedulas.add("1062085775");
-//        listaPollsCedulas.add("1062085898");
-//        listaPollsCedulas.add("106208849");
-//        listaPollsCedulas.add("106213415");
-//        listaPollsCedulas.add("1062219520");
-//        listaPollsCedulas.add("10622279860");
-//        listaPollsCedulas.add("1062278837");
-//        listaPollsCedulas.add("1062279398");
-//        listaPollsCedulas.add("1062300671");
-//        listaPollsCedulas.add("1062307714");
-//        listaPollsCedulas.add("1062313123");
-//        listaPollsCedulas.add("1062317907");
-//        listaPollsCedulas.add("1062318434");
-//        listaPollsCedulas.add("1062319589");
-//        listaPollsCedulas.add("1062324318");
-//        listaPollsCedulas.add("1062334023");
-//        listaPollsCedulas.add("1062334178");
-//        listaPollsCedulas.add("1062335577");
-//        listaPollsCedulas.add("1062335786");
-//        listaPollsCedulas.add("1062536387");
-//        listaPollsCedulas.add("1062774328");
-//        listaPollsCedulas.add("1062775152");
-//        listaPollsCedulas.add("1062778257");
-//        listaPollsCedulas.add("1062778429");
-//        listaPollsCedulas.add("1062780211");
-//        listaPollsCedulas.add("10633612");
-//        listaPollsCedulas.add("1063434835");
-//        listaPollsCedulas.add("1063809267");
-//        listaPollsCedulas.add("1063812720");
-//        listaPollsCedulas.add("1063814119");
-//        listaPollsCedulas.add("1064430880");
-//        listaPollsCedulas.add("1066846338");
-//        listaPollsCedulas.add("1067462876");
-//        listaPollsCedulas.add("1067526995");
-//        listaPollsCedulas.add("1068217139");
-//        listaPollsCedulas.add("1068218002");
-//        listaPollsCedulas.add("10690652");
-//        listaPollsCedulas.add("10752288");
-//        listaPollsCedulas.add("10752703");
-//        listaPollsCedulas.add("1075301335");
-//        listaPollsCedulas.add("1081280156");
-//        listaPollsCedulas.add("1082776915");
-//        listaPollsCedulas.add("1084576099");
-//        listaPollsCedulas.add("1084867461");
-//        listaPollsCedulas.add("10852755585");
-//        listaPollsCedulas.add("1086358249");
-//        listaPollsCedulas.add("1087202430");
-//        listaPollsCedulas.add("1106363440");
-//        listaPollsCedulas.add("110783904");
-//        listaPollsCedulas.add("1109119532");
-//        listaPollsCedulas.add("110967310");
-//        listaPollsCedulas.add("1110060113");
-//        listaPollsCedulas.add("1111111");
-//        listaPollsCedulas.add("11111111");
-//        listaPollsCedulas.add("111154227");
-//        listaPollsCedulas.add("1112061053");
-//        listaPollsCedulas.add("1112465426");
-//        listaPollsCedulas.add("1114061364");
-//        listaPollsCedulas.add("1114874162");
-//        listaPollsCedulas.add("1114888718");
-//        listaPollsCedulas.add("1114894135");
-//        listaPollsCedulas.add("1115791763");
-//        listaPollsCedulas.add("1116206758");
-//        listaPollsCedulas.add("1116232712");
-//        listaPollsCedulas.add("1116377621");
-//        listaPollsCedulas.add("1117496631");
-//        listaPollsCedulas.add("1117501891");
-//        listaPollsCedulas.add("1117514603");
-//        listaPollsCedulas.add("1118202284");
-//        listaPollsCedulas.add("1118473350");
-//        listaPollsCedulas.add("1120066482");
-//        listaPollsCedulas.add("1127076145");
-//        listaPollsCedulas.add("1127360480");
-//        listaPollsCedulas.add("1127672382");
-//        listaPollsCedulas.add("113102405");
-//        listaPollsCedulas.add("113102415");
-//        listaPollsCedulas.add("113102422");
-//        listaPollsCedulas.add("113102431");
-//        listaPollsCedulas.add("113102436");
-//        listaPollsCedulas.add("113102439");
-//        listaPollsCedulas.add("113102442");
-//        listaPollsCedulas.add("113102447");
-//        listaPollsCedulas.add("113102448");
-//        listaPollsCedulas.add("113983405");
-//        listaPollsCedulas.add("1143956289");
-//        listaPollsCedulas.add("114452413");
-//        listaPollsCedulas.add("114452419");
-//        listaPollsCedulas.add("1144524321");
-//        listaPollsCedulas.add("1144524412");
-//        listaPollsCedulas.add("114452499");
-//        listaPollsCedulas.add("114452501");
-//        listaPollsCedulas.add("114452529");
-//        listaPollsCedulas.add("114452540");
-//        listaPollsCedulas.add("1149685378");
-//        listaPollsCedulas.add("1149686579");
-//        listaPollsCedulas.add("1149686722");
-//        listaPollsCedulas.add("1149688407");
-//        listaPollsCedulas.add("1193076027");
-//        listaPollsCedulas.add("119336502");
-//        listaPollsCedulas.add("1194087240");
-//        listaPollsCedulas.add("1219996");
-//        listaPollsCedulas.add("12283096");
-//        listaPollsCedulas.add("14479016");
-//        listaPollsCedulas.add("14622481");
-//        listaPollsCedulas.add("16786481");
-//        listaPollsCedulas.add("16892279");
-//        listaPollsCedulas.add("20838274");
-//        listaPollsCedulas.add("24622141");
-//        listaPollsCedulas.add("25255647");
-//        listaPollsCedulas.add("25267406");
-//        listaPollsCedulas.add("25281327");
-//        listaPollsCedulas.add("25288035");
-//        listaPollsCedulas.add("25292284");
-//        listaPollsCedulas.add("25296164");
-//        listaPollsCedulas.add("25310738");
-//        listaPollsCedulas.add("25347890");
-//        listaPollsCedulas.add("25354233");
-//        listaPollsCedulas.add("25359275");
-//        listaPollsCedulas.add("25362826");
-//        listaPollsCedulas.add("25363118");
-//        listaPollsCedulas.add("25363444");
-//        listaPollsCedulas.add("25364069");
-//        listaPollsCedulas.add("25364718");
-//        listaPollsCedulas.add("253650683");
-//        listaPollsCedulas.add("25366344");
-//        listaPollsCedulas.add("25371314");
-//        listaPollsCedulas.add("25386768");
-//        listaPollsCedulas.add("25390086");
-//        listaPollsCedulas.add("25394689");
-//        listaPollsCedulas.add("25395314");
-//        listaPollsCedulas.add("25483067");
-//        listaPollsCedulas.add("25517993");
-//        listaPollsCedulas.add("25521509");
-//        listaPollsCedulas.add("25527607");
-//        listaPollsCedulas.add("25543806");
-//        listaPollsCedulas.add("25544480");
-//        listaPollsCedulas.add("25558746");
-//        listaPollsCedulas.add("25559022");
-//        listaPollsCedulas.add("25560525");
-//        listaPollsCedulas.add("25561333");
-//        listaPollsCedulas.add("25561400");
-//        listaPollsCedulas.add("25564364");
-//        listaPollsCedulas.add("25564703");
-//        listaPollsCedulas.add("25576779");
-//        listaPollsCedulas.add("25578868");
-//        listaPollsCedulas.add("25592676");
-//        listaPollsCedulas.add("25602452");
-//        listaPollsCedulas.add("25608432");
-//        listaPollsCedulas.add("25659323");
-//        listaPollsCedulas.add("25669522");
-//        listaPollsCedulas.add("25717723");
-//        listaPollsCedulas.add("25733161");
-//        listaPollsCedulas.add("25734407");
-//        listaPollsCedulas.add("25734655");
-//        listaPollsCedulas.add("25741780");
-//        listaPollsCedulas.add("25741813");
-//        listaPollsCedulas.add("25742232");
-//        listaPollsCedulas.add("27260453");
-//        listaPollsCedulas.add("27371394");
-//        listaPollsCedulas.add("2869878");
-//        listaPollsCedulas.add("29179472");
-//        listaPollsCedulas.add("29360767");
-//        listaPollsCedulas.add("29507868");
-//        listaPollsCedulas.add("29509548");
-//        listaPollsCedulas.add("29510532");
-//        listaPollsCedulas.add("29561320");
-//        listaPollsCedulas.add("29583629");
-//        listaPollsCedulas.add("30520251");
-//        listaPollsCedulas.add("31475978");
-//        listaPollsCedulas.add("31626901");
-//        listaPollsCedulas.add("31847382");
-//        listaPollsCedulas.add("31885495");
-//        listaPollsCedulas.add("34374991");
-//        listaPollsCedulas.add("34380235");
-//        listaPollsCedulas.add("34445957");
-//        listaPollsCedulas.add("34501610");
-//        listaPollsCedulas.add("34509572");
-//        listaPollsCedulas.add("34516176");
-//        listaPollsCedulas.add("34524132");
-//        listaPollsCedulas.add("34525839");
-//        listaPollsCedulas.add("34526052");
-//        listaPollsCedulas.add("34530196");
-//        listaPollsCedulas.add("34544241");
-//        listaPollsCedulas.add("34546752");
-//        listaPollsCedulas.add("34547235");
-//        listaPollsCedulas.add("34557660");
-//        listaPollsCedulas.add("34558016");
-//        listaPollsCedulas.add("34559811");
-//        listaPollsCedulas.add("34560193");
-//        listaPollsCedulas.add("34565063");
-//        listaPollsCedulas.add("34571163");
-//        listaPollsCedulas.add("34599364");
-//        listaPollsCedulas.add("34602217");
-//        listaPollsCedulas.add("34605571");
-//        listaPollsCedulas.add("34610401");
-//        listaPollsCedulas.add("34612196");
-//        listaPollsCedulas.add("34615003");
-//        listaPollsCedulas.add("34638761");
-//        listaPollsCedulas.add("34674537");
-//        listaPollsCedulas.add("34678677");
-//        listaPollsCedulas.add("34680075");
-//        listaPollsCedulas.add("34700187");
-//        listaPollsCedulas.add("38561289");
-//        listaPollsCedulas.add("40081034");
-//        listaPollsCedulas.add("403055563");
-//        listaPollsCedulas.add("40621552");
-//        listaPollsCedulas.add("40740367");
-//        listaPollsCedulas.add("4609760");
-//        listaPollsCedulas.add("4609919");
-//        listaPollsCedulas.add("4619811");
-//        listaPollsCedulas.add("4620358");
-//        listaPollsCedulas.add("4681151");
-//        listaPollsCedulas.add("4686163");
-//        listaPollsCedulas.add("4692025");
-//        listaPollsCedulas.add("4722486");
-//        listaPollsCedulas.add("47296966");
-//        listaPollsCedulas.add("4742210");
-//        listaPollsCedulas.add("4742842");
-//        listaPollsCedulas.add("4745576");
-//        listaPollsCedulas.add("4751052");
-//        listaPollsCedulas.add("4784077");
-//        listaPollsCedulas.add("4787459");
-//        listaPollsCedulas.add("4788137");
-//        listaPollsCedulas.add("48576199");
-//        listaPollsCedulas.add("48608803");
-//        listaPollsCedulas.add("48615063");
-//        listaPollsCedulas.add("48629564");
-//        listaPollsCedulas.add("48648961");
-//        listaPollsCedulas.add("48658046");
-//        listaPollsCedulas.add("48660128");
-//        listaPollsCedulas.add("48668115");
-//        listaPollsCedulas.add("48680176");
-//        listaPollsCedulas.add("48680321");
-//        listaPollsCedulas.add("5273935");
-//        listaPollsCedulas.add("59793457");
-//        listaPollsCedulas.add("6085249");
-//        listaPollsCedulas.add("6393656");
-//        listaPollsCedulas.add("6431480");
-//        listaPollsCedulas.add("66705111");
-//        listaPollsCedulas.add("67021841");
-//        listaPollsCedulas.add("69055277");
-//        listaPollsCedulas.add("76003110");
-//        listaPollsCedulas.add("760044070");
-//        listaPollsCedulas.add("76006086");
-//        listaPollsCedulas.add("76006667");
-//        listaPollsCedulas.add("76009684");
-//        listaPollsCedulas.add("76141667");
-//        listaPollsCedulas.add("76143074");
-//        listaPollsCedulas.add("76143138");
-//        listaPollsCedulas.add("76215383");
-//        listaPollsCedulas.add("76259224");
-//        listaPollsCedulas.add("76268520");
-//        listaPollsCedulas.add("76279880");
-//        listaPollsCedulas.add("76285444");
-//        listaPollsCedulas.add("76305604");
-//        listaPollsCedulas.add("76308235");
-//        listaPollsCedulas.add("76319421");
-//        listaPollsCedulas.add("76335763");
-//        listaPollsCedulas.add("76350920");
-//        listaPollsCedulas.add("8402200808");
-//        listaPollsCedulas.add("87712347");
-//        listaPollsCedulas.add("96355120");
+        GestionDuplicados gestionDuplicados = new GestionDuplicados();//se llama la clase de abajo y luego su metodo
 
-
-        for (int i=0;i<listaPollsCedulas.size();i++){ //Para este caso es necesario iniciar en 1 y terminar en <=
+        for (int i=0;i<gestionDuplicados.metDuplicadosCedulas().size();i++){
 
             Firestore db = FirestoreClient.getFirestore();
             CollectionReference documentReference = db.collection("answer");
-            Query query = documentReference.whereEqualTo("id_question", 205).whereEqualTo("open_answer", listaPollsCedulas.get(i));
+            Query query = documentReference.whereEqualTo("id_question", 205).whereEqualTo("open_answer", gestionDuplicados.metDuplicadosCedulas().get(i));
             ApiFuture<QuerySnapshot> future = query.get();
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
@@ -629,21 +295,23 @@ public class PruebasController {
 
                         /** ### OJO: Empieza proceso de ELIMINADO ### */
 
-                        if (listaProcesarFicha.size() >= 2) { //Eliminación CASO 1
-                            System.out.println("ELIMINAR los primeros ID menos uno -1 para ficha; y ademñas; TODO para lista elim");
+                        if (listaProcesarFicha.size() >= 2) { //Eliminación CASO 1 --- En ficha de atención existe mas de dos cedulas y cuestionarios repetidos
+                            System.out.println("ELIMINAR los primeros ID menos uno -1 para ficha; y ademñas; TODO de lista elim; y además; en la tabla POLL");
                             for (int j = 0; j < listaProcesarFicha.size()-1; j++) {
                                 eliminarAnswerByIdPoll(listaProcesarFicha.get(j));
                                 eliminarAnswerPsychosocialByIdPoll(listaProcesarFicha.get(j));
+                                eliminarPollByIdPoll(listaProcesarFicha.get(j));
                             }
                             for (int j = 0; j < idNoencontradosFichaElim.size(); j++) {
                                 eliminarAnswerByIdPoll(listaProcesarFicha.get(j));
                                 //No es necesario Psychosocial, porque se supone que no está
                             }
                         }else
-                        if (idNoencontradosFichaElim.size() >= 1 && listaProcesarFicha.size()==1) { //Eliminación CASO 2
-                            System.out.println("ELIMINAR TODO lo de esta lista Elim: TODO");
+                        if (idNoencontradosFichaElim.size() >= 1 && listaProcesarFicha.size()==1) { //Eliminación CASO 2 -- Solo hay un registro en FICHA de atención y los demás solo están en INSTRUMENTO
+                            System.out.println("ELIMINAR TODO lo de esta lista Elim: TODO, también los del POLL");
                             for (int j = 0; j < idNoencontradosFichaElim.size(); j++) {
                                 eliminarAnswerByIdPoll(idNoencontradosFichaElim.get(j));
+                                eliminarPollByIdPoll(idNoencontradosFichaElim.get(j));
                                 //No es necesario Psychosocial, porque se supone que no está
                             }
                         }
@@ -660,8 +328,7 @@ public class PruebasController {
         return null;
     }
 
-
-    //##### MÉTODOS PARA ELIMINACIÓN   ANSWER -- ANSWER PSYCHOSOCIAL ########
+    //##### MÉTODOS para ELIMINACIÓN por idPoll  ANSWER -- ANSWER PSYCHOSOCIAL ########
     public void eliminarAnswerByIdPoll(String idPoll) throws ExecutionException, InterruptedException {
         System.out.println("Hemos entrado al proceso de ELIMINADO ANSWER para: "+idPoll);
         Firestore db = FirestoreClient.getFirestore();
@@ -671,8 +338,7 @@ public class PruebasController {
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
         for (QueryDocumentSnapshot doc : documents){
-//            db.collection("answer").document(doc.getId()).delete();
-
+            db.collection("answer").document(doc.getId()).delete();
         }
     }
                         //PSYCHOSOCIAL
@@ -685,74 +351,37 @@ public class PruebasController {
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
         for (QueryDocumentSnapshot doc : documents){
-//            db.collection("answer").document(doc.getId()).delete();
-
+            db.collection("answer_psychosocial").document(doc.getId()).delete();
         }
     }
 
-
-
-    //****************** ANSWER PSYCHOSOCIAL **********************
-    @GetMapping(value = "/pruebasPsychosocial/{idPoll}")
-    public List<PruebasEntityAnswerPsychosocial> pruebasPsychosocial(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
-
-        List<procesaridPollAndFechas> procesaridPollAndFechas = new ArrayList<>();
-
-        List<PruebasEntityAnswerPsychosocial> pruebasEntities = new ArrayList<>();
+    public void eliminarPollByIdPoll(String idPoll) throws ExecutionException, InterruptedException {
+        System.out.println("Hemos entrado al proceso de ELIMINADO POLL para: "+idPoll);
         Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("answer_psychosocial");
-        Query query = documentReference.whereEqualTo("id_poll", null);
+        CollectionReference documentReference = db.collection("poll");
+        Query query = documentReference.whereEqualTo("id_poll", idPoll);
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
         for (QueryDocumentSnapshot doc : documents){
-            PruebasEntityAnswerPsychosocial pruebasEntity = doc.toObject(PruebasEntityAnswerPsychosocial.class);
-            pruebasEntities.add(pruebasEntity);
-            pruebasEntity.setCreatedAt2(doc.getCreateTime().toString());
+            db.collection("poll").document(doc.getId()).delete();
         }
-
-        pruebasEntities.sort(Comparator.comparing(PruebasEntityAnswerPsychosocial::getCreatedAt2));
-        /** Codigo extractor */
-        String capturandoFechas = "2022-11-17T15:54:20.646478000Z"; //COMIENZO
-        Instant capturandoFechasInstant = Instant.parse(capturandoFechas); //COMIENZO
-//        String claveAleatoria = codigoAletario();
-        long diferenciaEntreFechas = 0;
-        for (PruebasEntityAnswerPsychosocial recorriendoPruebas : pruebasEntities) { //no es conveniente hacer forEach para este caso
-
-            Instant auxFecha = Instant.parse(recorriendoPruebas.getCreatedAt2());
-
-//            if (Objects.equals(capturandoFechas, auxFecha)) {
-//                recorriendoPruebas.setIdPoll(claveAleatoria);
-//            } else {
-//                capturandoFechas = recorriendoPruebas.getCreatedAt();
-//                claveAleatoria = codigoAletario();
-//                recorriendoPruebas.setIdPoll(claveAleatoria);
-//                procesaridPollAndFechas.add(new procesaridPollAndFechas(capturandoFechas,claveAleatoria)); //para capturar en un archivo externo la info
-//            }
-
-//            if (Objects.equals(capturandoFechas, auxFecha)) {
-////                recorriendoPruebas.setIdPoll(claveAleatoria);
-//            } else {
-//                capturandoFechas = recorriendoPruebas.getCreatedAt2();
-//                System.out.println("Las fechas son: "+ capturandoFechas);
-//            }
-
-            /** NUEVA CONDICIÓN */
-            diferenciaEntreFechas = ChronoUnit.MICROS.between(capturandoFechasInstant, auxFecha);
-            if(diferenciaEntreFechas < 10000000 ){ //10 segundos
-
-            }else{
-                capturandoFechasInstant = auxFecha;
-                System.out.println("Las fechas son: "+ capturandoFechasInstant);
-            }
-
-        }
-//        //Ultimo FOR para enviar a consola
-//        procesaridPollAndFechas.forEach(procesaridPollAndFechas1 -> System.out.println("procesaridPollAndFechas.add(new procesaridPollAndFechas(\""+procesaridPollAndFechas1.getCreatedAt()+"\",\""+procesaridPollAndFechas1.idPoll+"\"));"));
-//
-        return pruebasEntities;
-//        return null;
     }
+
+    // ############ ELIMADO SIMPLE ###################3
+    @DeleteMapping(value = "/eliminarDocumentoSimple/{idDocumento}")
+    public void eliminarDocumentoSimple(@PathVariable String idDocumento){
+        Firestore db = FirestoreClient.getFirestore();
+        db.collection("answer").document(idDocumento).delete();
+    }
+
+    //////// ### fin metodos eliminacion ### //////////
+
+
+
+
+
+
 
     //################### CONTADOR DUCUMENTOS #################
     @GetMapping(value = "/contadorDocuemntos/{idPoll}")
@@ -779,10 +408,29 @@ public class PruebasController {
             System.out.println("La cantidad de documentos es: "+documents.size());
         }
 
-
 //        return pruebasEntities;
         return null;
 
+    }
+
+    //#### obtener idDocumento simple Firebase
+    @GetMapping(value = "/consultaDocuemntoSimple/{idPoll}")
+    public String obtenerIdDocumento() throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+
+        DocumentReference docRef = db.collection("answer").document("d0bY5EMcIe2fdysPFY3g");
+        // asynchronously retrieve the document
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+        // ...
+        // future.get() blocks on response
+        DocumentSnapshot document = future.get();
+        if (document.exists()) {
+            System.out.println("Document data: " + document.getData());
+        } else {
+            System.out.println("No such document!");
+        }
+
+        return "hola";
     }
 
     //PRUEBAS CON FECHAS
@@ -792,7 +440,7 @@ public class PruebasController {
         String fechaModelo = "2022-11-17T15:54:20.646478000Z";
         String fechaModelo2 = "2022-11-17T15:54:50.647471000Z";
 
-        Instant fechaParseada1 = Instant.parse(fechaModelo);
+        Instant fechaParseada1 = Instant.parse(fechaModelo); //Instant maneja el formato en que se guarda en Firebase
         Instant fechaParseada2 = Instant.parse(fechaModelo2);
 
         Instant resultadoResta = fechaParseada2;
@@ -811,7 +459,7 @@ public class PruebasController {
     }
 
     public void empezarACargarElArray(){
-        List<procesaridPollAndFechas> procesaridPollAndFechas = new ArrayList<>();
+        List<procesaridPollAndFechas> procesaridPollAndFechas = new ArrayList<>(); //Ahora solo sirve para la tabla POLL
         procesaridPollAndFechas.add(new procesaridPollAndFechas("2022-11-17T15:48:25.460300000Z",">,U80A6;,S"));
         procesaridPollAndFechas.add(new procesaridPollAndFechas("2022-11-17T21:19:13.320328000Z","?=C72EJQ2%"));
         procesaridPollAndFechas.add(new procesaridPollAndFechas("2022-11-20T15:44:59.355366000Z","%=K+S?O16X"));
@@ -1414,9 +1062,1538 @@ public class PruebasController {
 
 }
 
+/** Clase almacenar un lista para Answer **/
+class ListasAnswer {
+    public List<String> listaPollsParaAnswer() {
+        List<String> listaIdPollsAnswer = new ArrayList<>();
+        listaIdPollsAnswer.add(	">,U80A6;,S"	);
+        listaIdPollsAnswer.add(	"?=C72EJQ2%"	);
+        listaIdPollsAnswer.add(	"%=K+S?O16X"	);
+        listaIdPollsAnswer.add(	"<X71=BWSXD"	);
+        listaIdPollsAnswer.add(	"B);C08-$@R"	);
+        listaIdPollsAnswer.add(	"H1:GC*E$(B"	);
+        listaIdPollsAnswer.add(	"6IN3Y8NPB3"	);
+        listaIdPollsAnswer.add(	")3EZUKVK3A"	);
+        listaIdPollsAnswer.add(	"4>LZ0PX.Z0"	);
+        listaIdPollsAnswer.add(	"0/R@W4'B/)"	);
+        listaIdPollsAnswer.add(	"/N5:C:$8$N"	);
+        listaIdPollsAnswer.add(	"MGAC2N#QJ<"	);
+        listaIdPollsAnswer.add(	"'<L)2,JKZ7"	);
+        listaIdPollsAnswer.add(	"RV1&M'8$5F"	);
+        listaIdPollsAnswer.add(	"*RE4Z3=IE-"	);
+        listaIdPollsAnswer.add(	"@K92<:JMYN"	);
+        listaIdPollsAnswer.add(	"C8V<Q03K%N"	);
+        listaIdPollsAnswer.add(	"/KHC6D=))F"	);
+        listaIdPollsAnswer.add(	"NZ,3<C>COI"	);
+        listaIdPollsAnswer.add(	")L7=D%#I3T"	);
+        listaIdPollsAnswer.add(	"B6@Z*G:4LR"	);
+        listaIdPollsAnswer.add(	"%73(F9GS4T"	);
+        listaIdPollsAnswer.add(	"9F:-%PZ/@#"	);
+        listaIdPollsAnswer.add(	"R#*6$N%VK8"	);
+        listaIdPollsAnswer.add(	".N5EF17Y#9"	);
+        listaIdPollsAnswer.add(	"L:JLE-;&@J"	);
+        listaIdPollsAnswer.add(	">)'0*0PS'4"	);
+        listaIdPollsAnswer.add(	">0CYVS=6#E"	);
+        listaIdPollsAnswer.add(	"3R>3L9OZ;;"	);
+        listaIdPollsAnswer.add(	"SR'M4O1?',"	);
+        listaIdPollsAnswer.add(	"9,Z-:OI#XN"	);
+        listaIdPollsAnswer.add(	"#QC,LD0-I="	);
+        listaIdPollsAnswer.add(	"+>X#UK?,3Y"	);
+        listaIdPollsAnswer.add(	"/8(U2.H&$<"	);
+        listaIdPollsAnswer.add(	"52W90NXK;H"	);
+        listaIdPollsAnswer.add(	"HMOL(9R9$#"	);
+        listaIdPollsAnswer.add(	"IPBBJ?P/IO"	);
+        listaIdPollsAnswer.add(	"VX694Q/MU1"	);
+        listaIdPollsAnswer.add(	"-#TLL)$6(@"	);
+        listaIdPollsAnswer.add(	"IF?;8=ETNI"	);
+        listaIdPollsAnswer.add(	"W?'WW+9OD."	);
+        listaIdPollsAnswer.add(	"%3,'?//5IW"	);
+        listaIdPollsAnswer.add(	"MYTZI&ZT<W"	);
+        listaIdPollsAnswer.add(	"NZXC%VV30T"	);
+        listaIdPollsAnswer.add(	"GYF)UMK;:K"	);
+        listaIdPollsAnswer.add(	"(<L;E&#16S"	);
+        listaIdPollsAnswer.add(	"#K,2'9-EZ,"	);
+        listaIdPollsAnswer.add(	"?F%5BSW#+'"	);
+        listaIdPollsAnswer.add(	"0P&$.8YQ<F"	);
+        listaIdPollsAnswer.add(	"Z'TB$/4,:D"	);
+        listaIdPollsAnswer.add(	"9RAQFD3>TH"	);
+        listaIdPollsAnswer.add(	"+12S?X(29L"	);
+        listaIdPollsAnswer.add(	"R4<TQYFE8T"	);
+        listaIdPollsAnswer.add(	"ED'U('Q:EK"	);
+        listaIdPollsAnswer.add(	"O+&BF*XBT6"	);
+        listaIdPollsAnswer.add(	"0E<7T:=IOM"	);
+        listaIdPollsAnswer.add(	"13>/+*WX8C"	);
+        listaIdPollsAnswer.add(	">JP*>C/?S@"	);
+        listaIdPollsAnswer.add(	"AZ.V)8'OIL"	);
+        listaIdPollsAnswer.add(	"@HW5M4<J0E"	);
+        listaIdPollsAnswer.add(	"9V;N'GHQC>"	);
+        listaIdPollsAnswer.add(	"U;E9(<$Q*="	);
+        listaIdPollsAnswer.add(	"Y96BK=XVB+"	);
+        listaIdPollsAnswer.add(	"%NAF9E1+H<"	);
+        listaIdPollsAnswer.add(	"WOXY%FC0X'"	);
+        listaIdPollsAnswer.add(	"@PTU?<P5Z>"	);
+        listaIdPollsAnswer.add(	"ENHO+9Q>;C"	);
+        listaIdPollsAnswer.add(	"C4@=W(-@VQ"	);
+        listaIdPollsAnswer.add(	"M7)4K<Z5QJ"	);
+        listaIdPollsAnswer.add(	"+S,AB@?9O/"	);
+        listaIdPollsAnswer.add(	"T$?F2PF7&F"	);
+        listaIdPollsAnswer.add(	"7-+E55;IB7"	);
+        listaIdPollsAnswer.add(	"ZP;UM,,@SZ"	);
+        listaIdPollsAnswer.add(	"-)&$8/0@L:"	);
+        listaIdPollsAnswer.add(	"=M)(;(:<'/"	);
+        listaIdPollsAnswer.add(	"?;?BFI&>;Q"	);
+        listaIdPollsAnswer.add(	"S#FV7BD.DC"	);
+        listaIdPollsAnswer.add(	"57NAEW,ZX-"	);
+        listaIdPollsAnswer.add(	"&8I++@UXZI"	);
+        listaIdPollsAnswer.add(	"GNM@82C60F"	);
+        listaIdPollsAnswer.add(	"@<M*8/@;CM"	);
+        listaIdPollsAnswer.add(	"TU7<74@#88"	);
+        listaIdPollsAnswer.add(	"#:,<GLYW%1"	);
+        listaIdPollsAnswer.add(	"T0R/NQ196="	);
+        listaIdPollsAnswer.add(	"0'OHG((H#)"	);
+        listaIdPollsAnswer.add(	"*3?4)81CSV"	);
+        listaIdPollsAnswer.add(	"M#B8II8&-M"	);
+        listaIdPollsAnswer.add(	"4)SCZ*'RX1"	);
+        listaIdPollsAnswer.add(	"++'=%3OP%W"	);
+        listaIdPollsAnswer.add(	"@1LQUD%),V"	);
+        listaIdPollsAnswer.add(	"+KKZGP'IEK"	);
+        listaIdPollsAnswer.add(	"Y#/Q'3L$#W"	);
+        listaIdPollsAnswer.add(	",EMUZ26@$T"	);
+        listaIdPollsAnswer.add(	";$NHXZ)37>"	);
+        listaIdPollsAnswer.add(	"$0#PKR.U6L"	);
+        listaIdPollsAnswer.add(	":NJA'9EVCR"	);
+        listaIdPollsAnswer.add(	"5$(JTJ$I0M"	);
+        listaIdPollsAnswer.add(	"68<*75OI'$"	);
+        listaIdPollsAnswer.add(	"J8?F(00XI)"	);
+        listaIdPollsAnswer.add(	"2X(Z@<2$9C"	);
+        listaIdPollsAnswer.add(	"X%E=SK*?*I"	);
+        listaIdPollsAnswer.add(	"A@N2=4ZUFO"	);
+        listaIdPollsAnswer.add(	"Y.I%-,IRRF"	);
+        listaIdPollsAnswer.add(	"YMYD8K0P5+"	);
+        listaIdPollsAnswer.add(	"CD'&K6QR7("	);
+        listaIdPollsAnswer.add(	"G>3(9&%DU-"	);
+        listaIdPollsAnswer.add(	"-FK9R?-?@M"	);
+        listaIdPollsAnswer.add(	"M$V01&$?F."	);
+        listaIdPollsAnswer.add(	"L$C$,I#@1#"	);
+        listaIdPollsAnswer.add(	"$QD:&DX@L&"	);
+        listaIdPollsAnswer.add(	"R7W<NE6OR-"	);
+        listaIdPollsAnswer.add(	"@&G6K5+@#D"	);
+        listaIdPollsAnswer.add(	"UE'6F'+UJ6"	);
+        listaIdPollsAnswer.add(	"BS.,#O&3YY"	);
+        listaIdPollsAnswer.add(	"?-LY.A/D;K"	);
+        listaIdPollsAnswer.add(	"G(NP.,W?0,"	);
+        listaIdPollsAnswer.add(	"H.1+X%N<QW"	);
+        listaIdPollsAnswer.add(	"83$N<GJG/A"	);
+        listaIdPollsAnswer.add(	"Z)BDEZWL#4"	);
+        listaIdPollsAnswer.add(	"THD4I&E&29"	);
+        listaIdPollsAnswer.add(	"5LY=CTJ-=H"	);
+        listaIdPollsAnswer.add(	"Q=#9Q6S;.>"	);
+        listaIdPollsAnswer.add(	"CCBZ&K.Q%;"	);
+        listaIdPollsAnswer.add(	"L9M7SLC>HY"	);
+        listaIdPollsAnswer.add(	"TMM#2G@916"	);
+        listaIdPollsAnswer.add(	"INYU4$/X9<"	);
+        listaIdPollsAnswer.add(	"+K'G=<V,0D"	);
+        listaIdPollsAnswer.add(	".MC4)$@*02"	);
+        listaIdPollsAnswer.add(	"9BMEN@RLD4"	);
+        listaIdPollsAnswer.add(	"LGXI'1=U.'"	);
+        listaIdPollsAnswer.add(	"IC3#&/R,<("	);
+        listaIdPollsAnswer.add(	"UMP7#B)4HW"	);
+        listaIdPollsAnswer.add(	"FNS.%/,EF4"	);
+        listaIdPollsAnswer.add(	".4$1/ZI3BQ"	);
+        listaIdPollsAnswer.add(	"R+<.0UV6&W"	);
+        listaIdPollsAnswer.add(	"NV#C9LJI+/"	);
+        listaIdPollsAnswer.add(	"-M;8:.K&#C"	);
+        listaIdPollsAnswer.add(	"(GQ=ZD)DO*"	);
+        listaIdPollsAnswer.add(	"W95<$>8UZ3"	);
+        listaIdPollsAnswer.add(	",;H)KSS$IN"	);
+        listaIdPollsAnswer.add(	"ISAZXLPTH;"	);
+        listaIdPollsAnswer.add(	"IC/%EC))K'"	);
+        listaIdPollsAnswer.add(	"*T,#FN0-$#"	);
+        listaIdPollsAnswer.add(	"0X7Q9LXA#P"	);
+        listaIdPollsAnswer.add(	"'):0NFWGBZ"	);
+        listaIdPollsAnswer.add(	"/#AK9Y,BWA"	);
+        listaIdPollsAnswer.add(	"LA9B?X)A:W"	);
+        listaIdPollsAnswer.add(	"UZ2&X(7;O3"	);
+        listaIdPollsAnswer.add(	"0E(VA/=6($"	);
+        listaIdPollsAnswer.add(	"R6$,2/F>M<"	);
+        listaIdPollsAnswer.add(	"6?'GBY$(2O"	);
+        listaIdPollsAnswer.add(	"'S<9'IL$:'"	);
+        listaIdPollsAnswer.add(	"0MUJWX9D/3"	);
+        listaIdPollsAnswer.add(	"7Q36S1I&?."	);
+        listaIdPollsAnswer.add(	"IZZMO5O'GN"	);
+        listaIdPollsAnswer.add(	"<R/-Y.OVKB"	);
+        listaIdPollsAnswer.add(	"DE+4AIK8BS"	);
+        listaIdPollsAnswer.add(	"R*TY/:TX38"	);
+        listaIdPollsAnswer.add(	"*.*SC?-N.T"	);
+        listaIdPollsAnswer.add(	"*D1,Z*F?N+"	);
+        listaIdPollsAnswer.add(	":I@L8B-NR1"	);
+        listaIdPollsAnswer.add(	"VO@?K*0FL*"	);
+        listaIdPollsAnswer.add(	"U>>YW'85ZR"	);
+        listaIdPollsAnswer.add(	"KF<M4$R0+>"	);
+        listaIdPollsAnswer.add(	"/1(?YY@$I?"	);
+        listaIdPollsAnswer.add(	"+WLG'V1L3S"	);
+        listaIdPollsAnswer.add(	"KLAMFV&MAF"	);
+        listaIdPollsAnswer.add(	"<OB+9LN9'Q"	);
+        listaIdPollsAnswer.add(	"DMUUV/$&>W"	);
+        listaIdPollsAnswer.add(	"TOG$CYMC,$"	);
+        listaIdPollsAnswer.add(	"MU*E09TNP/"	);
+        listaIdPollsAnswer.add(	"-QGP3=IPRM"	);
+        listaIdPollsAnswer.add(	"XF5MF?S&,2"	);
+        listaIdPollsAnswer.add(	"R#,9JG35*;"	);
+        listaIdPollsAnswer.add(	"XV*AC=ATW#"	);
+        listaIdPollsAnswer.add(	"WT:KAZ;45#"	);
+        listaIdPollsAnswer.add(	")DG-#784$C"	);
+        listaIdPollsAnswer.add(	"0TSZ,FI''8"	);
+        listaIdPollsAnswer.add(	"%Z.Q</%QW/"	);
+        listaIdPollsAnswer.add(	"-)LG,G5NI6"	);
+        listaIdPollsAnswer.add(	"B6D#N7@(R9"	);
+        listaIdPollsAnswer.add(	"4%HDNV?G'0"	);
+        listaIdPollsAnswer.add(	"69V?/8I7)#"	);
+        listaIdPollsAnswer.add(	".D3://Y$%/"	);
+        listaIdPollsAnswer.add(	"R*IE5/O%U1"	);
+        listaIdPollsAnswer.add(	".T9K-COPR7"	);
+        listaIdPollsAnswer.add(	"XZ&(@'&0YV"	);
+        listaIdPollsAnswer.add(	"E/41OR>6YR"	);
+        listaIdPollsAnswer.add(	"#.'.D@#HOX"	);
+        listaIdPollsAnswer.add(	"W=T%CHJ8%B"	);
+        listaIdPollsAnswer.add(	":D&74FCVEE"	);
+        listaIdPollsAnswer.add(	"0'+E(VY2=0"	);
+        listaIdPollsAnswer.add(	"*3L.7,3G#>"	);
+        listaIdPollsAnswer.add(	")+V*TF<DK&"	);
+        listaIdPollsAnswer.add(	".FU/%(?$BA"	);
+        listaIdPollsAnswer.add(	"<42Z*JU0M<"	);
+        listaIdPollsAnswer.add(	">NK(W.Y?4Y"	);
+        listaIdPollsAnswer.add(	"3BV$N'X4CE"	);
+        listaIdPollsAnswer.add(	";1<#N5B$J/"	);
+        listaIdPollsAnswer.add(	"#QGW;UAH.*"	);
+        listaIdPollsAnswer.add(	"<6ZKJ1?@1B"	);
+        listaIdPollsAnswer.add(	"BLDJKQ@S'E"	);
+        listaIdPollsAnswer.add(	"TYC'G68)KG"	);
+        listaIdPollsAnswer.add(	"L*GJRI*10$"	);
+        listaIdPollsAnswer.add(	"/HF/QTW467"	);
+        listaIdPollsAnswer.add(	".)FYE'GH&2"	);
+        listaIdPollsAnswer.add(	"25+9S./,XO"	);
+        listaIdPollsAnswer.add(	"VAK?#@-Z:*"	);
+        listaIdPollsAnswer.add(	"6N=UE90WBO"	);
+        listaIdPollsAnswer.add(	"OV.C*79:9S"	);
+        listaIdPollsAnswer.add(	"4S*&>ZDU8("	);
+        listaIdPollsAnswer.add(	"5@8B(974--"	);
+        listaIdPollsAnswer.add(	":T7*//R&FG"	);
+        listaIdPollsAnswer.add(	"*+>9#F$U-F"	);
+        listaIdPollsAnswer.add(	"V1C4GG'Q03"	);
+        listaIdPollsAnswer.add(	">4?>C0=<$0"	);
+        listaIdPollsAnswer.add(	"-YJ.Z9#ZW>"	);
+        listaIdPollsAnswer.add(	">7?TV@D/9W"	);
+        listaIdPollsAnswer.add(	"AR(07-7JUK"	);
+        listaIdPollsAnswer.add(	"A<.5>Z(;9-"	);
+        listaIdPollsAnswer.add(	"Z#O&;TO%A#"	);
+        listaIdPollsAnswer.add(	"/I$68X$PK?"	);
+        listaIdPollsAnswer.add(	"C/<VM:$0<R"	);
+        listaIdPollsAnswer.add(	"*7?PY$B4?J"	);
+        listaIdPollsAnswer.add(	"*/WTZ.F/D#"	);
+        listaIdPollsAnswer.add(	"'CY@LS(+1>"	);
+        listaIdPollsAnswer.add(	"J=<#85UMF-"	);
+        listaIdPollsAnswer.add(	"4S-:?9NB08"	);
+        listaIdPollsAnswer.add(	"Y#L;GCHYIL"	);
+        listaIdPollsAnswer.add(	"I7+8?PG%XZ"	);
+        listaIdPollsAnswer.add(	"B/5@,'5>EZ"	);
+        listaIdPollsAnswer.add(	"#44%C(:4S="	);
+        listaIdPollsAnswer.add(	"LC?4>(P<(K"	);
+        listaIdPollsAnswer.add(	"7*(4*5Z&B*"	);
+        listaIdPollsAnswer.add(	"IQNF)/%+*#"	);
+        listaIdPollsAnswer.add(	"@D.%9FV-+A"	);
+        listaIdPollsAnswer.add(	"K.U%5GO(#H"	);
+        listaIdPollsAnswer.add(	"JN++'U.HL("	);
+        listaIdPollsAnswer.add(	"*(#.L5?#U;"	);
+        listaIdPollsAnswer.add(	";HY9ZHS)8H"	);
+        listaIdPollsAnswer.add(	"7-PO%=<20/"	);
+        listaIdPollsAnswer.add(	"*H/8K'I52B"	);
+        listaIdPollsAnswer.add(	"Z$T+%STL94"	);
+        listaIdPollsAnswer.add(	"@AZAIJ46)Y"	);
+        listaIdPollsAnswer.add(	"2%?509$:?."	);
+        listaIdPollsAnswer.add(	"Z64BX5CU8K"	);
+        listaIdPollsAnswer.add(	"7;2&V)P7>Q"	);
+        listaIdPollsAnswer.add(	"G)H5.5CXAY"	);
+        listaIdPollsAnswer.add(	"GK&'R4?;#1"	);
+        listaIdPollsAnswer.add(	"S9X8->)1B2"	);
+        listaIdPollsAnswer.add(	"#<L(C2:JRR"	);
+        listaIdPollsAnswer.add(	"W9DOP-E<LD"	);
+        listaIdPollsAnswer.add(	"EJ%T/F%+-H"	);
+        listaIdPollsAnswer.add(	"J%3OZ96FR)"	);
+        listaIdPollsAnswer.add(	"O&<-)/O/69"	);
+        listaIdPollsAnswer.add(	"'8FO+(RSMW"	);
+        listaIdPollsAnswer.add(	"Q/-?#)SQNE"	);
+        listaIdPollsAnswer.add(	"J,8$.(XBV1"	);
+        listaIdPollsAnswer.add(	"L'IIV9>@-N"	);
+        listaIdPollsAnswer.add(	"/:Q-18#7N;"	);
+        listaIdPollsAnswer.add(	"FE4RL'*N.)"	);
+        listaIdPollsAnswer.add(	"87&PYC5U;W"	);
+        listaIdPollsAnswer.add(	"%1.DAJP:$P"	);
+        listaIdPollsAnswer.add(	"6=F=9M.7LU"	);
+        listaIdPollsAnswer.add(	"?JCQ-+<R8>"	);
+        listaIdPollsAnswer.add(	"F4&*>=5L04"	);
+        listaIdPollsAnswer.add(	"=$A,2A8IE4"	);
+        listaIdPollsAnswer.add(	"?7:HM<H.<?"	);
+        listaIdPollsAnswer.add(	"I;TL?DK8+9"	);
+        listaIdPollsAnswer.add(	"P;U7574B/4"	);
+        listaIdPollsAnswer.add(	"YI&(QNI6$U"	);
+        listaIdPollsAnswer.add(	"0W?D@YNZGI"	);
+        listaIdPollsAnswer.add(	"EA03J=86O6"	);
+        listaIdPollsAnswer.add(	"5T@)TC?LFE"	);
+        listaIdPollsAnswer.add(	"A'X<K#>RKM"	);
+        listaIdPollsAnswer.add(	"O?HI4FACU%"	);
+        listaIdPollsAnswer.add(	"*VCPX'7%3I"	);
+        listaIdPollsAnswer.add(	"C-$/X319@E"	);
+        listaIdPollsAnswer.add(	"-IHO86+9EP"	);
+        listaIdPollsAnswer.add(	"TDPIZ.I>S."	);
+        listaIdPollsAnswer.add(	"Y'592+B?<?"	);
+        listaIdPollsAnswer.add(	"L7..*X52RQ"	);
+        listaIdPollsAnswer.add(	"K<M-O4(N.)"	);
+        listaIdPollsAnswer.add(	"5E1I8&<-6G"	);
+        listaIdPollsAnswer.add(	"#@Q*+6FTIZ"	);
+        listaIdPollsAnswer.add(	"+D0S9FT/'W"	);
+        listaIdPollsAnswer.add(	"3%FJAOJR/D"	);
+        listaIdPollsAnswer.add(	"=+XH8+D60E"	);
+        listaIdPollsAnswer.add(	")C5B/+4HR$"	);
+        listaIdPollsAnswer.add(	"JZ)MOSN=-<"	);
+        listaIdPollsAnswer.add(	"&%5=S$H<-V"	);
+        listaIdPollsAnswer.add(	"IW.'K$E<7?"	);
+        listaIdPollsAnswer.add(	"N;#)I&G7C$"	);
+        listaIdPollsAnswer.add(	"3X4$I,U.Y&"	);
+        listaIdPollsAnswer.add(	"4.4@<RV+V>"	);
+        listaIdPollsAnswer.add(	"-'.MN/7@=D"	);
+        listaIdPollsAnswer.add(	".0.RH@ML&X"	);
+        listaIdPollsAnswer.add(	"(>TACAB;WH"	);
+        listaIdPollsAnswer.add(	"6,E#)>VKMF"	);
+        listaIdPollsAnswer.add(	"*C%BAUCZEX"	);
+        listaIdPollsAnswer.add(	"++CMS9=#6."	);
+        listaIdPollsAnswer.add(	"Y7:K4',/RL"	);
+        listaIdPollsAnswer.add(	"-=7<LO/*I8"	);
+        listaIdPollsAnswer.add(	"/JICJIUCXG"	);
+        listaIdPollsAnswer.add(	"S?8,WJV'*V"	);
+        listaIdPollsAnswer.add(	"BFG<W@D5;B"	);
+        listaIdPollsAnswer.add(	"5*JAQ./W>6"	);
+        listaIdPollsAnswer.add(	"O($-KOOURE"	);
+        listaIdPollsAnswer.add(	"V@Y@B$%SPI"	);
+        listaIdPollsAnswer.add(	"<BBM@4S*4@"	);
+        listaIdPollsAnswer.add(	"FF1QMT<>T+"	);
+        listaIdPollsAnswer.add(	"(AYCK,UTB?"	);
+        listaIdPollsAnswer.add(	":YO;IN6JQN"	);
+        listaIdPollsAnswer.add(	".SZSI<4I.:"	);
+        listaIdPollsAnswer.add(	"OP-F35V,.+"	);
+        listaIdPollsAnswer.add(	"11?<=6&VAI"	);
+        listaIdPollsAnswer.add(	"P/78O(X8S1"	);
+        listaIdPollsAnswer.add(	"J'8*>Q>8)-"	);
+        listaIdPollsAnswer.add(	"9?.KYP&;*="	);
+        listaIdPollsAnswer.add(	">X.%++O)A&"	);
+        listaIdPollsAnswer.add(	"YF24@FWQZ/"	);
+        listaIdPollsAnswer.add(	"#74'XN*:NU"	);
+        listaIdPollsAnswer.add(	"ULYMJ69U-@"	);
+        listaIdPollsAnswer.add(	"T4X@;U1%>M"	);
+        listaIdPollsAnswer.add(	"G3VC&)&ZQZ"	);
+        listaIdPollsAnswer.add(	"1?LR<#P1XJ"	);
+        listaIdPollsAnswer.add(	"O9@BQ8FMZK"	);
+        listaIdPollsAnswer.add(	"E0YYEH)(TC"	);
+        listaIdPollsAnswer.add(	")NY#/;75+7"	);
+        listaIdPollsAnswer.add(	"C@OHG2>X0$"	);
+        listaIdPollsAnswer.add(	"5OI?66.06&"	);
+        listaIdPollsAnswer.add(	"NQ@WWUKW0Y"	);
+        listaIdPollsAnswer.add(	"TC6S55KX0-"	);
+        listaIdPollsAnswer.add(	"7=#/(A@-BM"	);
+        listaIdPollsAnswer.add(	"$6EG;5>ZLX"	);
+        listaIdPollsAnswer.add(	",VPQGYO0'@"	);
+        listaIdPollsAnswer.add(	"P@VS2=V,%."	);
+        listaIdPollsAnswer.add(	"7>/FZV@E)>"	);
+        listaIdPollsAnswer.add(	"OPAY=P?G>K"	);
+        listaIdPollsAnswer.add(	"Q5UDY''G9R"	);
+        listaIdPollsAnswer.add(	"Q6OK%D//6;"	);
+        listaIdPollsAnswer.add(	"?0?1C@FQ*#"	);
+        listaIdPollsAnswer.add(	"7V*$)ED#<="	);
+        listaIdPollsAnswer.add(	"EJSR#R;,EG"	);
+        listaIdPollsAnswer.add(	"$AIE8Y7IV&"	);
+        listaIdPollsAnswer.add(	"C$QC&N.S3-"	);
+        listaIdPollsAnswer.add(	"X@#A@,I5GC"	);
+        listaIdPollsAnswer.add(	"AB2P9L3$TD"	);
+        listaIdPollsAnswer.add(	"N>XY&%J)Q%"	);
+        listaIdPollsAnswer.add(	"9K(-7;MIUL"	);
+        listaIdPollsAnswer.add(	"@SFT.Z-.L("	);
+        listaIdPollsAnswer.add(	"6GHO/*26J)"	);
+        listaIdPollsAnswer.add(	"QWQ3?8ID6K"	);
+        listaIdPollsAnswer.add(	"3NO)V1(>U("	);
+        listaIdPollsAnswer.add(	"CM,)IJMPHF"	);
+        listaIdPollsAnswer.add(	"M;*:U'M#2G"	);
+        listaIdPollsAnswer.add(	"3N4&(/.4SV"	);
+        listaIdPollsAnswer.add(	"'*+I7P&V)'"	);
+        listaIdPollsAnswer.add(	"D=2=S=1I-D"	);
+        listaIdPollsAnswer.add(	"7*=FCAFRP0"	);
+        listaIdPollsAnswer.add(	"DY.4N.3=#*"	);
+        listaIdPollsAnswer.add(	"(/IF#B)HL2"	);
+        listaIdPollsAnswer.add(	"@L3HRL;JZ2"	);
+        listaIdPollsAnswer.add(	"S)SMBGV0SS"	);
+        listaIdPollsAnswer.add(	"%=PNOEFA0("	);
+        listaIdPollsAnswer.add(	"2+%PFCG;V5"	);
+        listaIdPollsAnswer.add(	"9/PV@FA#QU"	);
+        listaIdPollsAnswer.add(	":D(7*M36KB"	);
+        listaIdPollsAnswer.add(	";2$Y.3;OR:"	);
+        listaIdPollsAnswer.add(	"WU&CW@O=WP"	);
+        listaIdPollsAnswer.add(	"G@:+=&?4>4"	);
+        listaIdPollsAnswer.add(	"@-N*V&CVMJ"	);
+        listaIdPollsAnswer.add(	".=?8A<T/2H"	);
+        listaIdPollsAnswer.add(	"CI5'%5?*%$"	);
+        listaIdPollsAnswer.add(	"1:IWS'J:HR"	);
+        listaIdPollsAnswer.add(	"4B@T2LZ>54"	);
+        listaIdPollsAnswer.add(	"'V<J&JTU+R"	);
+        listaIdPollsAnswer.add(	"(HQJTUZL+Z"	);
+        listaIdPollsAnswer.add(	"%&IB,W7O+C"	);
+        listaIdPollsAnswer.add(	"X2SOE@U>BS"	);
+        listaIdPollsAnswer.add(	"NQKW%@K2%,"	);
+        listaIdPollsAnswer.add(	"9S$HV:(W3?"	);
+        listaIdPollsAnswer.add(	"+N/B#>5Z-1"	);
+        listaIdPollsAnswer.add(	"J+P-WC>B%P"	);
+        listaIdPollsAnswer.add(	"G4S1F5@>OH"	);
+        listaIdPollsAnswer.add(	"PM/R&9'G4T"	);
+        listaIdPollsAnswer.add(	"-5WON$P:3>"	);
+        listaIdPollsAnswer.add(	"WR/ZV9*0@Z"	);
+        listaIdPollsAnswer.add(	"YJ.7OT*-XD"	);
+        listaIdPollsAnswer.add(	"OJCV*AJ+<0"	);
+        listaIdPollsAnswer.add(	"81+.D?<;;9"	);
+        listaIdPollsAnswer.add(	";G#?X96VL@"	);
+        listaIdPollsAnswer.add(	"2-CY:3+19;"	);
+        listaIdPollsAnswer.add(	"5W;,AH?#SO"	);
+        listaIdPollsAnswer.add(	"01W)IS*3$>"	);
+        listaIdPollsAnswer.add(	"BU2YM938K,"	);
+        listaIdPollsAnswer.add(	"T$0XRP&D+'"	);
+        listaIdPollsAnswer.add(	"NFX2EHMSXQ"	);
+        listaIdPollsAnswer.add(	"P9(>Q?.3UY"	);
+        listaIdPollsAnswer.add(	"2*NWM,%,KM"	);
+        listaIdPollsAnswer.add(	"LJ*7VFMEB&"	);
+        listaIdPollsAnswer.add(	"-N0X,FKMWC"	);
+        listaIdPollsAnswer.add(	"R39UZGDXF<"	);
+        listaIdPollsAnswer.add(	"5WUQBGPSI."	);
+        listaIdPollsAnswer.add(	"O.VK46TR7H"	);
+        listaIdPollsAnswer.add(	"#XN2O-$5VM"	);
+        listaIdPollsAnswer.add(	"&;&T(AS&-0"	);
+        listaIdPollsAnswer.add(	"ACA?+8BO'*"	);
+        listaIdPollsAnswer.add(	"9@K+S&>$6Z"	);
+        listaIdPollsAnswer.add(	"E$-7M&J78?"	);
+        listaIdPollsAnswer.add(	":N)0@J9X/1"	);
+        listaIdPollsAnswer.add(	"P-Z%O2;SM-"	);
+        listaIdPollsAnswer.add(	"54.M0&0T3Q"	);
+        listaIdPollsAnswer.add(	"HUDH(/K8C'"	);
+        listaIdPollsAnswer.add(	"F3)2;WV)J."	);
+        listaIdPollsAnswer.add(	"0X1?2&E(RU"	);
+        listaIdPollsAnswer.add(	"O7B<MWGW1("	);
+        listaIdPollsAnswer.add(	"$S*KIA3OL<"	);
+        listaIdPollsAnswer.add(	"%1BHI*9I/)"	);
+        listaIdPollsAnswer.add(	"GI$28/?5#2"	);
+        listaIdPollsAnswer.add(	"OPD'VXF##-"	);
+        listaIdPollsAnswer.add(	"AA-Y,>#PJC"	);
+        listaIdPollsAnswer.add(	"=OG4@/=DZ1"	);
+        listaIdPollsAnswer.add(	"E?<3WY=I24"	);
+        listaIdPollsAnswer.add(	"6DIKEYF2I="	);
+        listaIdPollsAnswer.add(	"F%8T,$%VO%"	);
+        listaIdPollsAnswer.add(	":K1G*(H*4X"	);
+        listaIdPollsAnswer.add(	"UPUXUY/LLT"	);
+        listaIdPollsAnswer.add(	"VE=?XF$XDN"	);
+        listaIdPollsAnswer.add(	"&=&Q(3Z:B'"	);
+        listaIdPollsAnswer.add(	":-M-6?LTS."	);
+        listaIdPollsAnswer.add(	"K'*)@;I959"	);
+        listaIdPollsAnswer.add(	"+7.9L;<T'6"	);
+        listaIdPollsAnswer.add(	"Z2,B93:XB&"	);
+        listaIdPollsAnswer.add(	"<Q?R1)T3.C"	);
+        listaIdPollsAnswer.add(	"OS=.&JXXU%"	);
+        listaIdPollsAnswer.add(	"<6YUMRV;D$"	);
+        listaIdPollsAnswer.add(	",.LLH1).;X"	);
+        listaIdPollsAnswer.add(	"0OXJJ(-0GA"	);
+        listaIdPollsAnswer.add(	"%;B+UI+FI@"	);
+        listaIdPollsAnswer.add(	",<E=EZJ<G("	);
+        listaIdPollsAnswer.add(	"8S)O3V13LS"	);
+        listaIdPollsAnswer.add(	"<UZCS9-D=P"	);
+        listaIdPollsAnswer.add(	"-DO/L$'+:I"	);
+        listaIdPollsAnswer.add(	"T5CW0&.-)S"	);
+        listaIdPollsAnswer.add(	"=JCNNI9F1("	);
+        listaIdPollsAnswer.add(	"5.&*AF.R=<"	);
+        listaIdPollsAnswer.add(	"BD#WL2=4ZN"	);
+        listaIdPollsAnswer.add(	"9)K:6HWX%O"	);
+        listaIdPollsAnswer.add(	")J,=52W?=3"	);
+        listaIdPollsAnswer.add(	"WL*T6,9SZ9"	);
+        listaIdPollsAnswer.add(	">ZRLW=O%T8"	);
+        listaIdPollsAnswer.add(	"L<@LU7D1@X"	);
+        listaIdPollsAnswer.add(	"'.V%Q+M=Z)"	);
+        listaIdPollsAnswer.add(	"KE,06/F<J;"	);
+        listaIdPollsAnswer.add(	"A0'AZZY:(@"	);
+        listaIdPollsAnswer.add(	"=7E<%Z'A1:"	);
+        listaIdPollsAnswer.add(	"E8AG4;Y(KP"	);
+        listaIdPollsAnswer.add(	"BE6G?Z<$(6"	);
+        listaIdPollsAnswer.add(	"-A;?E94FF2"	);
+        listaIdPollsAnswer.add(	"58>+JZ5D=$"	);
+        listaIdPollsAnswer.add(	"DKKG,I,(6P"	);
+        listaIdPollsAnswer.add(	"4R/F7+>$'B"	);
+        listaIdPollsAnswer.add(	"+R4@*2(4WD"	);
+        listaIdPollsAnswer.add(	"=MD0/BJXY2"	);
+        listaIdPollsAnswer.add(	">(R)MBK/UQ"	);
+        listaIdPollsAnswer.add(	"%Y=R+O8N#0"	);
+        listaIdPollsAnswer.add(	"TBG=V)'C2>"	);
+        listaIdPollsAnswer.add(	"KDT0?LP>7?"	);
+        listaIdPollsAnswer.add(	"K3DW6(&&8V"	);
+        listaIdPollsAnswer.add(	"J.@C&IQ540"	);
+        listaIdPollsAnswer.add(	"1%V#OJEPL#"	);
+        listaIdPollsAnswer.add(	"D:2NG#.-MM"	);
+        listaIdPollsAnswer.add(	":RYCAHA'T*"	);
+        listaIdPollsAnswer.add(	".$7+'S2W'0"	);
+        listaIdPollsAnswer.add(	"A9-T3D0?Q)"	);
+        listaIdPollsAnswer.add(	"$MOZ9COBIM"	);
+        listaIdPollsAnswer.add(	"6=O3;6'(WI"	);
+        listaIdPollsAnswer.add(	"29LLCO/L?I"	);
+        listaIdPollsAnswer.add(	"F/)X:WSU@N"	);
+        listaIdPollsAnswer.add(	"2SMHF*36<%"	);
+        listaIdPollsAnswer.add(	"ZBK&%,(>+B"	);
+        listaIdPollsAnswer.add(	"%*GAU&T9D)"	);
+        listaIdPollsAnswer.add(	"66H>QQ>X/-"	);
+        listaIdPollsAnswer.add(	"Y;:Q<I'901"	);
+        listaIdPollsAnswer.add(	"@T.5)U>B(&"	);
+        listaIdPollsAnswer.add(	"#FNKYD07X4"	);
+        listaIdPollsAnswer.add(	"2R9BMX;)B'"	);
+        listaIdPollsAnswer.add(	"*Y@@L')YO4"	);
+        listaIdPollsAnswer.add(	"%-SMBHWL95"	);
+        listaIdPollsAnswer.add(	"/XWXBCECA="	);
+        listaIdPollsAnswer.add(	"67T2Q9S'*+"	);
+        listaIdPollsAnswer.add(	"8/9FJ'3H?N"	);
+        listaIdPollsAnswer.add(	"QD9%S<I<-3"	);
+        listaIdPollsAnswer.add(	"4O4(BJ'O;D"	);
+        listaIdPollsAnswer.add(	"*6CZCE0?=&"	);
+        listaIdPollsAnswer.add(	"@)R1*>7S?/"	);
+        listaIdPollsAnswer.add(	")9LNF9,#7U"	);
+        listaIdPollsAnswer.add(	"UV$/>(BP0O"	);
+        listaIdPollsAnswer.add(	"0D#P@?QO,G"	);
+        listaIdPollsAnswer.add(	"**/$-Z#4*;"	);
+        listaIdPollsAnswer.add(	"E-5-V:FT+X"	);
+        listaIdPollsAnswer.add(	"4,JPU;8A3C"	);
+        listaIdPollsAnswer.add(	"O@Q-LK/M86"	);
+        listaIdPollsAnswer.add(	"N3R:X#KGOD"	);
+        listaIdPollsAnswer.add(	"L(VXFCGSO:"	);
+        listaIdPollsAnswer.add(	"+,U<0$JS9S"	);
+        listaIdPollsAnswer.add(	"8GCO/W(VHU"	);
+        listaIdPollsAnswer.add(	"64J%@:>=P."	);
+        listaIdPollsAnswer.add(	"B,VS.K=D%?"	);
+        listaIdPollsAnswer.add(	"SCI2LCI<X<"	);
+        listaIdPollsAnswer.add(	"#5$Q-@5X>P"	);
+        listaIdPollsAnswer.add(	"60JD/035YD"	);
+        listaIdPollsAnswer.add(	"C3X2:G9;WU"	);
+        listaIdPollsAnswer.add(	"N5D>JPPJ-:"	);
+        listaIdPollsAnswer.add(	"E@GOUFO3,)"	);
+        listaIdPollsAnswer.add(	"9ED5BM#&(T"	);
+        listaIdPollsAnswer.add(	"I$+I;A$,*G"	);
+        listaIdPollsAnswer.add(	"89R<1YUFZ1"	);
+        listaIdPollsAnswer.add(	"%9KA/5A4CP"	);
+        listaIdPollsAnswer.add(	"CP29K.>R-:"	);
+        listaIdPollsAnswer.add(	"*)7?6F8DVJ"	);
+        listaIdPollsAnswer.add(	"NY%+8FSDEG"	);
+        listaIdPollsAnswer.add(	"'#OKR2P25D"	);
+        listaIdPollsAnswer.add(	".XDLWEQCE3"	);
+        listaIdPollsAnswer.add(	"7YGB*,=H<&"	);
+        listaIdPollsAnswer.add(	"2/FVOJFP$R"	);
+        listaIdPollsAnswer.add(	".1/>U*R@GP"	);
+        listaIdPollsAnswer.add(	"6=S9SBAY3@"	);
+        listaIdPollsAnswer.add(	"'80J@N'LL'"	);
+        listaIdPollsAnswer.add(	"DGY:OD$=FV"	);
+        listaIdPollsAnswer.add(	"9L'E:8V:,<"	);
+        listaIdPollsAnswer.add(	"Q8P=2#MC$N"	);
+        listaIdPollsAnswer.add(	"Y4><3PN%@S"	);
+        listaIdPollsAnswer.add(	"PZTT$U&AB6"	);
+        listaIdPollsAnswer.add(	"B%1V+4NDS;"	);
+        listaIdPollsAnswer.add(	"N0L-$I5=@5"	);
+        listaIdPollsAnswer.add(	"BVG4,U?D+8"	);
+        listaIdPollsAnswer.add(	"KW6>,5,JZ,"	);
+        listaIdPollsAnswer.add(	"B2>Y??<5<W"	);
+        listaIdPollsAnswer.add(	"%%+$4$WB?R"	);
+        listaIdPollsAnswer.add(	"M:VIN?J),>"	);
+        listaIdPollsAnswer.add(	"K1C%TA+(VI"	);
+        listaIdPollsAnswer.add(	"U4*,PC3/P7"	);
+        listaIdPollsAnswer.add(	":*$@ATQI:V"	);
+        listaIdPollsAnswer.add(	"('BH.%)':O"	);
+        listaIdPollsAnswer.add(	"PI&$RYZUAP"	);
+        listaIdPollsAnswer.add(	"A'Z#XLAX31"	);
+        listaIdPollsAnswer.add(	"<@#I&-WEQ*"	);
+        listaIdPollsAnswer.add(	"/K<1NBEZ96"	);
+        listaIdPollsAnswer.add(	"G#)-;9Q#9X"	);
+        listaIdPollsAnswer.add(	"8ZV8QC&DBE"	);
+        listaIdPollsAnswer.add(	")KL=@,WHGB"	);
+        listaIdPollsAnswer.add(	"4GWGG;TPJN"	);
+        listaIdPollsAnswer.add(	"00$CGB8UT:"	);
+        listaIdPollsAnswer.add(	"N@Q.Y;X?E>"	);
+        listaIdPollsAnswer.add(	"%?Z+L*52;D"	);
+        listaIdPollsAnswer.add(	"QCR:7.CH#."	);
+        listaIdPollsAnswer.add(	"?XONG*)<2:"	);
+        listaIdPollsAnswer.add(	",=;N=O0PB$"	);
+        listaIdPollsAnswer.add(	">$NVI;Z*1-"	);
+        listaIdPollsAnswer.add(	"F5=/X4Y?##"	);
+        listaIdPollsAnswer.add(	"GC)Y)R4,(;"	);
+        listaIdPollsAnswer.add(	"#B1OHOR-TW"	);
+        listaIdPollsAnswer.add(	"L)N9>NLJ00"	);
+        listaIdPollsAnswer.add(	"UV59T*Z#X&"	);
+        listaIdPollsAnswer.add(	"?7%M>ELT,1"	);
+        listaIdPollsAnswer.add(	",)8EWSA4(K"	);
+        listaIdPollsAnswer.add(	"?FI1RU#C14"	);
+        listaIdPollsAnswer.add(	"DU+9L9F+=N"	);
+        listaIdPollsAnswer.add(	"HZ33'//TD;"	);
+        listaIdPollsAnswer.add(	"@S8-SF(6X*"	);
+        listaIdPollsAnswer.add(	"2VY2;<E&N%"	);
+        listaIdPollsAnswer.add(	"9Z0K.:Y&IH"	);
+        listaIdPollsAnswer.add(	"W&JZ>0;F8@"	);
+        listaIdPollsAnswer.add(	"@4N;UE%W0-"	);
+        listaIdPollsAnswer.add(	"%O#I<%=9RM"	);
+        listaIdPollsAnswer.add(	"CF@@C)RLQ%"	);
+        listaIdPollsAnswer.add(	"F%%--/3:#M"	);
+        listaIdPollsAnswer.add(	"(R0YC@P4=("	);
+        listaIdPollsAnswer.add(	"E$@4&M+$O2"	);
+        listaIdPollsAnswer.add(	"+1<U(:D<3;"	);
+        listaIdPollsAnswer.add(	"7$CC:)XA1L"	);
+        listaIdPollsAnswer.add(	"EZ-N.?.)P8"	);
+        listaIdPollsAnswer.add(	"Y),B?I>@T,"	);
+        listaIdPollsAnswer.add(	"?<X>T/FEY0"	);
+        listaIdPollsAnswer.add(	"@I&EYGD#'8"	);
+        listaIdPollsAnswer.add(	"$,#G'6-U7H"	);
+        listaIdPollsAnswer.add(	"OT;VB?XV5&"	);
+        listaIdPollsAnswer.add(	"Q(PU5##3F$"	);
+        listaIdPollsAnswer.add(	"8>GD#-K6MZ"	);
+        listaIdPollsAnswer.add(	">7TQX4<:5S"	);
+        listaIdPollsAnswer.add(	"COE;EX/:L>"	);
+        listaIdPollsAnswer.add(	"GBIH9MPOV-"	);
+        listaIdPollsAnswer.add(	"D)=&NVEJR="	);
+        listaIdPollsAnswer.add(	"63?V1OF=ZT"	);
+        listaIdPollsAnswer.add(	"X;>C.RW1M9"	);
+        listaIdPollsAnswer.add(	"LD=18QR<V;"	);
+
+        return listaIdPollsAnswer;
+    }
+}
+
+/** Clase almacenar listas para Answer PSYCHOSOCIAL **/
+class ListasPsychosocial {
+    public List<String> listaPollParaPsychosocial(){
+        List<String> listaSoloIdPoll = new ArrayList<>();
+        listaSoloIdPoll.add(">,U80A6;,S");
+        listaSoloIdPoll.add("?=C72EJQ2%");
+        listaSoloIdPoll.add("%=K+S?O16X");
+        listaSoloIdPoll.add("<X71=BWSXD");
+        listaSoloIdPoll.add("B);C08-$@R");
+        listaSoloIdPoll.add("H1:GC*E$(B");
+        listaSoloIdPoll.add("6IN3Y8NPB3");
+        listaSoloIdPoll.add(")3EZUKVK3A");
+        listaSoloIdPoll.add("4>LZ0PX.Z0");
+        listaSoloIdPoll.add("0/R@W4'B/)");
+        listaSoloIdPoll.add("/N5:C:$8$N");
+        listaSoloIdPoll.add("MGAC2N#QJ<");
+        listaSoloIdPoll.add("'<L)2,JKZ7");
+        listaSoloIdPoll.add("RV1&M'8$5F");
+        listaSoloIdPoll.add("*RE4Z3=IE-");
+        listaSoloIdPoll.add("@K92<:JMYN");
+        listaSoloIdPoll.add("C8V<Q03K%N");
+        listaSoloIdPoll.add("/KHC6D=))F");
+        listaSoloIdPoll.add("NZ,3<C>COI");
+        listaSoloIdPoll.add("B6@Z*G:4LR");
+        listaSoloIdPoll.add("9F:-%PZ/@#");
+        listaSoloIdPoll.add("R#*6$N%VK8");
+        listaSoloIdPoll.add(">)'0*0PS'4");
+        listaSoloIdPoll.add(">0CYVS=6#E");
+        listaSoloIdPoll.add("3R>3L9OZ;;");
+        listaSoloIdPoll.add("SR'M4O1?',");
+        listaSoloIdPoll.add("9,Z-:OI#XN");
+        listaSoloIdPoll.add("#QC,LD0-I=");
+        listaSoloIdPoll.add("+>X#UK?,3Y");
+        listaSoloIdPoll.add("/8(U2.H&$<");
+        listaSoloIdPoll.add("52W90NXK;H");
+        listaSoloIdPoll.add("HMOL(9R9$#");
+        listaSoloIdPoll.add("IPBBJ?P/IO");
+        listaSoloIdPoll.add("VX694Q/MU1");
+        listaSoloIdPoll.add("-#TLL)$6(@");
+        listaSoloIdPoll.add("IF?;8=ETNI");
+        listaSoloIdPoll.add("%3,'?//5IW");
+        listaSoloIdPoll.add("GYF)UMK;:K");
+        listaSoloIdPoll.add("#K,2'9-EZ,");
+        listaSoloIdPoll.add("?F%5BSW#+'");
+        listaSoloIdPoll.add("0P&$.8YQ<F");
+        listaSoloIdPoll.add("Z'TB$/4,:D");
+        listaSoloIdPoll.add("R4<TQYFE8T");
+        listaSoloIdPoll.add("0E<7T:=IOM");
+        listaSoloIdPoll.add("13>/+*WX8C");
+        listaSoloIdPoll.add(">JP*>C/?S@");
+        listaSoloIdPoll.add("AZ.V)8'OIL");
+        listaSoloIdPoll.add("9V;N'GHQC>");
+        listaSoloIdPoll.add("U;E9(<$Q*=");
+        listaSoloIdPoll.add("Y96BK=XVB+");
+        listaSoloIdPoll.add("ENHO+9Q>;C");
+        listaSoloIdPoll.add("C4@=W(-@VQ");
+        listaSoloIdPoll.add("T$?F2PF7&F");
+        listaSoloIdPoll.add("ZP;UM,,@SZ");
+        listaSoloIdPoll.add("-)&$8/0@L:");
+        listaSoloIdPoll.add("=M)(;(:<'/");
+        listaSoloIdPoll.add("?;?BFI&>;Q");
+        listaSoloIdPoll.add("S#FV7BD.DC");
+        listaSoloIdPoll.add("57NAEW,ZX-");
+        listaSoloIdPoll.add("&8I++@UXZI");
+        listaSoloIdPoll.add("GNM@82C60F");
+        listaSoloIdPoll.add("@<M*8/@;CM");
+        listaSoloIdPoll.add("TU7<74@#88");
+        listaSoloIdPoll.add("#:,<GLYW%1");
+        listaSoloIdPoll.add("T0R/NQ196=");
+        listaSoloIdPoll.add("0'OHG((H#)");
+        listaSoloIdPoll.add("*3?4)81CSV");
+        listaSoloIdPoll.add("M#B8II8&-M");
+        listaSoloIdPoll.add("4)SCZ*'RX1");
+        listaSoloIdPoll.add("++'=%3OP%W");
+        listaSoloIdPoll.add("@1LQUD%),V");
+        listaSoloIdPoll.add("+KKZGP'IEK");
+        listaSoloIdPoll.add("Y#/Q'3L$#W");
+        listaSoloIdPoll.add(",EMUZ26@$T");
+        listaSoloIdPoll.add(";$NHXZ)37>");
+        listaSoloIdPoll.add("$0#PKR.U6L");
+        listaSoloIdPoll.add(":NJA'9EVCR");
+        listaSoloIdPoll.add("5$(JTJ$I0M");
+        listaSoloIdPoll.add("68<*75OI'$");
+        listaSoloIdPoll.add("J8?F(00XI)");
+        listaSoloIdPoll.add("2X(Z@<2$9C");
+        listaSoloIdPoll.add("X%E=SK*?*I");
+        listaSoloIdPoll.add("A@N2=4ZUFO");
+        listaSoloIdPoll.add("Y.I%-,IRRF");
+        listaSoloIdPoll.add("YMYD8K0P5+");
+        listaSoloIdPoll.add("CD'&K6QR7(");
+        listaSoloIdPoll.add("G>3(9&%DU-");
+        listaSoloIdPoll.add("-FK9R?-?@M");
+        listaSoloIdPoll.add("M$V01&$?F.");
+        listaSoloIdPoll.add("L$C$,I#@1#");
+        listaSoloIdPoll.add("$QD:&DX@L&");
+        listaSoloIdPoll.add("R7W<NE6OR-");
+        listaSoloIdPoll.add("@&G6K5+@#D");
+        listaSoloIdPoll.add("UE'6F'+UJ6");
+        listaSoloIdPoll.add("G(NP.,W?0,");
+        listaSoloIdPoll.add("Z)BDEZWL#4");
+        listaSoloIdPoll.add("5LY=CTJ-=H");
+        listaSoloIdPoll.add("CCBZ&K.Q%;");
+        listaSoloIdPoll.add("L9M7SLC>HY");
+        listaSoloIdPoll.add("+K'G=<V,0D");
+        listaSoloIdPoll.add("IC3#&/R,<(");
+        listaSoloIdPoll.add("UMP7#B)4HW");
+        listaSoloIdPoll.add("FNS.%/,EF4");
+        listaSoloIdPoll.add("NV#C9LJI+/");
+        listaSoloIdPoll.add("(GQ=ZD)DO*");
+        listaSoloIdPoll.add("W95<$>8UZ3");
+        listaSoloIdPoll.add("IC/%EC))K'");
+        listaSoloIdPoll.add("0X7Q9LXA#P");
+        listaSoloIdPoll.add("LA9B?X)A:W");
+        listaSoloIdPoll.add("UZ2&X(7;O3");
+        listaSoloIdPoll.add("0E(VA/=6($");
+        listaSoloIdPoll.add("R6$,2/F>M<");
+        listaSoloIdPoll.add("6?'GBY$(2O");
+        listaSoloIdPoll.add("'S<9'IL$:'");
+        listaSoloIdPoll.add("0MUJWX9D/3");
+        listaSoloIdPoll.add("7Q36S1I&?.");
+        listaSoloIdPoll.add("IZZMO5O'GN");
+        listaSoloIdPoll.add("<R/-Y.OVKB");
+        listaSoloIdPoll.add("DE+4AIK8BS");
+        listaSoloIdPoll.add("R*TY/:TX38");
+        listaSoloIdPoll.add("*.*SC?-N.T");
+        listaSoloIdPoll.add("*D1,Z*F?N+");
+        listaSoloIdPoll.add(":I@L8B-NR1");
+        listaSoloIdPoll.add("VO@?K*0FL*");
+        listaSoloIdPoll.add("U>>YW'85ZR");
+        listaSoloIdPoll.add("KF<M4$R0+>");
+        listaSoloIdPoll.add("/1(?YY@$I?");
+        listaSoloIdPoll.add("+WLG'V1L3S");
+        listaSoloIdPoll.add("KLAMFV&MAF");
+        listaSoloIdPoll.add("<OB+9LN9'Q");
+        listaSoloIdPoll.add("DMUUV/$&>W");
+        listaSoloIdPoll.add("TOG$CYMC,$");
+        listaSoloIdPoll.add("-QGP3=IPRM");
+        listaSoloIdPoll.add("XF5MF?S&,2");
+        listaSoloIdPoll.add("R#,9JG35*;");
+        listaSoloIdPoll.add("XV*AC=ATW#");
+        listaSoloIdPoll.add("WT:KAZ;45#");
+        listaSoloIdPoll.add(")DG-#784$C");
+        listaSoloIdPoll.add("0TSZ,FI''8");
+        listaSoloIdPoll.add("-)LG,G5NI6");
+        listaSoloIdPoll.add("B6D#N7@(R9");
+        listaSoloIdPoll.add("4%HDNV?G'0");
+        listaSoloIdPoll.add("69V?/8I7)#");
+        listaSoloIdPoll.add(".T9K-COPR7");
+        listaSoloIdPoll.add("XZ&(@'&0YV");
+        listaSoloIdPoll.add("E/41OR>6YR");
+        listaSoloIdPoll.add("#.'.D@#HOX");
+        listaSoloIdPoll.add("W=T%CHJ8%B");
+        listaSoloIdPoll.add(":D&74FCVEE");
+        listaSoloIdPoll.add("0'+E(VY2=0");
+        listaSoloIdPoll.add("*3L.7,3G#>");
+        listaSoloIdPoll.add(".FU/%(?$BA");
+        listaSoloIdPoll.add("<42Z*JU0M<");
+        listaSoloIdPoll.add(">NK(W.Y?4Y");
+        listaSoloIdPoll.add("3BV$N'X4CE");
+        listaSoloIdPoll.add(";1<#N5B$J/");
+        listaSoloIdPoll.add("#QGW;UAH.*");
+        listaSoloIdPoll.add("<6ZKJ1?@1B");
+        listaSoloIdPoll.add("BLDJKQ@S'E");
+        listaSoloIdPoll.add("6N=UE90WBO");
+        listaSoloIdPoll.add("OV.C*79:9S");
+        listaSoloIdPoll.add("4S*&>ZDU8(");
+        listaSoloIdPoll.add("5@8B(974--");
+        listaSoloIdPoll.add(":T7*//R&FG");
+        listaSoloIdPoll.add("*+>9#F$U-F");
+        listaSoloIdPoll.add(">7?TV@D/9W");
+        listaSoloIdPoll.add("AR(07-7JUK");
+        listaSoloIdPoll.add("A<.5>Z(;9-");
+        listaSoloIdPoll.add("/I$68X$PK?");
+        listaSoloIdPoll.add("'CY@LS(+1>");
+        listaSoloIdPoll.add("J=<#85UMF-");
+        listaSoloIdPoll.add("4S-:?9NB08");
+        listaSoloIdPoll.add("Y#L;GCHYIL");
+        listaSoloIdPoll.add("I7+8?PG%XZ");
+        listaSoloIdPoll.add("B/5@,'5>EZ");
+        listaSoloIdPoll.add("#44%C(:4S=");
+        listaSoloIdPoll.add("LC?4>(P<(K");
+        listaSoloIdPoll.add("7*(4*5Z&B*");
+        listaSoloIdPoll.add(";HY9ZHS)8H");
+        listaSoloIdPoll.add("@AZAIJ46)Y");
+        listaSoloIdPoll.add("G)H5.5CXAY");
+        listaSoloIdPoll.add("EJ%T/F%+-H");
+        listaSoloIdPoll.add("J%3OZ96FR)");
+        listaSoloIdPoll.add("O&<-)/O/69");
+        listaSoloIdPoll.add("'8FO+(RSMW");
+        listaSoloIdPoll.add("/:Q-18#7N;");
+        listaSoloIdPoll.add("FE4RL'*N.)");
+        listaSoloIdPoll.add("87&PYC5U;W");
+        listaSoloIdPoll.add("%1.DAJP:$P");
+        listaSoloIdPoll.add("6=F=9M.7LU");
+        listaSoloIdPoll.add("F4&*>=5L04");
+        listaSoloIdPoll.add("I;TL?DK8+9");
+        listaSoloIdPoll.add("P;U7574B/4");
+        listaSoloIdPoll.add("YI&(QNI6$U");
+        listaSoloIdPoll.add("0W?D@YNZGI");
+        listaSoloIdPoll.add("EA03J=86O6");
+        listaSoloIdPoll.add("5T@)TC?LFE");
+        listaSoloIdPoll.add("A'X<K#>RKM");
+        listaSoloIdPoll.add("O?HI4FACU%");
+        listaSoloIdPoll.add("C-$/X319@E");
+        listaSoloIdPoll.add("TDPIZ.I>S.");
+        listaSoloIdPoll.add("L7..*X52RQ");
+        listaSoloIdPoll.add("K<M-O4(N.)");
+        listaSoloIdPoll.add("5E1I8&<-6G");
+        listaSoloIdPoll.add("#@Q*+6FTIZ");
+        listaSoloIdPoll.add("+D0S9FT/'W");
+        listaSoloIdPoll.add("3%FJAOJR/D");
+        listaSoloIdPoll.add("=+XH8+D60E");
+        listaSoloIdPoll.add(")C5B/+4HR$");
+        listaSoloIdPoll.add("N;#)I&G7C$");
+        listaSoloIdPoll.add("4.4@<RV+V>");
+        listaSoloIdPoll.add("-'.MN/7@=D");
+        listaSoloIdPoll.add(".0.RH@ML&X");
+        listaSoloIdPoll.add("6,E#)>VKMF");
+        listaSoloIdPoll.add("++CMS9=#6.");
+        listaSoloIdPoll.add("S?8,WJV'*V");
+        listaSoloIdPoll.add("BFG<W@D5;B");
+        listaSoloIdPoll.add("5*JAQ./W>6");
+        listaSoloIdPoll.add("O($-KOOURE");
+        listaSoloIdPoll.add("<BBM@4S*4@");
+        listaSoloIdPoll.add("FF1QMT<>T+");
+        listaSoloIdPoll.add("(AYCK,UTB?");
+        listaSoloIdPoll.add(":YO;IN6JQN");
+        listaSoloIdPoll.add(".SZSI<4I.:");
+        listaSoloIdPoll.add("OP-F35V,.+");
+        listaSoloIdPoll.add("11?<=6&VAI");
+        listaSoloIdPoll.add("P/78O(X8S1");
+        listaSoloIdPoll.add("J'8*>Q>8)-");
+        listaSoloIdPoll.add("9?.KYP&;*=");
+        listaSoloIdPoll.add(">X.%++O)A&");
+        listaSoloIdPoll.add("YF24@FWQZ/");
+        listaSoloIdPoll.add("#74'XN*:NU");
+        listaSoloIdPoll.add("ULYMJ69U-@");
+        listaSoloIdPoll.add("T4X@;U1%>M");
+        listaSoloIdPoll.add("G3VC&)&ZQZ");
+        listaSoloIdPoll.add("1?LR<#P1XJ");
+        listaSoloIdPoll.add("O9@BQ8FMZK");
+        listaSoloIdPoll.add("E0YYEH)(TC");
+        listaSoloIdPoll.add(")NY#/;75+7");
+        listaSoloIdPoll.add("C@OHG2>X0$");
+        listaSoloIdPoll.add("5OI?66.06&");
+        listaSoloIdPoll.add("NQ@WWUKW0Y");
+        listaSoloIdPoll.add("TC6S55KX0-");
+        listaSoloIdPoll.add("7=#/(A@-BM");
+        listaSoloIdPoll.add("$6EG;5>ZLX");
+        listaSoloIdPoll.add(",VPQGYO0'@");
+        listaSoloIdPoll.add("Q5UDY''G9R");
+        listaSoloIdPoll.add("7V*$)ED#<=");
+        listaSoloIdPoll.add("EJSR#R;,EG");
+        listaSoloIdPoll.add("$AIE8Y7IV&");
+        listaSoloIdPoll.add("9K(-7;MIUL");
+        listaSoloIdPoll.add("@SFT.Z-.L(");
+        listaSoloIdPoll.add("6GHO/*26J)");
+        listaSoloIdPoll.add("QWQ3?8ID6K");
+        listaSoloIdPoll.add("3NO)V1(>U(");
+        listaSoloIdPoll.add("CM,)IJMPHF");
+        listaSoloIdPoll.add("M;*:U'M#2G");
+        listaSoloIdPoll.add("3N4&(/.4SV");
+        listaSoloIdPoll.add("'*+I7P&V)'");
+        listaSoloIdPoll.add("D=2=S=1I-D");
+        listaSoloIdPoll.add("7*=FCAFRP0");
+        listaSoloIdPoll.add("DY.4N.3=#*");
+        listaSoloIdPoll.add("(/IF#B)HL2");
+        listaSoloIdPoll.add("@L3HRL;JZ2");
+        listaSoloIdPoll.add("S)SMBGV0SS");
+        listaSoloIdPoll.add("%=PNOEFA0(");
+        listaSoloIdPoll.add("2+%PFCG;V5");
+        listaSoloIdPoll.add("9/PV@FA#QU");
+        listaSoloIdPoll.add(":D(7*M36KB");
+        listaSoloIdPoll.add(";2$Y.3;OR:");
+        listaSoloIdPoll.add("WU&CW@O=WP");
+        listaSoloIdPoll.add("G@:+=&?4>4");
+        listaSoloIdPoll.add("@-N*V&CVMJ");
+        listaSoloIdPoll.add(".=?8A<T/2H");
+        listaSoloIdPoll.add("CI5'%5?*%$");
+        listaSoloIdPoll.add("1:IWS'J:HR");
+        listaSoloIdPoll.add("4B@T2LZ>54");
+        listaSoloIdPoll.add("'V<J&JTU+R");
+        listaSoloIdPoll.add("(HQJTUZL+Z");
+        listaSoloIdPoll.add("%&IB,W7O+C");
+        listaSoloIdPoll.add("X2SOE@U>BS");
+        listaSoloIdPoll.add("NQKW%@K2%,");
+        listaSoloIdPoll.add("9S$HV:(W3?");
+        listaSoloIdPoll.add("+N/B#>5Z-1");
+        listaSoloIdPoll.add("J+P-WC>B%P");
+        listaSoloIdPoll.add("G4S1F5@>OH");
+        listaSoloIdPoll.add("PM/R&9'G4T");
+        listaSoloIdPoll.add("-5WON$P:3>");
+        listaSoloIdPoll.add("WR/ZV9*0@Z");
+        listaSoloIdPoll.add("YJ.7OT*-XD");
+        listaSoloIdPoll.add("OJCV*AJ+<0");
+        listaSoloIdPoll.add("81+.D?<;;9");
+        listaSoloIdPoll.add(";G#?X96VL@");
+        listaSoloIdPoll.add("2-CY:3+19;");
+        listaSoloIdPoll.add("5W;,AH?#SO");
+        listaSoloIdPoll.add("01W)IS*3$>");
+        listaSoloIdPoll.add("BU2YM938K,");
+        listaSoloIdPoll.add("T$0XRP&D+'");
+        listaSoloIdPoll.add("NFX2EHMSXQ");
+        listaSoloIdPoll.add("P9(>Q?.3UY");
+        listaSoloIdPoll.add("2*NWM,%,KM");
+        listaSoloIdPoll.add("LJ*7VFMEB&");
+        listaSoloIdPoll.add("-N0X,FKMWC");
+        listaSoloIdPoll.add("R39UZGDXF<");
+        listaSoloIdPoll.add("5WUQBGPSI.");
+        listaSoloIdPoll.add("O.VK46TR7H");
+        listaSoloIdPoll.add("#XN2O-$5VM");
+        listaSoloIdPoll.add("&;&T(AS&-0");
+        listaSoloIdPoll.add("ACA?+8BO'*");
+        listaSoloIdPoll.add("9@K+S&>$6Z");
+        listaSoloIdPoll.add("E$-7M&J78?");
+        listaSoloIdPoll.add(":N)0@J9X/1");
+        listaSoloIdPoll.add("P-Z%O2;SM-");
+        listaSoloIdPoll.add("54.M0&0T3Q");
+        listaSoloIdPoll.add("HUDH(/K8C'");
+        listaSoloIdPoll.add("F3)2;WV)J.");
+        listaSoloIdPoll.add("0X1?2&E(RU");
+        listaSoloIdPoll.add("O7B<MWGW1(");
+        listaSoloIdPoll.add("$S*KIA3OL<");
+        listaSoloIdPoll.add("%1BHI*9I/)");
+        listaSoloIdPoll.add("GI$28/?5#2");
+        listaSoloIdPoll.add("OPD'VXF##-");
+        listaSoloIdPoll.add("AA-Y,>#PJC");
+        listaSoloIdPoll.add("=OG4@/=DZ1");
+        listaSoloIdPoll.add("E?<3WY=I24");
+        listaSoloIdPoll.add("6DIKEYF2I=");
+        listaSoloIdPoll.add("F%8T,$%VO%");
+        listaSoloIdPoll.add(":K1G*(H*4X");
+        listaSoloIdPoll.add("UPUXUY/LLT");
+        listaSoloIdPoll.add("&=&Q(3Z:B'");
+        listaSoloIdPoll.add(":-M-6?LTS.");
+        listaSoloIdPoll.add("K'*)@;I959");
+        listaSoloIdPoll.add("+7.9L;<T'6");
+        listaSoloIdPoll.add("Z2,B93:XB&");
+        listaSoloIdPoll.add("<Q?R1)T3.C");
+        listaSoloIdPoll.add("OS=.&JXXU%");
+        listaSoloIdPoll.add("<6YUMRV;D$");
+        listaSoloIdPoll.add(",.LLH1).;X");
+        listaSoloIdPoll.add("%;B+UI+FI@");
+        listaSoloIdPoll.add(",<E=EZJ<G(");
+        listaSoloIdPoll.add("8S)O3V13LS");
+        listaSoloIdPoll.add("<UZCS9-D=P");
+        listaSoloIdPoll.add("-DO/L$'+:I");
+        listaSoloIdPoll.add("T5CW0&.-)S");
+        listaSoloIdPoll.add("=JCNNI9F1(");
+        listaSoloIdPoll.add("5.&*AF.R=<");
+        listaSoloIdPoll.add("BD#WL2=4ZN");
+        listaSoloIdPoll.add("9)K:6HWX%O");
+        listaSoloIdPoll.add(")J,=52W?=3");
+        listaSoloIdPoll.add("WL*T6,9SZ9");
+        listaSoloIdPoll.add(">ZRLW=O%T8");
+        listaSoloIdPoll.add("L<@LU7D1@X");
+        listaSoloIdPoll.add("'.V%Q+M=Z)");
+        listaSoloIdPoll.add("KE,06/F<J;");
+        listaSoloIdPoll.add("A0'AZZY:(@");
+        listaSoloIdPoll.add("=7E<%Z'A1:");
+        listaSoloIdPoll.add("E8AG4;Y(KP");
+        listaSoloIdPoll.add("BE6G?Z<$(6");
+        listaSoloIdPoll.add("-A;?E94FF2");
+        listaSoloIdPoll.add("58>+JZ5D=$");
+        listaSoloIdPoll.add("DKKG,I,(6P");
+        listaSoloIdPoll.add("4R/F7+>$'B");
+        listaSoloIdPoll.add("+R4@*2(4WD");
+        listaSoloIdPoll.add(">(R)MBK/UQ");
+        listaSoloIdPoll.add("%Y=R+O8N#0");
+        listaSoloIdPoll.add("TBG=V)'C2>");
+        listaSoloIdPoll.add("KDT0?LP>7?");
+        listaSoloIdPoll.add("K3DW6(&&8V");
+        listaSoloIdPoll.add("J.@C&IQ540");
+        listaSoloIdPoll.add("1%V#OJEPL#");
+        listaSoloIdPoll.add("D:2NG#.-MM");
+        listaSoloIdPoll.add(":RYCAHA'T*");
+        listaSoloIdPoll.add(".$7+'S2W'0");
+        listaSoloIdPoll.add("A9-T3D0?Q)");
+        listaSoloIdPoll.add("$MOZ9COBIM");
+        listaSoloIdPoll.add("6=O3;6'(WI");
+        listaSoloIdPoll.add("29LLCO/L?I");
+        listaSoloIdPoll.add("F/)X:WSU@N");
+        listaSoloIdPoll.add("2SMHF*36<%");
+        listaSoloIdPoll.add("ZBK&%,(>+B");
+        listaSoloIdPoll.add("%*GAU&T9D)");
+        listaSoloIdPoll.add("66H>QQ>X/-");
+        listaSoloIdPoll.add("Y;:Q<I'901");
+        listaSoloIdPoll.add("@T.5)U>B(&");
+        listaSoloIdPoll.add("#FNKYD07X4");
+        listaSoloIdPoll.add("2R9BMX;)B'");
+        listaSoloIdPoll.add("*Y@@L')YO4");
+        listaSoloIdPoll.add("%-SMBHWL95");
+        listaSoloIdPoll.add("/XWXBCECA=");
+        listaSoloIdPoll.add("67T2Q9S'*+");
+        listaSoloIdPoll.add("8/9FJ'3H?N");
+        listaSoloIdPoll.add("QD9%S<I<-3");
+        listaSoloIdPoll.add("4O4(BJ'O;D");
+        listaSoloIdPoll.add("*6CZCE0?=&");
+        listaSoloIdPoll.add("@)R1*>7S?/");
+        listaSoloIdPoll.add(")9LNF9,#7U");
+        listaSoloIdPoll.add("UV$/>(BP0O");
+        listaSoloIdPoll.add("0D#P@?QO,G");
+        listaSoloIdPoll.add("**/$-Z#4*;");
+        listaSoloIdPoll.add("E-5-V:FT+X");
+        listaSoloIdPoll.add("4,JPU;8A3C");
+        listaSoloIdPoll.add("O@Q-LK/M86");
+        listaSoloIdPoll.add("N3R:X#KGOD");
+        listaSoloIdPoll.add("L(VXFCGSO:");
+        listaSoloIdPoll.add("+,U<0$JS9S");
+        listaSoloIdPoll.add("8GCO/W(VHU");
+        listaSoloIdPoll.add("64J%@:>=P.");
+        listaSoloIdPoll.add("B,VS.K=D%?");
+        listaSoloIdPoll.add("SCI2LCI<X<");
+        listaSoloIdPoll.add("#5$Q-@5X>P");
+        listaSoloIdPoll.add("60JD/035YD");
+        listaSoloIdPoll.add("C3X2:G9;WU");
+        listaSoloIdPoll.add("N5D>JPPJ-:");
+        listaSoloIdPoll.add("E@GOUFO3,)");
+        listaSoloIdPoll.add("9ED5BM#&(T");
+        listaSoloIdPoll.add("I$+I;A$,*G");
+        listaSoloIdPoll.add("89R<1YUFZ1");
+        listaSoloIdPoll.add("%9KA/5A4CP");
+        listaSoloIdPoll.add("CP29K.>R-:");
+        listaSoloIdPoll.add("*)7?6F8DVJ");
+        listaSoloIdPoll.add("NY%+8FSDEG");
+        listaSoloIdPoll.add("'#OKR2P25D");
+        listaSoloIdPoll.add(".XDLWEQCE3");
+        listaSoloIdPoll.add("7YGB*,=H<&");
+        listaSoloIdPoll.add("2/FVOJFP$R");
+        listaSoloIdPoll.add(".1/>U*R@GP");
+        listaSoloIdPoll.add("6=S9SBAY3@");
+        listaSoloIdPoll.add("'80J@N'LL'");
+        listaSoloIdPoll.add("DGY:OD$=FV");
+        listaSoloIdPoll.add("9L'E:8V:,<");
+        listaSoloIdPoll.add("Q8P=2#MC$N");
+        listaSoloIdPoll.add("Y4><3PN%@S");
+        listaSoloIdPoll.add("PZTT$U&AB6");
+        listaSoloIdPoll.add("B%1V+4NDS;");
+        listaSoloIdPoll.add("N0L-$I5=@5");
+        listaSoloIdPoll.add("BVG4,U?D+8");
+        listaSoloIdPoll.add("KW6>,5,JZ,");
+        listaSoloIdPoll.add("B2>Y??<5<W");
+        listaSoloIdPoll.add("%%+$4$WB?R");
+        listaSoloIdPoll.add("K1C%TA+(VI");
+        listaSoloIdPoll.add("U4*,PC3/P7");
+        listaSoloIdPoll.add(":*$@ATQI:V");
+        listaSoloIdPoll.add("('BH.%)':O");
+        listaSoloIdPoll.add("A'Z#XLAX31");
+        listaSoloIdPoll.add("<@#I&-WEQ*");
+        listaSoloIdPoll.add("N@Q.Y;X?E>");
+        listaSoloIdPoll.add("%?Z+L*52;D");
+        listaSoloIdPoll.add(",=;N=O0PB$");
+        listaSoloIdPoll.add("#B1OHOR-TW");
+        listaSoloIdPoll.add("L)N9>NLJ00");
+        listaSoloIdPoll.add("UV59T*Z#X&");
+        listaSoloIdPoll.add("?7%M>ELT,1");
+        listaSoloIdPoll.add("?FI1RU#C14");
+        listaSoloIdPoll.add("DU+9L9F+=N");
+        listaSoloIdPoll.add("HZ33'//TD;");
+        listaSoloIdPoll.add("@S8-SF(6X*");
+        listaSoloIdPoll.add("2VY2;<E&N%");
+        listaSoloIdPoll.add("9Z0K.:Y&IH");
+        listaSoloIdPoll.add("W&JZ>0;F8@");
+        listaSoloIdPoll.add("@4N;UE%W0-");
+        listaSoloIdPoll.add("%O#I<%=9RM");
+        listaSoloIdPoll.add("CF@@C)RLQ%");
+        listaSoloIdPoll.add("F%%--/3:#M");
+        listaSoloIdPoll.add("(R0YC@P4=(");
+        listaSoloIdPoll.add("7$CC:)XA1L");
+        listaSoloIdPoll.add("EZ-N.?.)P8");
+        listaSoloIdPoll.add("Y),B?I>@T,");
+        listaSoloIdPoll.add("?<X>T/FEY0");
+        listaSoloIdPoll.add("@I&EYGD#'8");
+        listaSoloIdPoll.add("$,#G'6-U7H");
+        listaSoloIdPoll.add("OT;VB?XV5&");
+        listaSoloIdPoll.add("Q(PU5##3F$");
+        listaSoloIdPoll.add("8>GD#-K6MZ");
+        listaSoloIdPoll.add(">7TQX4<:5S");
+        listaSoloIdPoll.add("COE;EX/:L>");
+        listaSoloIdPoll.add("GBIH9MPOV-");
+        listaSoloIdPoll.add("D)=&NVEJR=");
+        listaSoloIdPoll.add("63?V1OF=ZT");
+        listaSoloIdPoll.add("X;>C.RW1M9");
+        listaSoloIdPoll.add("LD=18QR<V;");
+
+        return listaSoloIdPoll;
+    }
+
+}
+
+/** Clase para gestionr los DUPLICADOS tanto de idPOLLS como de Cedulas **/
+class GestionDuplicados{
+
+    //Método para duplicados de IdPoll
+    public List<String> metDuplicadosIdPolls(){
+        List<String> listaPolls = new ArrayList<>();
+
+        return listaPolls;
+    }
+
+    //Metodo para duplicados de cedulas
+    public List<String> metDuplicadosCedulas(){
+        List<String> listaPollsCedulas = new ArrayList<>();
+
+        listaPollsCedulas.add("1006879150");
+        listaPollsCedulas.add("1007209067");
+        listaPollsCedulas.add("1007419315");
+        listaPollsCedulas.add("1007616652");
+        listaPollsCedulas.add("1010095335");
+        listaPollsCedulas.add("1015444237");
+        listaPollsCedulas.add("1023872275");
+        listaPollsCedulas.add("1029604953");
+        listaPollsCedulas.add("1029623790");
+        listaPollsCedulas.add("10303634");
+        listaPollsCedulas.add("1033775294");
+        listaPollsCedulas.add("10389086");
+        listaPollsCedulas.add("10483221");
+        listaPollsCedulas.add("10490990");
+        listaPollsCedulas.add("10491525");
+        listaPollsCedulas.add("10495284");
+        listaPollsCedulas.add("10526180");
+        listaPollsCedulas.add("10534157");
+        listaPollsCedulas.add("10543877");
+        listaPollsCedulas.add("10551932");
+        listaPollsCedulas.add("1058932334");
+        listaPollsCedulas.add("1058935903");
+        listaPollsCedulas.add("10589661");
+        listaPollsCedulas.add("1058968238");
+        listaPollsCedulas.add("105897055");
+        listaPollsCedulas.add("1058971714");
+        listaPollsCedulas.add("1058974674");
+        listaPollsCedulas.add("1059047040");
+        listaPollsCedulas.add("1059166657");
+        listaPollsCedulas.add("1059236614");
+        listaPollsCedulas.add("1059240003");
+        listaPollsCedulas.add("105924392");
+        listaPollsCedulas.add("1059360213");
+        listaPollsCedulas.add("1059360859");
+        listaPollsCedulas.add("1059363862");
+        listaPollsCedulas.add("1059444666");
+        listaPollsCedulas.add("1059445432");
+        listaPollsCedulas.add("1059446402");
+        listaPollsCedulas.add("1059447061");
+        listaPollsCedulas.add("105944744");
+        listaPollsCedulas.add("1059449162");
+        listaPollsCedulas.add("1059449264");
+        listaPollsCedulas.add("1059595490");
+        listaPollsCedulas.add("1059597101");
+        listaPollsCedulas.add("1059599451");
+        listaPollsCedulas.add("1059601734");
+        listaPollsCedulas.add("1059601877");
+        listaPollsCedulas.add("1059602891");
+        listaPollsCedulas.add("1059602906");
+        listaPollsCedulas.add("1059604117");
+        listaPollsCedulas.add("1059604439");
+        listaPollsCedulas.add("1059605535");
+        listaPollsCedulas.add("1059843889");
+        listaPollsCedulas.add("1059844988");
+        listaPollsCedulas.add("1059845804");
+        listaPollsCedulas.add("105990072");
+        listaPollsCedulas.add("1059901421");
+        listaPollsCedulas.add("1059906299");
+        listaPollsCedulas.add("105990736");
+        listaPollsCedulas.add("1059912558");
+        listaPollsCedulas.add("105991265");
+        listaPollsCedulas.add("1059913053");
+        listaPollsCedulas.add("105993798");
+        listaPollsCedulas.add("1059986722");
+        listaPollsCedulas.add("1060207660");
+        listaPollsCedulas.add("1060208045");
+        listaPollsCedulas.add("1060208549");
+        listaPollsCedulas.add("1060236096");
+        listaPollsCedulas.add("1060336544");
+        listaPollsCedulas.add("1060363230");
+        listaPollsCedulas.add("1060386498");
+        listaPollsCedulas.add("1060467667");
+        listaPollsCedulas.add("1060879812");
+        listaPollsCedulas.add("1060988975");
+        listaPollsCedulas.add("106107740");
+        listaPollsCedulas.add("1061083377");
+        listaPollsCedulas.add("1061198580");
+        listaPollsCedulas.add("1061200886");
+        listaPollsCedulas.add("1061210416");
+        listaPollsCedulas.add("1061212148");
+        listaPollsCedulas.add("1061215187");
+        listaPollsCedulas.add("1061220985");
+        listaPollsCedulas.add("106122191");
+        listaPollsCedulas.add("1061222296");
+        listaPollsCedulas.add("1061431524");
+        listaPollsCedulas.add("1061432002");
+        listaPollsCedulas.add("1061432788");
+        listaPollsCedulas.add("1061434062");
+        listaPollsCedulas.add("10614341129");
+        listaPollsCedulas.add("1061434657");
+        listaPollsCedulas.add("1061434773");
+        listaPollsCedulas.add("1061436319");
+        listaPollsCedulas.add("1061437615");
+        listaPollsCedulas.add("1061440188");
+        listaPollsCedulas.add("1061440263");
+        listaPollsCedulas.add("1061440265");
+        listaPollsCedulas.add("1061502799");
+        listaPollsCedulas.add("1061503941");
+        listaPollsCedulas.add("1061534824");
+        listaPollsCedulas.add("1061538420");
+        listaPollsCedulas.add("1061540762");
+        listaPollsCedulas.add("1061541021");
+        listaPollsCedulas.add("1061541108");
+        listaPollsCedulas.add("1061542115");
+        listaPollsCedulas.add("1061543046");
+        listaPollsCedulas.add("1061543631");
+        listaPollsCedulas.add("1061543750");
+        listaPollsCedulas.add("1061543779");
+        listaPollsCedulas.add("1061599464");
+        listaPollsCedulas.add("1061600819");
+        listaPollsCedulas.add("1061687962");
+        listaPollsCedulas.add("1061689653");
+        listaPollsCedulas.add("1061692452");
+        listaPollsCedulas.add("1061696754");
+        listaPollsCedulas.add("1061712555");
+        listaPollsCedulas.add("1061712941");
+        listaPollsCedulas.add("1061717338");
+        listaPollsCedulas.add("1061726472");
+        listaPollsCedulas.add("1061748602");
+        listaPollsCedulas.add("106174939");
+        listaPollsCedulas.add("1061749687");
+        listaPollsCedulas.add("1061750417");
+        listaPollsCedulas.add("1061757008");
+        listaPollsCedulas.add("106176165");
+        listaPollsCedulas.add("1061787029");
+        listaPollsCedulas.add("1061790582");
+        listaPollsCedulas.add("1061794482");
+        listaPollsCedulas.add("10620078727");
+        listaPollsCedulas.add("1062014170");
+        listaPollsCedulas.add("1062074294");
+        listaPollsCedulas.add("1062077228");
+        listaPollsCedulas.add("1062078033");
+        listaPollsCedulas.add("1062078183");
+        listaPollsCedulas.add("1062078625");
+        listaPollsCedulas.add("106207917");
+        listaPollsCedulas.add("1062079304");
+        listaPollsCedulas.add("1062079334");
+        listaPollsCedulas.add("1062079870");
+        listaPollsCedulas.add("1062080432");
+        listaPollsCedulas.add("1062080997");
+        listaPollsCedulas.add("1062081038");
+        listaPollsCedulas.add("1062082537");
+        listaPollsCedulas.add("1062083350");
+        listaPollsCedulas.add("1062083419");
+        listaPollsCedulas.add("1062083758");
+        listaPollsCedulas.add("1062083822");
+        listaPollsCedulas.add("1062084595");
+        listaPollsCedulas.add("1062084686");
+        listaPollsCedulas.add("1062085034");
+        listaPollsCedulas.add("1062085217");
+        listaPollsCedulas.add("1062085775");
+        listaPollsCedulas.add("1062085898");
+        listaPollsCedulas.add("106208849");
+        listaPollsCedulas.add("106213415");
+        listaPollsCedulas.add("1062219520");
+        listaPollsCedulas.add("10622279860");
+        listaPollsCedulas.add("1062278837");
+        listaPollsCedulas.add("1062279398");
+        listaPollsCedulas.add("1062300671");
+        listaPollsCedulas.add("1062307714");
+        listaPollsCedulas.add("1062313123");
+        listaPollsCedulas.add("1062317907");
+        listaPollsCedulas.add("1062318434");
+        listaPollsCedulas.add("1062319589");
+        listaPollsCedulas.add("1062324318");
+        listaPollsCedulas.add("1062334023");
+        listaPollsCedulas.add("1062334178");
+        listaPollsCedulas.add("1062335577");
+        listaPollsCedulas.add("1062335786");
+        listaPollsCedulas.add("1062536387");
+        listaPollsCedulas.add("1062774328");
+        listaPollsCedulas.add("1062775152");
+        listaPollsCedulas.add("1062778257");
+        listaPollsCedulas.add("1062778429");
+        listaPollsCedulas.add("1062780211");
+        listaPollsCedulas.add("10633612");
+        listaPollsCedulas.add("1063434835");
+        listaPollsCedulas.add("1063809267");
+        listaPollsCedulas.add("1063812720");
+        listaPollsCedulas.add("1063814119");
+        listaPollsCedulas.add("1064430880");
+        listaPollsCedulas.add("1066846338");
+        listaPollsCedulas.add("1067462876");
+        listaPollsCedulas.add("1067526995");
+        listaPollsCedulas.add("1068217139");
+        listaPollsCedulas.add("1068218002");
+        listaPollsCedulas.add("10690652");
+        listaPollsCedulas.add("10752288");
+        listaPollsCedulas.add("10752703");
+        listaPollsCedulas.add("1075301335");
+        listaPollsCedulas.add("1081280156");
+        listaPollsCedulas.add("1082776915");
+        listaPollsCedulas.add("1084576099");
+        listaPollsCedulas.add("1084867461");
+        listaPollsCedulas.add("10852755585");
+        listaPollsCedulas.add("1086358249");
+        listaPollsCedulas.add("1087202430");
+        listaPollsCedulas.add("1106363440");
+        listaPollsCedulas.add("110783904");
+        listaPollsCedulas.add("1109119532");
+        listaPollsCedulas.add("110967310");
+        listaPollsCedulas.add("1110060113");
+        listaPollsCedulas.add("1111111");
+        listaPollsCedulas.add("11111111");
+        listaPollsCedulas.add("111154227");
+        listaPollsCedulas.add("1112061053");
+        listaPollsCedulas.add("1112465426");
+        listaPollsCedulas.add("1114061364");
+        listaPollsCedulas.add("1114874162");
+        listaPollsCedulas.add("1114888718");
+        listaPollsCedulas.add("1114894135");
+        listaPollsCedulas.add("1115791763");
+        listaPollsCedulas.add("1116206758");
+        listaPollsCedulas.add("1116232712");
+        listaPollsCedulas.add("1116377621");
+        listaPollsCedulas.add("1117496631");
+        listaPollsCedulas.add("1117501891");
+        listaPollsCedulas.add("1117514603");
+        listaPollsCedulas.add("1118202284");
+        listaPollsCedulas.add("1118473350");
+        listaPollsCedulas.add("1120066482");
+        listaPollsCedulas.add("1127076145");
+        listaPollsCedulas.add("1127360480");
+        listaPollsCedulas.add("1127672382");
+        listaPollsCedulas.add("113102405");
+        listaPollsCedulas.add("113102415");
+        listaPollsCedulas.add("113102422");
+        listaPollsCedulas.add("113102431");
+        listaPollsCedulas.add("113102436");
+        listaPollsCedulas.add("113102439");
+        listaPollsCedulas.add("113102442");
+        listaPollsCedulas.add("113102447");
+        listaPollsCedulas.add("113102448");
+        listaPollsCedulas.add("113983405");
+        listaPollsCedulas.add("1143956289");
+        listaPollsCedulas.add("114452413");
+        listaPollsCedulas.add("114452419");
+        listaPollsCedulas.add("1144524321");
+        listaPollsCedulas.add("1144524412");
+        listaPollsCedulas.add("114452499");
+        listaPollsCedulas.add("114452501");
+        listaPollsCedulas.add("114452529");
+        listaPollsCedulas.add("114452540");
+        listaPollsCedulas.add("1149685378");
+        listaPollsCedulas.add("1149686579");
+        listaPollsCedulas.add("1149686722");
+        listaPollsCedulas.add("1149688407");
+        listaPollsCedulas.add("1193076027");
+        listaPollsCedulas.add("119336502");
+        listaPollsCedulas.add("1194087240");
+        listaPollsCedulas.add("1219996");
+        listaPollsCedulas.add("12283096");
+        listaPollsCedulas.add("14479016");
+        listaPollsCedulas.add("14622481");
+        listaPollsCedulas.add("16786481");
+        listaPollsCedulas.add("16892279");
+        listaPollsCedulas.add("20838274");
+        listaPollsCedulas.add("24622141");
+        listaPollsCedulas.add("25255647");
+        listaPollsCedulas.add("25267406");
+        listaPollsCedulas.add("25281327");
+        listaPollsCedulas.add("25288035");
+        listaPollsCedulas.add("25292284");
+        listaPollsCedulas.add("25296164");
+        listaPollsCedulas.add("25310738");
+        listaPollsCedulas.add("25347890");
+        listaPollsCedulas.add("25354233");
+        listaPollsCedulas.add("25359275");
+        listaPollsCedulas.add("25362826");
+        listaPollsCedulas.add("25363118");
+        listaPollsCedulas.add("25363444");
+        listaPollsCedulas.add("25364069");
+        listaPollsCedulas.add("25364718");
+        listaPollsCedulas.add("253650683");
+        listaPollsCedulas.add("25366344");
+        listaPollsCedulas.add("25371314");
+        listaPollsCedulas.add("25386768");
+        listaPollsCedulas.add("25390086");
+        listaPollsCedulas.add("25394689");
+        listaPollsCedulas.add("25395314");
+        listaPollsCedulas.add("25483067");
+        listaPollsCedulas.add("25517993");
+        listaPollsCedulas.add("25521509");
+        listaPollsCedulas.add("25527607");
+        listaPollsCedulas.add("25543806");
+        listaPollsCedulas.add("25544480");
+        listaPollsCedulas.add("25558746");
+        listaPollsCedulas.add("25559022");
+        listaPollsCedulas.add("25560525");
+        listaPollsCedulas.add("25561333");
+        listaPollsCedulas.add("25561400");
+        listaPollsCedulas.add("25564364");
+        listaPollsCedulas.add("25564703");
+        listaPollsCedulas.add("25576779");
+        listaPollsCedulas.add("25578868");
+        listaPollsCedulas.add("25592676");
+        listaPollsCedulas.add("25602452");
+        listaPollsCedulas.add("25608432");
+        listaPollsCedulas.add("25659323");
+        listaPollsCedulas.add("25669522");
+        listaPollsCedulas.add("25717723");
+        listaPollsCedulas.add("25733161");
+        listaPollsCedulas.add("25734407");
+        listaPollsCedulas.add("25734655");
+        listaPollsCedulas.add("25741780");
+        listaPollsCedulas.add("25741813");
+        listaPollsCedulas.add("25742232");
+        listaPollsCedulas.add("27260453");
+        listaPollsCedulas.add("27371394");
+        listaPollsCedulas.add("2869878");
+        listaPollsCedulas.add("29179472");
+        listaPollsCedulas.add("29360767");
+        listaPollsCedulas.add("29507868");
+        listaPollsCedulas.add("29509548");
+        listaPollsCedulas.add("29510532");
+        listaPollsCedulas.add("29561320");
+        listaPollsCedulas.add("29583629");
+        listaPollsCedulas.add("30520251");
+        listaPollsCedulas.add("31475978");
+        listaPollsCedulas.add("31626901");
+        listaPollsCedulas.add("31847382");
+        listaPollsCedulas.add("31885495");
+        listaPollsCedulas.add("34374991");
+        listaPollsCedulas.add("34380235");
+        listaPollsCedulas.add("34445957");
+        listaPollsCedulas.add("34501610");
+        listaPollsCedulas.add("34509572");
+        listaPollsCedulas.add("34516176");
+        listaPollsCedulas.add("34524132");
+        listaPollsCedulas.add("34525839");
+        listaPollsCedulas.add("34526052");
+        listaPollsCedulas.add("34530196");
+        listaPollsCedulas.add("34544241");
+        listaPollsCedulas.add("34546752");
+        listaPollsCedulas.add("34547235");
+        listaPollsCedulas.add("34557660");
+        listaPollsCedulas.add("34558016");
+        listaPollsCedulas.add("34559811");
+        listaPollsCedulas.add("34560193");
+        listaPollsCedulas.add("34565063");
+        listaPollsCedulas.add("34571163");
+        listaPollsCedulas.add("34599364");
+        listaPollsCedulas.add("34602217");
+        listaPollsCedulas.add("34605571");
+        listaPollsCedulas.add("34610401");
+        listaPollsCedulas.add("34612196");
+        listaPollsCedulas.add("34615003");
+        listaPollsCedulas.add("34638761");
+        listaPollsCedulas.add("34674537");
+        listaPollsCedulas.add("34678677");
+        listaPollsCedulas.add("34680075");
+        listaPollsCedulas.add("34700187");
+        listaPollsCedulas.add("38561289");
+        listaPollsCedulas.add("40081034");
+        listaPollsCedulas.add("403055563");
+        listaPollsCedulas.add("40621552");
+        listaPollsCedulas.add("40740367");
+        listaPollsCedulas.add("4609760");
+        listaPollsCedulas.add("4609919");
+        listaPollsCedulas.add("4619811");
+        listaPollsCedulas.add("4620358");
+        listaPollsCedulas.add("4681151");
+        listaPollsCedulas.add("4686163");
+        listaPollsCedulas.add("4692025");
+        listaPollsCedulas.add("4722486");
+        listaPollsCedulas.add("47296966");
+        listaPollsCedulas.add("4742210");
+        listaPollsCedulas.add("4742842");
+        listaPollsCedulas.add("4745576");
+        listaPollsCedulas.add("4751052");
+        listaPollsCedulas.add("4784077");
+        listaPollsCedulas.add("4787459");
+        listaPollsCedulas.add("4788137");
+        listaPollsCedulas.add("48576199");
+        listaPollsCedulas.add("48608803");
+        listaPollsCedulas.add("48615063");
+        listaPollsCedulas.add("48629564");
+        listaPollsCedulas.add("48648961");
+        listaPollsCedulas.add("48658046");
+        listaPollsCedulas.add("48660128");
+        listaPollsCedulas.add("48668115");
+        listaPollsCedulas.add("48680176");
+        listaPollsCedulas.add("48680321");
+        listaPollsCedulas.add("5273935");
+        listaPollsCedulas.add("59793457");
+        listaPollsCedulas.add("6085249");
+        listaPollsCedulas.add("6393656");
+        listaPollsCedulas.add("6431480");
+        listaPollsCedulas.add("66705111");
+        listaPollsCedulas.add("67021841");
+        listaPollsCedulas.add("69055277");
+        listaPollsCedulas.add("76003110");
+        listaPollsCedulas.add("760044070");
+        listaPollsCedulas.add("76006086");
+        listaPollsCedulas.add("76006667");
+        listaPollsCedulas.add("76009684");
+        listaPollsCedulas.add("76141667");
+        listaPollsCedulas.add("76143074");
+        listaPollsCedulas.add("76143138");
+        listaPollsCedulas.add("76215383");
+        listaPollsCedulas.add("76259224");
+        listaPollsCedulas.add("76268520");
+        listaPollsCedulas.add("76279880");
+        listaPollsCedulas.add("76285444");
+        listaPollsCedulas.add("76305604");
+        listaPollsCedulas.add("76308235");
+        listaPollsCedulas.add("76319421");
+        listaPollsCedulas.add("76335763");
+        listaPollsCedulas.add("76350920");
+        listaPollsCedulas.add("8402200808");
+        listaPollsCedulas.add("87712347");
+        listaPollsCedulas.add("96355120");
+
+        return listaPollsCedulas;
+
+    }
+}
+
 /** Para evaluar las otras tablas */
 class procesaridPollAndFechas{
-//    procesaridPollAndFechas.add(new procesaridPollAndFechas("hola1","idiii1"));
+    //    procesaridPollAndFechas.add(new procesaridPollAndFechas("hola1","idiii1"));
     public String createdAt;
     public String idPoll;
 
@@ -1444,8 +2621,4 @@ class procesaridPollAndFechas{
     public procesaridPollAndFechas() {
     }
 
-
-
 }
-
-

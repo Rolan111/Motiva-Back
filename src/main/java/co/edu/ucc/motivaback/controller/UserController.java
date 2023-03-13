@@ -2,6 +2,7 @@ package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.UserDto;
+import co.edu.ucc.motivaback.entity.PollEntity;
 import co.edu.ucc.motivaback.entity.UserEntity;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.UserService;
@@ -37,6 +38,24 @@ public class UserController {
 //    prueba (0,"La sesión aún está activa");
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping(value = "/users")
+    public List<UserEntity> allUsers() throws ExecutionException, InterruptedException {
+        List<UserEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("user");
+        ApiFuture<QuerySnapshot> future = documentReference.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        System.out.println("La cantidad de documentos es: "+documents.size());
+
+        for (QueryDocumentSnapshot doc : documents){
+            UserEntity commentsDto = doc.toObject(UserEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
     }
 
     @GetMapping(value = "/users-by-supervisor")

@@ -1,5 +1,7 @@
 package co.edu.ucc.motivaback.entity;
 
+import com.google.cloud.firestore.annotation.PropertyName;
+
 public class PruebasEntityAnswerPsychosocial {
 
     private String id_poll;
@@ -8,10 +10,11 @@ public class PruebasEntityAnswerPsychosocial {
     private String open_answer;
     private String createdAt2;
 
+    @PropertyName("created_at")
     public String getCreatedAt2() {
         return createdAt2;
     }
-
+    @PropertyName("created_at")
     public void setCreatedAt2(String createdAt2) {
         this.createdAt2 = createdAt2;
     }

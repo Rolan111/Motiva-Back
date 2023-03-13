@@ -194,6 +194,21 @@ public class CareSheetController {
 
     }
 
+    @DeleteMapping(value = "/deleteAnswerPsychosocialByIdPoll/{idPoll}")
+    public void eliminarAnswerPsychosocialByIdPoll(String idPoll) throws ExecutionException, InterruptedException {
+        System.out.println("Hemos entrado al proceso de ELIMINADO ANSWER PSY para: "+idPoll);
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("answer_psychosocial");
+        Query query = documentReference.whereEqualTo("id_poll", idPoll);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            System.out.println("Se va a eliminar el documento: "+doc.getId());
+            db.collection("answer_psychosocial").document(doc.getId()).delete();
+        }
+    }
+
     private ResponseEntity<?> hasAccess(AuthenticatedUser authenticatedUser) {
         if (!authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()) && !authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name())) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, CommonsService.NOT_ACCESS, null), HttpStatus.UNAUTHORIZED);

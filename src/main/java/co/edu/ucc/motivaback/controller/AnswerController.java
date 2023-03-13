@@ -60,6 +60,43 @@ public class AnswerController {
     }
 
 
+    @GetMapping(value = "/answerByIdPollAndIdQuestion/{idPoll}/{idQuestion}")
+    public List<AnswerEntity> answerByIdAndIdQuestion(@PathVariable String idPoll, @PathVariable Integer idQuestion) throws ExecutionException, InterruptedException {
+        List<AnswerEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("answer");
+        Query query = documentReference.whereEqualTo("id_poll", idPoll).whereEqualTo("id_question", idQuestion);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            AnswerEntity commentsDto = doc.toObject(AnswerEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+    }
+
+
+
+    @GetMapping(value = "/answerByIdQuestionAndOpenAnswer/{idQuestion}/{openAnswer}")
+    public List<AnswerEntity> answerByIdQuestionAndOpenAnswer(@PathVariable Integer idQuestion, @PathVariable String openAnswer) throws ExecutionException, InterruptedException {
+        List<AnswerEntity> commentsEntities = new ArrayList<>();
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("answer");
+        Query query = documentReference.whereEqualTo("id_question", idQuestion).whereEqualTo("open_answer", openAnswer);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            AnswerEntity commentsDto = doc.toObject(AnswerEntity.class);
+            commentsEntities.add(commentsDto);
+        }
+        return commentsEntities;
+    }
+
+
 
     @PostMapping(value = "/answer")
     public ResponseEntity<GeneralBodyResponse<List<AnswerDto>>> create(
@@ -79,47 +116,7 @@ public class AnswerController {
         }
     }
 
-    @GetMapping(value = "/answerByIdPollAndIdQuestion/{idPoll}/{idQuestion}")
-    public List<AnswerEntity> answerByIdAndIdQuestion(@PathVariable String idPoll, @PathVariable Integer idQuestion) throws ExecutionException, InterruptedException {
-        List<AnswerEntity> commentsEntities = new ArrayList<>();
 
-        Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("answer");
-        Query query = documentReference.whereEqualTo("id_poll", idPoll).whereEqualTo("id_question", idQuestion);
-        ApiFuture<QuerySnapshot> future = query.get();
-        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-
-        for (QueryDocumentSnapshot doc : documents){
-            AnswerEntity commentsDto = doc.toObject(AnswerEntity.class);
-            commentsEntities.add(commentsDto);
-        }
-        return commentsEntities;
-    }
-
-    @GetMapping(value = "/answerByIdQuestionAndOpenAnswer/{idQuestion}/{openAnswer}")
-    public List<AnswerEntity> answerByIdQuestionAndOpenAnswer(@PathVariable Integer idQuestion, @PathVariable String openAnswer) throws ExecutionException, InterruptedException {
-        List<AnswerEntity> commentsEntities = new ArrayList<>();
-
-        Firestore db = FirestoreClient.getFirestore();
-        CollectionReference documentReference = db.collection("answer");
-        Query query = documentReference.whereEqualTo("id_question", idQuestion).whereEqualTo("open_answer", openAnswer);
-        ApiFuture<QuerySnapshot> future = query.get();
-        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-
-        for (QueryDocumentSnapshot doc : documents){
-            AnswerEntity commentsDto = doc.toObject(AnswerEntity.class);
-            commentsEntities.add(commentsDto);
-        }
-        return commentsEntities;
-    }
-
-    //COLECCIÓN DE PRUEBA
-    @PostMapping(value = "/answers-pruebas")
-    public String saveComment(@RequestBody CareSheetAnswerEntity commentsEntity) {
-        Firestore db = FirestoreClient.getFirestore();
-        db.collection("answer_pruebas").document().set(commentsEntity);
-        return "Hola mundo";
-    }
 
     @GetMapping(value = "/last-sequences")
     public ResponseEntity<GeneralBodyResponse<SequenceDto>> getLastSequence(
@@ -139,6 +136,7 @@ public class AnswerController {
         }
     }
 
+
     @GetMapping(value = "/answers-by-poll/{idPoll}")
     public ResponseEntity<GeneralBodyResponse<List<AnswerDto>>> getAnswersByIdPoll(
             @PathVariable Integer idPoll,
@@ -156,6 +154,14 @@ public class AnswerController {
         } catch (Exception ex) {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    //COLECCIÓN DE PRUEBA
+    @PostMapping(value = "/answers-pruebas")
+    public String saveComment(@RequestBody CareSheetAnswerEntity commentsEntity) {
+        Firestore db = FirestoreClient.getFirestore();
+        db.collection("answer_pruebas").document().set(commentsEntity);
+        return "Hola mundo";
     }
 
     @GetMapping(value = "/answerByIdPoll/{idPoll}")
@@ -227,6 +233,20 @@ public class AnswerController {
         return commentsEntities;
     }
 
+    @DeleteMapping(value = "/deleteAnswerByIdPoll/{idPoll}")
+    public void eliminarAnswerByIdPoll(String idPoll) throws ExecutionException, InterruptedException {
+        System.out.println("Hemos entrado al proceso de ELIMINADO ANSWER para: "+idPoll);
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("answer");
+        Query query = documentReference.whereEqualTo("id_poll", null);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            System.out.println("Se va a eliminar el documento: "+doc.getId());
+            db.collection("answer").document(doc.getId()).delete();
+        }
+    }
 
     private ResponseEntity<?> hasAccess(AuthenticatedUser authenticatedUser) {
         if (!authenticatedUser.getRol().equals(UserRolEnum.P_CAMPO.name()) && !authenticatedUser.getRol().equals(UserRolEnum.SUPERVISOR.name())) {

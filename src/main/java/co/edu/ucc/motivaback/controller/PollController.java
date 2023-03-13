@@ -4,6 +4,7 @@ import co.edu.ucc.motivaback.config.security.AuthenticatedUser;
 import co.edu.ucc.motivaback.dto.PollDto;
 import co.edu.ucc.motivaback.dto.UserDto;
 import co.edu.ucc.motivaback.entity.PollEntity;
+import co.edu.ucc.motivaback.entity.PruebasEntityAnswerPsychosocial;
 import co.edu.ucc.motivaback.enums.UserRolEnum;
 import co.edu.ucc.motivaback.service.PollService;
 import co.edu.ucc.motivaback.service.UserService;
@@ -170,4 +171,30 @@ public class PollController {
             return new ResponseEntity<>(new GeneralBodyResponse<>(null, ex.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
     }
+
+    //Listas de datos POLLs
+    @PostMapping(value = "/polls-create")
+    public void saveComment(@RequestBody List<PollEntity> pollEntity) {
+        Firestore db = FirestoreClient.getFirestore();
+
+        for (PollEntity doc: pollEntity){
+            db.collection("poll").document().set(doc);
+        }
+    }
+
+    @DeleteMapping(value = "/deletePollByIdPoll/{idPoll}")
+    public void eliminarPollByIdPoll(String idPoll) throws ExecutionException, InterruptedException {
+        System.out.println("Hemos entrado al proceso de ELIMINADO POLL para: "+idPoll);
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("poll");
+        Query query = documentReference.whereEqualTo("id_poll", null);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc : documents){
+            System.out.println("Se va a eliminar el documento: "+doc.getId());
+            db.collection("poll").document(doc.getId()).delete();
+        }
+    }
+
 }
