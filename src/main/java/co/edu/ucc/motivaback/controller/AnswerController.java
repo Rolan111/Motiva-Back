@@ -238,7 +238,7 @@ public class AnswerController {
         System.out.println("Hemos entrado al proceso de ELIMINADO ANSWER para: "+idPoll);
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("answer");
-        Query query = documentReference.whereEqualTo("id_poll", null);
+        Query query = documentReference.whereEqualTo("id_poll", idPoll);
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 

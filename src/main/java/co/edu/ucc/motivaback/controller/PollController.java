@@ -187,7 +187,7 @@ public class PollController {
         System.out.println("Hemos entrado al proceso de ELIMINADO POLL para: "+idPoll);
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("poll");
-        Query query = documentReference.whereEqualTo("id_poll", null);
+        Query query = documentReference.whereEqualTo("id_poll", idPoll);
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
