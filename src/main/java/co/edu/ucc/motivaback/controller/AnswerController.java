@@ -234,8 +234,8 @@ public class AnswerController {
     }
 
     @DeleteMapping(value = "/deleteAnswerByIdPoll/{idPoll}")
-    public void eliminarAnswerByIdPoll(String idPoll) throws ExecutionException, InterruptedException {
-        System.out.println("Hemos entrado al proceso de ELIMINADO ANSWER para: "+idPoll);
+    public void eliminarAnswerByIdPoll(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
+        System.out.println("Hemos entrado al proceso de ELIMINADO ANSWER para: " + idPoll);
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("answer");
         Query query = documentReference.whereEqualTo("id_poll", idPoll);
@@ -244,7 +244,7 @@ public class AnswerController {
 
         for (QueryDocumentSnapshot doc : documents){
             System.out.println("Se va a eliminar el documento: "+doc.getId());
-            db.collection("answer").document(doc.getId()).delete();
+//            db.collection("answer").document(doc.getId()).delete();
         }
     }
 

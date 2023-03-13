@@ -183,7 +183,7 @@ public class PollController {
     }
 
     @DeleteMapping(value = "/deletePollByIdPoll/{idPoll}")
-    public void eliminarPollByIdPoll(String idPoll) throws ExecutionException, InterruptedException {
+    public void eliminarPollByIdPoll(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
         System.out.println("Hemos entrado al proceso de ELIMINADO POLL para: "+idPoll);
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("poll");
