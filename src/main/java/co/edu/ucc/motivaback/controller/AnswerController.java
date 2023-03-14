@@ -244,7 +244,7 @@ public class AnswerController {
 
         for (QueryDocumentSnapshot doc : documents){
             System.out.println("Se va a eliminar el documento: "+doc.getId());
-//            db.collection("answer").document(doc.getId()).delete();
+            db.collection("answer").document(doc.getId()).delete();
         }
     }
 

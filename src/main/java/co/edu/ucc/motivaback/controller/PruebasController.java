@@ -162,13 +162,34 @@ public class PruebasController {
 
 
 
+    // ******** obtner cédulas a partir de una lista de idPolls *********
+    @GetMapping(value = "/obtenerCedulas")
+    public void obtenercedulas() throws ExecutionException, InterruptedException {
+        ListaIdPollPruebasGenericas listaIdPollPruebasGenericas = new ListaIdPollPruebasGenericas();
+
+        for (int i = 1; i <= listaIdPollPruebasGenericas.listaConsultarIdPollParaIdentficacion().size(); i++) {
+            Firestore db = FirestoreClient.getFirestore();
+            CollectionReference documentReference = db.collection("answer");
+            Query query = documentReference.whereEqualTo("id_poll",listaIdPollPruebasGenericas.listaConsultarIdPollParaIdentficacion().get(i-1)).whereEqualTo("id_question", 205);
+            ApiFuture<QuerySnapshot> future = query.get();
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            System.out.println("Para el id en la poscion: "+i+": la coincidencias son: "+documents.size());
+            for (QueryDocumentSnapshot doc : documents){
+                System.out.println("Las cedulas son: "+doc.getData().get("open_answer"));
+            }
+        }
+
+//        System.out.println("La cantidad de documentos es: "+documents.size());
+//        for (QueryDocumentSnapshot doc : documents){
+//            System.out.println("Las cedulas son: "+doc.getData().get("open_answer"));
+//        }
+    }
 
 
 
-
-    //###################   Gestión de DUPLICADOS idPoll -- Obtención Info -- ANSWER --- también para Cedulas #################
+        //###################   Gestión de DUPLICADOS idPoll -- Obtención Info -- ANSWER --- también para Cedulas #################
     /** Conslta todos los cuestionarios y los ordena por fecha de identificación,
-     * ara luego obtener una lista de polls y revisar en excel cuales estan repetidos */
+     * para luego obtener una lista de polls y revisar en excel cuales estan repetidos */
     @GetMapping(value = "/duplicadosIdPolls/{idPoll}")
     public List<PruebasEntity2> duplicados(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
         //Se utiliza UNO de los dos depende de la necesidad
@@ -2621,4 +2642,20 @@ class procesaridPollAndFechas{
     public procesaridPollAndFechas() {
     }
 
+}
+
+class ListaIdPollPruebasGenericas{
+    public List<String> listaConsultarIdPollParaIdentficacion() {
+        List<String> listaSoloIdPoll = new ArrayList<>();
+        // ** Copia el código aquí
+        listaSoloIdPoll.add(")L7=D%#I3T");
+        listaSoloIdPoll.add("%73(F9GS4T");
+        listaSoloIdPoll.add(".N5EF17Y#9");
+        listaSoloIdPoll.add("L:JLE-;&@J");
+        listaSoloIdPoll.add("W?'WW+9OD.");
+        listaSoloIdPoll.add("MYTZI&ZT<W");
+        // ** Finaliza copiado de código
+
+        return listaSoloIdPoll;
+    }
 }
