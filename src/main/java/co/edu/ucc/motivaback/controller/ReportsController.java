@@ -2,15 +2,18 @@ package co.edu.ucc.motivaback.controller;
 
 import co.edu.ucc.motivaback.entity.AlertEntity;
 import co.edu.ucc.motivaback.entity.AnswerEntity;
+import com.google.api.client.util.DateTime;
 import com.google.api.core.ApiFuture;
+import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletOutputStream;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -58,5 +61,23 @@ public class ReportsController {
         System.out.println("La cantidad de encuestas de este PROFESIONAL es: "+documents.size());
 
         return documents.size();
+    }
+
+    @GetMapping(value = "/idPollsBasedData/{fechaInicio}/{fechaFin}")
+    public void IdPollsEnbaseUnaFecha(@PathVariable String fechaInicio, @PathVariable String fechaFin) throws ExecutionException, InterruptedException {
+        /** Este servicio espera el formato en string: 2022-12-01T00:00:00   ---  Luego se transforma en Timestamp **/
+        //Instant maneja el formato en que se guarda en Firebase, pero para CONSULTAS funciona mejor "Timestamp"
+        Timestamp fechafireInicio = Timestamp.parseTimestamp(fechaInicio);
+        Timestamp fechafireFin = Timestamp.parseTimestamp(fechaFin);
+
+        Firestore db = FirestoreClient.getFirestore();
+        CollectionReference documentReference = db.collection("poll");
+        Query query = documentReference.whereGreaterThanOrEqualTo("created_at", fechafireInicio).whereLessThanOrEqualTo("created_at", fechafireFin);
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        System.out.println("La cantidad de datos es: "+documents.size());
+        for (QueryDocumentSnapshot doc : documents){
+            System.out.println("Los datos son: "+doc.getData().get("created_at"));
+        }
     }
 }

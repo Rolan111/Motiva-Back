@@ -198,13 +198,18 @@ public class AnswerController {
         return commentsEntities;
     }
 
+    //Consulta Cuatro "condiciones" o cuatro opcines de respuesta A LA VEZ
     @GetMapping(value = "/answerMultipleByIdPoll/{idPoll}")
     public List<AnswerEntity> answerMultipleConsultas(@PathVariable String idPoll) throws ExecutionException, InterruptedException {
         List<AnswerEntity> commentsEntities = new ArrayList<>();
 
         Firestore db = FirestoreClient.getFirestore();
         CollectionReference documentReference = db.collection("answer");
-        Query query = documentReference.whereEqualTo("id_poll", idPoll).whereIn("id_question", Arrays.asList(2,6,1,5));
+        //Cuatro "condiciones" -- 1 edad, 2 sexo, 5 zona, 6 Municipio,
+//        Query query = documentReference.whereEqualTo("id_poll", idPoll).whereIn("id_question", Arrays.asList(2,6,1,5));
+        Query query = documentReference.whereEqualTo("id_poll", idPoll).whereIn("id_question", Arrays.asList(2,6,1,5)).whereIn("open_answer", Arrays.asList("")).whereIn("id_option_answers", Arrays.asList(15));
+        //1 open_answer, 2 id_option_answer, 5 id_option_answer , 6 open_answer
+
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
 
